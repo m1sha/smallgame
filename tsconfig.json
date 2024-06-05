@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "declaration": false,
+    "stripInternal": true,
+    "sourceMap": true,
+    "importHelpers": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "src",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "@": [
+        "src/*"
+      ]
+    },
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "index.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "img",
+    "docs"
+  ]
+}
