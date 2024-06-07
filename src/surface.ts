@@ -30,7 +30,11 @@ export class Surface {
     this.#ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit(surface: Surface, rect: Rect) {
+  blit(surface: Surface, rect: Rect, distRect: Rect | null = null) {
+    if (distRect) {
+      this.#ctx.drawImage(surface.#canvas, rect.x, rect.y, surface.width, surface.height, distRect.x, distRect.y, distRect.width, distRect.height)
+      return  
+    }
     this.#ctx.drawImage(surface.#canvas, rect.x, rect.y, surface.width, surface.height)
   }
 
@@ -46,6 +50,14 @@ export class Surface {
     
     this.#ctx.translate(w, h)
     this.#ctx.scale(x, y)
+    this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height)
+  }
+
+  rotate (a: number) {
+    this.#ctx.clearRect(0, 0, this.width, this.height)
+    this.#ctx.translate(this.width / 2, this.height /2)
+    this.#ctx.rotate(a * Math.PI / 180)
+    this.#ctx.translate(-this.width /2, -this.height /2)
     this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height)
   }
 

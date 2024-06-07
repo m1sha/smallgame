@@ -7,9 +7,9 @@ export async function loadImage (url: string): Promise<Surface> {
   return Surface.fromImage(img, rect)
 }
 
-export async function loadTileMap(tileWidth: number, titleHight: number, url: string): Promise<TileMap> {
+export async function loadTileMap(tileWidth: number, titleHight: number, url: string, surfaceWidth: number | undefined = undefined, surfaceHeight: number | undefined = undefined ): Promise<TileMap> {
   const [img, rect] = await __loadImage(url)
-  return TileMap.fromImage(tileWidth, titleHight, img, rect)
+  return TileMap.fromImage(tileWidth, titleHight, img, rect, surfaceWidth, surfaceHeight)
 }
 
 function __loadImage (url: string): Promise<[HTMLImageElement, Rect]> {

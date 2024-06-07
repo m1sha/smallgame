@@ -9,8 +9,8 @@ export abstract class Sprite extends Drawable {
   abstract update (): void
 
   draw (suface: Surface): void {
-    if (!this.image || !this.rect) return
     this.update()
+    if (!this.image || !this.rect) return
     suface.blit(this.image, this.rect)
   }
 }

@@ -12,13 +12,13 @@ export class TileMap {
   x: number = 0
   y: number = 0
 
-  constructor (tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect) {
+  constructor (tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, surfaceWidth: number | undefined = undefined, surfaceHeight: number | undefined = undefined) {
     this.tileWidth = tileWidth
     this.titleHight = titleHight
     this.image = image
     this.rect = rect
     this.framePosition = Point.zero
-    this.surface = new Surface(tileWidth, titleHight, true)
+    this.surface = new Surface(surfaceWidth ? surfaceWidth : tileWidth, surfaceHeight ? surfaceHeight: titleHight, true)
   }
 
   get cols () {
@@ -74,7 +74,7 @@ export class TileMap {
     return this.surface
   }
 
-  static fromImage(tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect) {
-    return new TileMap(tileWidth, titleHight, image, rect)
+  static fromImage(tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, surfaceWidth: number | undefined = undefined, surfaceHeight: number | undefined = undefined) {
+    return new TileMap(tileWidth, titleHight, image, rect, surfaceWidth, surfaceHeight)
   }
 }
