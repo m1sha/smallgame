@@ -17,7 +17,7 @@ function __loadImage (url: string): Promise<[HTMLImageElement, Rect]> {
     const img = new Image()
     img.src = url
     const rect = new Rect(0,0,0,0)
-    img.onload = ev => {
+    img.onload = () => {
       rect.width = img.naturalWidth
       rect.height = img.naturalHeight
       resolve([img, rect])

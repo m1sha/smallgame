@@ -9,7 +9,7 @@ export class EventController {
     const queue = unsafecast<EventQueue>(keys)
 
     document.addEventListener('keydown', e => {
-      e.preventDefault()
+      //e.preventDefault()
       
       queue.push(e)
       if (keypressed) return
@@ -20,7 +20,7 @@ export class EventController {
     })
 
     document.addEventListener('keyup', e => {
-      e.preventDefault()
+      //e.preventDefault()
       queue.pop(e)
       if (!keypressed) return
       keypressed = false

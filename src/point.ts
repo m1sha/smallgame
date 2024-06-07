@@ -7,4 +7,6 @@ export class Point {
     this.x = x
     this.y = y
   }
+
+  static get zero () { return new Point(0, 0) }
 }

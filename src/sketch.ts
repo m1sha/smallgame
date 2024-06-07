@@ -1,9 +1,9 @@
-import { ShapeStyle } from './shape-style'
+import { ShapeStyle, TShapeStyle, applyStroke } from './styles/shape-style'
 import { Drawable } from './drawable'
 import { Surface } from './surface'
 import { Rect, TRect } from './rect'
 import { Point, TPoint } from './point'
-import { Shape, Rectangle, Circle } from './shapes'
+import { Shape, Rectangle, Circle, Line } from './shapes'
 
 
 export class Sketch extends Drawable {
@@ -13,23 +13,28 @@ export class Sketch extends Drawable {
   sx: number = 1
   sy: number = 1
 
-  rect(style: ShapeStyle, rect: Rect | TRect): Rectangle {
-    const shape: Shape = { type: 'rectangle', ...rect, style }
+  rect (style: ShapeStyle | TShapeStyle, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
+    const shape: Shape = { type: 'rectangle', ...rect, style: ShapeStyle.from(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  circle(style: ShapeStyle, center: Point | TPoint, radius: number): Circle {
-    const shape: Shape = {  type: 'circle', ...center, radius,  style }
+  circle (style: ShapeStyle | TShapeStyle, center: Point | TPoint, radius: number): Circle & { style: ShapeStyle }  {
+    const shape: Shape = {  type: 'circle', ...center, radius, style: ShapeStyle.from(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  update(suface: Surface): void {
-    
+  line (style: ShapeStyle | TShapeStyle, p0: Point | TPoint, p1: Point | TPoint): Line & { style: ShapeStyle }  {
+    const shape: Shape = {  type: 'line', p0, p1, style: ShapeStyle.from(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  draw (suface: Surface): void {
     for (const shape of this._shapes) {
       suface.draw.beginPath()
-      if (shape.style.stroke) suface.draw.strokeStyle = shape.style.stroke
+      if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
       if (shape.style.fill) suface.draw.fillStyle = shape.style.fill
       switch (shape.type) {
         case 'rectangle': {
@@ -40,14 +45,22 @@ export class Sketch extends Drawable {
           suface.draw.ellipse(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.radius * this.sx, shape.radius * this.sy, 0, 0, 2*Math.PI)
           break
         }
-          
+        case 'line': {
+          suface.draw.moveTo(this.x + shape.p0.x * this.sx, this.y + shape.p0.y * this.sy)
+          suface.draw.lineTo(this.x + shape.p1.x * this.sx, this.y + shape.p1.y * this.sy)
+          break
+        }
       }
 
-      if (shape.style.stroke)
-        suface.draw.stroke()
-      if (shape.style.fill)
-        suface.draw.fill()
+      if (shape.style.fillStrokeOrder === 'stroke-first') {
+        if (shape.style.stroke) suface.draw.stroke()
+        if (shape.style.fill) suface.draw.fill()
+        
+        return
+      }
       
+      if (shape.style.fill) suface.draw.fill()
+      if (shape.style.stroke) suface.draw.stroke()
     }
   }
 }

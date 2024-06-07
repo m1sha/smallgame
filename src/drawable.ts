@@ -1,5 +1,5 @@
-import { Surface } from 'surface'
+import { Surface } from './surface'
 
 export abstract class Drawable {
-  abstract update(suface: Surface): void
+  abstract draw(suface: Surface): void
 }

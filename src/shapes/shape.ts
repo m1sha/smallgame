@@ -1,8 +1,10 @@
-import { ShapeStyle } from 'shape-style'
+import { ShapeStyle } from '../styles/shape-style'
 import { Circle } from './circle'
+import { Line } from './line'
 import { Rectangle } from './rectangle'
   
 export type Shape = (
   | Rectangle 
   | Circle
-) & {  style: ShapeStyle } 
+  | Line
+) & { style: ShapeStyle } 
