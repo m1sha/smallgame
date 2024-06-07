@@ -1,3 +1,4 @@
+//import { EventQueue } from "../events/event-queue"
 import { Key } from "./key"
 
 const keymap: Record<string, number> = {
@@ -91,7 +92,7 @@ const keymap: Record<string, number> = {
   'f12': Key.F12
 }
 
-export class Keys {
+export class Keys /* implicitly implements EventQueue */ {
   private keys: number[] = []
 
   constructor () {
@@ -102,7 +103,7 @@ export class Keys {
     return this.keys
   }
   
-  /** @internal */ protected push (e: KeyboardEvent) {
+  /** @internal */ protected /*EventQueue.*/push (e: KeyboardEvent) {
     const code = Keys.getKeyCode(e.code)
     this.keys[code] = 1
     this.keys[Key.ALT] = e.altKey || code === Key.LALT || code === Key.RALT ? 1: 0
@@ -111,9 +112,13 @@ export class Keys {
     this.keys[Key.META] =  e.metaKey ? 1: 0
   }
   
-  /** @internal */ protected clear () {
-    for (let i = 0; i < this.keys.length; i++)
-      this.keys[i] = 0
+  /** @internal */ protected /*EventQueue.*/pop (e: KeyboardEvent) {
+    const code = Keys.getKeyCode(e.code)
+    this.keys[code] = 0
+    this.keys[Key.ALT] = 0
+    this.keys[Key.CTRL] = 0
+    this.keys[Key.SHIFT] = 0
+    this.keys[Key.META] =  0
   }
 
   static getKeyCode (key: string) {

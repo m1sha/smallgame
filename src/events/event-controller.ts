@@ -1,21 +1,17 @@
 import { Keys } from "../keys/keys"
 import { GameEvents } from "./game-event"
 import { unsafecast } from "../utils"
+import { EventQueue } from "./event-queue"
 
 export class EventController {
   init (events: GameEvents, keys: Keys) {
-    
     let keypressed = false
-
-    const k = unsafecast<{
-      push: (e: KeyboardEvent) => void,
-      clear: () => void
-    }>(keys)
+    const queue = unsafecast<EventQueue>(keys)
 
     document.addEventListener('keydown', e => {
       e.preventDefault()
       
-      k.push(e)
+      queue.push(e)
       if (keypressed) return
       keypressed = true
       events.push('KEYDOWN', e)
@@ -25,8 +21,7 @@ export class EventController {
 
     document.addEventListener('keyup', e => {
       e.preventDefault()
-      
-      k.clear()
+      queue.pop(e)
       if (!keypressed) return
       keypressed = false
       events.push('KEYUP', e)
