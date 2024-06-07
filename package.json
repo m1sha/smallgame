@@ -1,15 +1,15 @@
 {
   "name": "smallgame",
   "version": "0.0.1",
-  "description": "",
+  "description": "A simple graphics library for developing 2D games and interactive applications",
   "main": "src/index.ts",
   "scripts": {
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "m1hailostertag@gmail.com",
+  "license": "MIT",
   "devDependencies": {
     "ts-loader": "^9.5.1",
     "tslib": "^2.6.3",
