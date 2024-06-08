@@ -1,5 +1,6 @@
 export * from './drawable'
 export * from './game'
+export * from './group'
 export * from './point'
 export * from './rect'
 export * from './styles/shape-style'
