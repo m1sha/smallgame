@@ -7,6 +7,9 @@
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "url": "https://github.com/m1sha/smallgame"
+  },
   "keywords": [],
   "author": "m1hailostertag@gmail.com",
   "license": "MIT",
