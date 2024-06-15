@@ -32,7 +32,7 @@ export class ShapeStyle {
     this.lineDashOffset = 0
     this.lineDash = []
     this.lineJoin = 'bevel'
-    this.lineWidth = 1
+    this.lineWidth = style.lineWidth ?? 1
     this.miterLimit = 0
   }
 

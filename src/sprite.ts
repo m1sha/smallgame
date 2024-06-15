@@ -1,12 +1,12 @@
 import { Surface } from "./surface"
 import { Drawable } from "./drawable"
-import { Rect } from "./rect"
+import { ObservableRect, Rect } from "./rect"
 
 export abstract class Sprite extends Drawable {
   image: Surface | null = null
-  rect: Rect | null = null
+  rect: Rect | ObservableRect | null = null
 
-  abstract update (): void
+  protected update (): void {}
 
   draw (suface: Surface): void {
     this.update()
