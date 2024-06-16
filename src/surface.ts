@@ -1,3 +1,4 @@
+import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 
 export class Surface {
@@ -39,7 +40,9 @@ export class Surface {
   }
 
   zoom (index: number) {
-    this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
+    const image = this.toImage()
+    this.#ctx.clearRect(0, 0, this.width, this.height)
+    this.#ctx.drawImage(image, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
   }
 
   flip (position: 'x' | 'y' | 'xy') {
@@ -61,24 +64,32 @@ export class Surface {
     this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height)
   }
 
-  /*
-
-  blit_i(surface: Surface, rect: Rect) {
-    this.ctx.drawImage(surface.rasterizate()!, rect.x, rect.y, surface.width, surface.height)
-  }
-
-  rasterizate () {
-    if (this._canvas instanceof OffscreenCanvas) return null
+  toImage () {
+    if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
     const img = document.createElement("img")
-    img.src = this._canvas.toDataURL('image/webp', 1)
+    img.src = this.#canvas.toDataURL('image/webp', 1)
     return img
   }
 
-  */
+  createMask () {
+    const imageDate = this.#ctx.getImageData(0, 0, this.width, this.height)
+    return PixelMask.fromImageData(imageDate)
+  }
 
   static fromImage(image: HTMLImageElement, rect: Rect, useAlpha: boolean = true) {
     const surface = new Surface(rect.width, rect.height, useAlpha)
     surface.#ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
+    return surface
+  }
+
+  static fromImages(images: HTMLImageElement[], rect: Rect, rows: number = 1, cols: number = -1, useAlpha: boolean = true,) {
+    const surface = new Surface(rect.width * images.length, rect.height, useAlpha)
+
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i]
+      surface.#ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height, rect.x + rect.width * i, rect.y, rect.width, rect.height)
+    }
+    
     return surface
   }
 }
