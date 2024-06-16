@@ -105,6 +105,14 @@ export class Rect {
   clone () {
     return new Rect(this.x, this.y, this.width, this.height)
   }
+
+  static get zero () {
+    return new Rect(0, 0, 0, 0)
+  }
+
+  static size (width: number, height: number) {
+    return new Rect(0, 0, width, height)
+  }
 }
 
 export class ObservableRect /* implicitly implements Observable */ {

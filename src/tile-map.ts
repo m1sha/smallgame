@@ -2,6 +2,13 @@ import { Point } from "./point"
 import { Rect } from "./rect";
 import { Surface } from "./surface"
 
+export type TileMapInitOptions = {
+  surfaceWidth?: number
+  surfaceHeight?: number
+  alpha?: boolean
+  offscreen?: boolean
+}
+
 export class TileMap {
   private image: HTMLImageElement
   private surface: Surface
@@ -12,13 +19,18 @@ export class TileMap {
   x: number = 0
   y: number = 0
 
-  constructor (tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, surfaceWidth: number | undefined = undefined, surfaceHeight: number | undefined = undefined) {
+  constructor (tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, options?: TileMapInitOptions) {
     this.tileWidth = tileWidth
     this.titleHight = titleHight
     this.image = image
     this.rect = rect
     this.framePosition = Point.zero
-    this.surface = new Surface(surfaceWidth ? surfaceWidth : tileWidth, surfaceHeight ? surfaceHeight: titleHight, true)
+    const opt = Object.assign({ 
+      surfaceWidth: tileWidth, 
+      surfaceHeight: titleHight, 
+      alpha: true, 
+      offscreen: false }, options)
+    this.surface = new Surface(opt.surfaceWidth, opt.surfaceHeight, opt.alpha, opt.offscreen)
   }
 
   get cols () {
@@ -59,6 +71,7 @@ export class TileMap {
       this.framePosition.y = args[0] * this.titleHight
     }
 
+    this.surface.clear()
     this.surface.draw.drawImage(
       this.image,
       this.framePosition.x,
@@ -74,7 +87,7 @@ export class TileMap {
     return this.surface
   }
 
-  static fromImage(tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, surfaceWidth: number | undefined = undefined, surfaceHeight: number | undefined = undefined) {
-    return new TileMap(tileWidth, titleHight, image, rect, surfaceWidth, surfaceHeight)
+  static fromImage(tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, options?: TileMapInitOptions) {
+    return new TileMap(tileWidth, titleHight, image, rect, options)
   }
 }
