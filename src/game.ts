@@ -7,7 +7,9 @@ export class Game {
   readonly event: GameEvents
   readonly key: Keys
   private readonly controller: EventController 
-  private screen: Surface | null = null
+  #screen: Surface | null = null
+  #clock = 0
+  #fps: number = 60
   
   constructor () {
     this.event = new GameEvents()
@@ -17,16 +19,30 @@ export class Game {
   }
 
   init (width: number, height: number, containter: HTMLElement): Surface {
-    this.screen = new Surface(width, height)
-    containter.append(this.screen.draw.canvas as any)
-    return this.screen
+    this.#screen = new Surface(width, height)
+    containter.append(this.#screen.draw.canvas as any)
+    return this.#screen
   }
 
-  loop (callback: () => void): void {
-    callback()
-    
-    requestAnimationFrame(() => {
+  get fps () { return this.#fps }
+
+  loop (callback: () => void, rate: number = 1000 / 60): void {
+    requestAnimationFrame(timestamp => {
+      if (this.#clock === 0) {
+        this.#clock = timestamp
+        this.loop(callback)
+        return
+      }
+
+      if (timestamp < rate + this.#clock) {
+        this.loop(callback)
+        return
+      }
+     
+      this.#fps = 1000 / (timestamp - this.#clock)
+      this.#clock = timestamp
       this.loop(callback)
+      callback()
     })
   }
 }
