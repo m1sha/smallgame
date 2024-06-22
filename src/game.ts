@@ -14,13 +14,14 @@ export class Game {
   constructor () {
     this.event = new GameEvents()
     this.key = new Keys
-    this.controller = new EventController()
-    this.controller.init(this.event, this.key)
+    this.controller = new EventController(this)
   }
 
   init (width: number, height: number, containter: HTMLElement): Surface {
+    if (this.#screen) return this.#screen
     this.#screen = new Surface(width, height)
     containter.append(this.#screen.draw.canvas as any)
+    this.controller.init(this.#screen)
     return this.#screen
   }
 
