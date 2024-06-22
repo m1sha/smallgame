@@ -43,6 +43,7 @@ const keymap: Record<string, number> = {
   'arrowleft': Key.LEFT,
   'arrowright': Key.RIGHT,
   'arrowup': Key.UP,
+  'arrowdown': Key.DOWN,
   'arrowend': Key.END,
   'shiftleft': Key.LSHIFT,
   'shiftright': Key.RSHIFT,
