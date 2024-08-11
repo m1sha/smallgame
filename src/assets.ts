@@ -18,7 +18,8 @@ export async function createTileMap(tileWidth: number, titleHight: number, urls:
   const images = (await Promise.all(imageLoader)).map( p => p[0])
   const tileRect = new Rect(0, 0, tileWidth, titleHight)
   const surface = Surface.fromImages(images, tileRect, rows, cols)
-  return TileMap.fromImage(tileWidth, titleHight, surface.toImage(), surface.rect, options)
+  const image = await surface.createImage()
+  return TileMap.fromImage(tileWidth, titleHight, image, surface.rect, options)
 }
 
 function __loadImage (url: string): Promise<[HTMLImageElement, Rect]> {
