@@ -1,3 +1,4 @@
+import { Point, TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 
@@ -31,18 +32,27 @@ export class Surface {
     this.#ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit(surface: Surface, rect: Rect, distRect: Rect | null = null) {
+  blit(surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null) {
+    const { x, y, width, height } = Object.assign(rect, { 
+      width: (rect as Rect).width ?? surface.width, 
+      height: (rect as Rect).height ?? surface.height 
+    })
+
     if (distRect) {
-      this.#ctx.drawImage(surface.#canvas, rect.x, rect.y, surface.width, surface.height, distRect.x, distRect.y, distRect.width, distRect.height)
+      this.#ctx.drawImage(surface.#ctx.canvas, x, y, width, height, distRect.x, distRect.y, distRect.width, distRect.height)
       return  
     }
-    this.#ctx.drawImage(surface.#canvas, rect.x, rect.y, surface.width, surface.height)
+
+    this.#ctx.drawImage(surface.#ctx.canvas, x, y, width, height)
   }
 
   zoom (index: number) {
-    const image = this.toImage()
-    this.#ctx.clearRect(0, 0, this.width, this.height)
-    this.#ctx.drawImage(image, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
+    if (index === 0) throw Error('Zero is not a support value.')
+    if (index < 0) index = 1 / Math.abs(index)
+    
+    const canvas = this.cloneCanvas()
+    this.clear()
+    this.#ctx.drawImage(canvas, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
   }
 
   flip (position: 'x' | 'y' | 'xy') {
@@ -57,23 +67,63 @@ export class Surface {
   }
 
   rotate (a: number) {
-    this.#ctx.clearRect(0, 0, this.width, this.height)
-    this.#ctx.translate(this.width / 2, this.height /2)
+    const canvas = this.cloneCanvas()
+    this.clear()
+    
+    this.#ctx.translate(this.width / 2, this.height / 2)
     this.#ctx.rotate(a * Math.PI / 180)
-    this.#ctx.translate(-this.width /2, -this.height /2)
-    this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height)
+    this.#ctx.translate(-this.width / 2, -this.height / 2)
+    this.#ctx.drawImage(canvas, 0, 0)
   }
 
-  toImage () {
-    if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
-    const img = document.createElement("img")
-    img.src = this.#canvas.toDataURL('image/webp', 1)
-    return img
+  resize (width: number, height: number) {
+    const canvas = this.cloneCanvas()
+    this.#canvas.width = width
+    this.#canvas.height = height
+    this.#ctx.drawImage(canvas, 0, 0, width, height)
+    this.#rect.resizeSelf(width, height)
+  }
+
+  setCanvasSize  (width: number, height: number, shiftToCenter: boolean = true) {
+    const canvas = this.cloneCanvas()
+    this.clear()
+    const shiftX = shiftToCenter ? (width - canvas.width) / 2 : 0
+    const shiftY = shiftToCenter ? (height - canvas.height) / 2: 0
+    this.#canvas.width = width
+    this.#canvas.height = height
+    this.#ctx.fillStyle = '#119922'
+    this.#ctx.fillRect(0,0,width, height)
+    this.#ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
+    this.#rect.resizeSelf(width, height)
+  }
+
+  createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
+    return new Promise((resolve) => {
+      if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+      const img = document.createElement("img")
+      img.onload = () => resolve(img)
+      img.src = this.#canvas.toDataURL(type, quality)
+    })
+  }
+
+  save (type?: string, quality?: any): Promise<Blob | null> {
+    return new Promise((resolve) => {
+      if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+      this.#canvas.toBlob(blob => resolve(blob), type, quality)
+    })
   }
 
   createMask () {
     const imageDate = this.#ctx.getImageData(0, 0, this.width, this.height)
     return PixelMask.fromImageData(imageDate)
+  }
+
+  clone () {
+    const surface = new Surface(this.width, this.height, true)
+    const canvas = this.cloneCanvas()
+    surface.#canvas = canvas
+    surface.#ctx = canvas.getContext('2d')!
+    return surface
   }
 
   static fromImage(image: HTMLImageElement, rect: Rect, useAlpha: boolean = true) {
@@ -91,5 +141,24 @@ export class Surface {
     }
     
     return surface
+  }
+
+  private cloneCanvas (size?: { width: number, height: number }) {
+    const { width, height } = Object.assign({}, { 
+      width: size ? size.width : this.width,
+      height : size ? size.height : this.height,
+    })
+
+    const shift = Point.zero
+    if (size) {
+      shift.move(Math.abs((size.width - this.width / 2)), Math.abs((size.height - this.height / 2)))
+    }
+
+    const imageDate = this.#ctx.getImageData(0, 0, width, height)
+    const canvas = document.createElement('canvas')
+    canvas.width = this.width
+    canvas.height = this.height
+    canvas.getContext('2d')!.putImageData(imageDate, shift.x, shift.y)
+    return canvas
   }
 }
