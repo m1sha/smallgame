@@ -1,4 +1,4 @@
-import { Surface } from "./surface"
+import { Screen } from "./screen"
 import { EventController } from "./events/event-controller"
 import { GameEvents } from "./events/game-event"
 import { Keys } from "./keys/keys"
@@ -7,7 +7,7 @@ export class Game {
   readonly event: GameEvents
   readonly key: Keys
   private readonly controller: EventController 
-  #screen: Surface | null = null
+  #screen: Screen | null = null
   #clock = 0
   #fps: number = 60
   
@@ -17,9 +17,9 @@ export class Game {
     this.controller = new EventController(this)
   }
 
-  init (width: number, height: number, containter: HTMLElement): Surface {
+  init (width: number, height: number, containter: HTMLElement): Screen {
     if (this.#screen) return this.#screen
-    this.#screen = new Surface(width, height)
+    this.#screen = new Screen(width, height)
     containter.append(this.#screen.draw.canvas as any)
     this.controller.init(this.#screen)
     return this.#screen
