@@ -90,7 +90,8 @@ const keymap: Record<string, number> = {
   'f9': Key.F9,
   'f10': Key.F10,
   'f11': Key.F11,
-  'f12': Key.F12
+  'f12': Key.F12,
+  'pause': Key.PAUSE
 }
 
 export class Keys /* implicitly implements EventQueue */ {
