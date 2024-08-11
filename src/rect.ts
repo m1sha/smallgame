@@ -49,6 +49,8 @@ export class Rect {
     return { x: this.x + x, y: this.y + y }
   }
 
+  get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
+
   overlaps (rect: Rect) {
     const e1 =  this.containsPoint(rect.topLeft) 
     const e2 =  this.containsPoint(rect.topRight) 
@@ -106,6 +108,26 @@ export class Rect {
     return new Rect(this.x, this.y, this.width, this.height)
   }
 
+  move (x: number, y: number) {
+    return new Rect(x, y, this.width, this.height)
+  }
+
+  moveSelf (x: number, y: number) {
+    this.x = x
+    this.y = y
+    return this
+  }
+
+  resize (width: number, height: number) {
+    return new Rect(this.x, this.y, width, height)
+  }
+
+  resizeSelf (width: number, height: number) {
+    this.width = width
+    this.height = height
+    return this
+  }
+
   static get zero () {
     return new Rect(0, 0, 0, 0)
   }
@@ -156,6 +178,7 @@ export class ObservableRect /* implicitly implements Observable */ {
   get topRight () { return this.#rect.topRight }
   get bottomLeft () { return this.#rect.bottomLeft }
   get bottomRight () { return this.#rect.bottomRight }
+  get diagonal () { return this.#rect.diagonal }
   overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
   touchSide (rect: Rect) { return this.#rect.touchSide(rect) }
   contains (rect: Rect) { return this.#rect.contains(rect) }
