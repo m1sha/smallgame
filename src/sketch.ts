@@ -20,7 +20,7 @@ export class Sketch extends Drawable {
   }
 
   circle (style: ShapeStyle | TShapeStyle, center: Point | TPoint, radius: number): Circle & { style: ShapeStyle }  {
-    const shape: Shape = {  type: 'circle', ...center, radius, style: ShapeStyle.from(style) }
+    const shape: Shape = { type: 'circle', ...center, radius, style: ShapeStyle.from(style), x : center.x, y: center.y }
     this._shapes.push(shape)
     return shape
   }
@@ -62,5 +62,11 @@ export class Sketch extends Drawable {
       if (shape.style.fill) suface.draw.fill()
       if (shape.style.stroke) suface.draw.stroke()
     }
+  }
+
+  toSurface (width: number, height: number) {
+    const suface = new Surface(width, height)
+    this.draw(suface)
+    return suface
   }
 }
