@@ -6,6 +6,7 @@ export abstract class Sprite extends Drawable {
   image: Surface | null = null
   rect: Rect | ObservableRect | null = null
 
+  async create (): Promise<void> {}
   protected update (): void {}
 
   draw (suface: Surface): void {

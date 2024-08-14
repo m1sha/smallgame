@@ -13,32 +13,31 @@ index.html
 </html>
 ```
 
-index.js
+index.ts
 ```ts
-import { Game, Surface, Sketch, Rect } from 'smallgame'
+import { Game, Surface, Point } from 'smallgame'
 
-const game = new Game()
-const screen = game.init(800, 800, document.getElementById("container"))
+const GAME_WIDTH       = 800
+const GAME_HEIGHT      = 800
+const HERO_WIDTH       = 100
+const HERO_HEIGHT      = 100
+const container        = document.getElementById('container')
+const heroPos          = Point.zero
+const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT)
+hero.fill('green')
 
-const hero = new Surface(100, 100)
-const sketch = new Sketch()
-sketch.rect({ fill: "green" }, new Rect(0, 0, 100, 100))
-sketch.draw(hero)
-
-let x = 0
-let y = 0
 game.loop(() => {
   const keys = game.key.getPressed()
   
-  if (keys[Key.K_A]) { x -= 0.5 }
-  if (keys[Key.K_D]) { x += 0.5 }
-  if (keys[Key.K_W]) { y -= 0.5 }
-  if (keys[Key.K_A]) { y += 0.5 }
+  if (keys[Key.K_A] || keys[Key.LEFT])  { heroPos.x -= 5 }
+  if (keys[Key.K_D] || keys[Key.RIGHT]) { heroPos.x += 5 }
+  if (keys[Key.K_W] || keys[Key.UP])    { heroPos.y -= 5 }
+  if (keys[Key.K_S] || keys[Key.DOWN])  { heroPos.y += 5 }
 
   screen.clear()
-  screen.blit(hero, new Rect(0 | x, 0 | y, hero.width, hero.height))
+  screen.blit(hero, heroPos))
 })
-
 ```
 
 ### Show an image
@@ -46,29 +45,28 @@ game.loop(() => {
 ```ts
 import { Game, loadImage } from 'smallgame'
 
-async function main () {
-  const game = new Game()
-  const screen = game.init(1024, 800, document.getElementById("container"))
-  
-  const surface = await loadImage('image.jpg')
+const GAME_WIDTH  = 800
+const GAME_HEIGHT = 800
 
-  screen.clear()
-  screen.blit(surface, surface.rect)
+async function main () {
+  const container  = document.getElementById('container')
+  const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+  const hero       = await loadImage('hero.png')
+
+  screen.blit(hero, hero.rect)
 }
 
 main()
-
 ```
 
 ### Works with sprites
 
 hero.ts
 ```ts
-import { Sprite, loadImage } from 'smallgame'
+import { Sprite, Point, loadImage } from 'smallgame'
 
 export class Hero extends Sprite {
-  x = 0
-  y = 0
+  position = Point.zero
 
   async create () {
     this.image = await loadImage('hero.png')
@@ -76,9 +74,14 @@ export class Hero extends Sprite {
   }
 
   update(): void {
-    this.rect.x = 0 | this.x - this.rect.width / 2
-    this.rect.y = 0 | this.y - this.rect.height / 2
+    this.rect.x = 0 | this.position.x - this.rect.width / 2
+    this.rect.y = 0 | this.position.y - this.rect.height / 2
   }
+
+  moveUp()    { hero.position.y -= 5 }
+  moveDown()  { hero.position.y += 5 }
+  moveLeft()  { hero.position.x -= 5 }
+  moveRight() { hero.position.x -= 5 }
 }
 ```
 
@@ -87,21 +90,23 @@ index.ts
 import { Game, Key } from 'smallgame'
 import { Hero } from './hero'
 
+const GAME_WIDTH  = 800
+const GAME_HEIGHT = 800
+
 async function main () {
-  const game = new Game()
-  const screen = game.init(800, 800, container.value!)
+  const container = document.getElementById('container')
+  const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
 
   const hero = new Hero()
   await hero.create()
-  hero.x = screen.width / 2
-  hero.y = screen.width / 2
+  hero.position = screen.rect.center
 
   game.loop(() => {
     const keys = game.key.getPressed()
-    if (keys[Key.K_A]) { hero.x -= 1 }
-    if (keys[Key.K_D]) { hero.x += 1 }
-    if (keys[Key.K_W]) { hero.y -= 1 }
-    if (keys[Key.K_S]) { hero.y += 1 }
+    if (keys[Key.K_A] || keys[Key.LEFT])  { hero.moveLeft() }
+    if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.moveRight() }
+    if (keys[Key.K_W] || keys[Key.UP])    { hero.moveUp() }
+    if (keys[Key.K_S] || keys[Key.DOWN])  { hero.moveDown() }
 
     screen.fill('white')
     hero.draw(screen)
@@ -114,35 +119,39 @@ main()
 ### Tile Maps
 
 ```ts
-async function main() {
-  const game = new Game()
-  const screen = game.init(320, 320, container.value!)
-  
-  const tileWidth = 16
-  const tileHeight = 16
-  const map = await loadTileMap(tileWidth, tileHeight, 'Tileset.png')
-  const gap = 2
-  map.y = map.x = 0 | gap / 2
-  
-  const strokeRect = new Rect(0, 0, tileWidth + gap, tileHeight + gap)
-  const stroke = new Sketch()
-  stroke.rect({ fill: 'gray' }, strokeRect)
+import { Game, loadTileMap } from 'smallgame'
 
-  const strokeSurf = new Surface(strokeRect.width, strokeRect.height)
-  stroke.draw(strokeSurf)
+const GAME_WIDTH  = 800
+const GAME_HEIGHT = 800
+const TILE_WIDTH  = 16
+const TILE_HEIGHT = 16
+const GAP         = 2
+
+async function main() {
+  const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+  const backgroud = createTileBackgroud()
+  const map = await loadTileMap(TILE_WIDTH, TILE_HEIGHT, 'tileset.png')
+  map.y = map.x = 0 | GAP / 2
 
   for (let i = 0; i < map.rows; i++) {
     for (let j = 0; j < map.cols; j++) {
       const image = map.cell(i, j)
-      const x = j * (image.width + gap)
-      const y = i * (image.height + gap)
+      const x = j * (image.width + GAP)
+      const y = i * (image.height + GAP)
       
-      screen.blit(strokeSurf, new Rect(x, y, strokeSurf.width, strokeSurf.height))
-      screen.blit(image, new Rect(x, y, image.width, image.height))
+      screen.blit(backgroud, { x, y })
+      screen.blit(image, { x, y })
     }  
   }
+}
 
-  screen.zoom(2)
+function createTileBackgroud() {
+  const rect = new Rect(0, 0, TILE_WIDTH + GAP, TILE_HEIGHT + GAP)
+  const sketch = new Sketch()
+  sketch.rect({ fill: 'gray' }, rect)
+  const surface = new Surface(rect.width, rect.height)
+  sketch.draw(surface)
+  return surface
 }
 
 main()
