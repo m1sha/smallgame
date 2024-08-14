@@ -46,4 +46,9 @@ export class Game {
       callback()
     })
   }
+
+  static create(width: number, height: number, containter: HTMLElement) {
+    const game = new Game()
+    return { game, screen: game.init(width, height, containter) }
+  }
 }
