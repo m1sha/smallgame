@@ -53,6 +53,7 @@ export class Surface {
     const canvas = this.cloneCanvas()
     this.clear()
     this.#ctx.drawImage(canvas, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
+//    this.#rect.resizeSelf(this.width * index, this.height * index)
   }
 
   flip (position: 'x' | 'y' | 'xy') {
@@ -63,7 +64,7 @@ export class Surface {
     
     this.#ctx.translate(w, h)
     this.#ctx.scale(x, y)
-    this.#ctx.drawImage(this.#canvas, 0, 0, this.width, this.height)
+    this.#ctx.drawImage(this.#canvas, 0, 0)
   }
 
   rotate (a: number) {
@@ -99,11 +100,15 @@ export class Surface {
 
   createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
-      if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
       const img = document.createElement("img")
       img.onload = () => resolve(img)
-      img.src = this.#canvas.toDataURL(type, quality)
+      img.src = this.toDataURL(type, quality)
     })
+  }
+
+  toDataURL (type?: string, quality?: any): string {
+    if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+    return this.#canvas.toDataURL(type, quality)
   }
 
   save (type?: string, quality?: any): Promise<Blob | null> {
