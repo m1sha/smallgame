@@ -16,8 +16,9 @@ export class TileMap {
   private framePosition: Point
   readonly tileWidth: number
   readonly titleHight: number
-  x: number = 0
-  y: number = 0
+  #x: number = 0
+  #y: number = 0
+  #gap: number = 0
 
   constructor (tileWidth: number, titleHight: number, image: HTMLImageElement, rect: Rect, options?: TileMapInitOptions) {
     this.tileWidth = tileWidth
@@ -33,6 +34,19 @@ export class TileMap {
     this.surface = new Surface(opt.surfaceWidth, opt.surfaceHeight, opt.alpha, opt.offscreen)
   }
 
+  get x () { return this.#x }
+  set x (value: number) { this.#x = value + this.#gap }
+  get y () { return this.#y }
+  set y (value: number) { this.#y = value + this.#gap }
+  get gap () { return this.#gap }
+  set gap (value: number) {  
+    this.#x -= 0 | this.#gap / 2
+    this.#y -= 0 | this.#gap / 2
+    this.#gap = value
+    this.#x += 0 | this.#gap / 2 
+    this.#y += 0 | this.#gap / 2
+  }
+
   get cols () {
     return 0 | this.rect.width / this.tileWidth
   }
@@ -43,6 +57,14 @@ export class TileMap {
 
   get count () {
     return this.cols * this.rows
+  }
+
+  get width () {
+    return this.rect.width
+  }
+
+  get height () {
+    return this.rect.height
   }
 
   get index (): [number, number] {
@@ -78,8 +100,8 @@ export class TileMap {
       this.framePosition.y,
       this.tileWidth || 0,
       this.titleHight || 0,
-      (this.x || 0),
-      (this.y || 0),
+      (this.#x || 0),
+      (this.#y || 0),
       this.tileWidth || 0,
       this.titleHight || 0
     )
