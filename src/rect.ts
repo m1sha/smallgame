@@ -1,6 +1,13 @@
 import { TPoint } from "point"
 import { Sprite } from "./sprite"
 
+export type Pivote = 
+  | 'top-left' 
+  | 'top-right' 
+  | 'bottom-left' 
+  | 'bottom-right' 
+  | 'center-center'
+
 export type TRect = { x: number, y: number, width: number, height: number }
 
 export class Rect {
@@ -108,14 +115,43 @@ export class Rect {
     return new Rect(this.x, this.y, this.width, this.height)
   }
 
-  move (x: number, y: number) {
-    return new Rect(x, y, this.width, this.height)
+  move (point: TPoint, pivote?: Pivote): Rect
+  move (x: number, y: number, pivote?: Pivote): Rect
+  move (...args: Array<any>): Rect {
+    
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      const [x, y] = this.calcPivote(args[2])
+      return new Rect(args[0] + x, args[1] + y, this.width, this.height)
+    }
+    else {
+      const point = args[0] as TPoint
+      const [x, y] = this.calcPivote(args[1])
+      if (point && typeof point.x === 'number' && typeof point.y === 'number')
+        return new Rect(point.x + x, point.y + y, this.width, this.height)
+      else
+        throw new Error('Unsupport arguments.')
+    }
+    
   }
 
-  moveSelf (x: number, y: number) {
-    this.x = x
-    this.y = y
-    return this
+  moveSelf (point: TPoint, pivote?: Pivote): Rect
+  moveSelf (x: number, y: number, pivote?: Pivote): Rect
+  moveSelf (...args: Array<any>): Rect  {
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      const [x, y] = this.calcPivote(args[2])
+      this.x = args[0] + x
+      this.y = args[1] + y
+      return this
+    } else {
+      const point = args[0] as TPoint
+      const [x, y] = this.calcPivote(args[1])
+      if (point && typeof point.x === 'number' && typeof point.y === 'number') {
+        this.x = point.x + x
+        this.y = point.y + y
+        return this
+      }
+    }
+    throw new Error('Unsupport arguments.')
   }
 
   resize (width: number, height: number) {
@@ -134,6 +170,18 @@ export class Rect {
 
   static size (width: number, height: number) {
     return new Rect(0, 0, width, height)
+  }
+
+  private calcPivote(pivote?: Pivote) {
+    if (!pivote) return [0, 0]
+    switch (pivote) {
+      case 'top-left': return [0, 0]
+      case 'top-right': return [-this.width, 0]
+      case 'bottom-left': return [0, -this.height]
+      case 'bottom-right': return [-this.width, -this.height]
+      case 'center-center': return [0 | -this.width / 2, 0 | -this.height  / 2]
+      default: return [0, 0]
+    }
   }
 }
 
@@ -190,4 +238,20 @@ export class ObservableRect /* implicitly implements Observable */ {
     return this.#rect.outline.apply(this.#rect, args as any)
   }
   clone () { return this.#rect.clone() }
+  move (point: TPoint, pivote?: Pivote): Rect
+  move (x: number, y: number, pivote?: Pivote): Rect
+  move (...args: Array<any>): Rect {
+    return this.#rect.move.apply(this.#rect, args as any)
+  }
+  moveSelf (point: TPoint, pivote?: Pivote): Rect
+  moveSelf (x: number, y: number, pivote?: Pivote): Rect
+  moveSelf (...args: Array<any>): Rect {
+    return this.#rect.moveSelf.apply(this.#rect, args as any)
+  }
+  resize (width: number, height: number) {
+    return this.#rect.resize(width, height)
+  }
+  resizeSelf (width: number, height: number) {
+    return this.#rect.resizeSelf(width, height)
+  }
 }
