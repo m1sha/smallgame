@@ -2,6 +2,8 @@
 
 ### Base game circle
 
+![getting started output](getting-started.png)
+
 index.html
 ```html
 <html>
@@ -22,21 +24,21 @@ const GAME_HEIGHT      = 800
 const HERO_WIDTH       = 100
 const HERO_HEIGHT      = 100
 const container        = document.getElementById('container')
-const heroPos          = Point.zero
 const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
 const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT)
 hero.fill('green')
+hero.rect.moveSelf(screen.rect.center, 'center-center')
 
 game.loop(() => {
   const keys = game.key.getPressed()
   
-  if (keys[Key.K_A] || keys[Key.LEFT])  { heroPos.x -= 5 }
-  if (keys[Key.K_D] || keys[Key.RIGHT]) { heroPos.x += 5 }
-  if (keys[Key.K_W] || keys[Key.UP])    { heroPos.y -= 5 }
-  if (keys[Key.K_S] || keys[Key.DOWN])  { heroPos.y += 5 }
+  if (keys[Key.K_A] || keys[Key.LEFT])  { hero.rect.x -= 5 }
+  if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.rect.x += 5 }
+  if (keys[Key.K_W] || keys[Key.UP])    { hero.rect.y -= 5 }
+  if (keys[Key.K_S] || keys[Key.DOWN])  { hero.rect.y += 5 }
 
   screen.clear()
-  screen.blit(hero, heroPos))
+  screen.blit(hero, hero.rect))
 })
 ```
 
@@ -73,9 +75,8 @@ export class Hero extends Sprite {
     this.rect = this.image.rect
   }
 
-  update(): void {
-    this.rect.x = 0 | this.position.x - this.rect.width / 2
-    this.rect.y = 0 | this.position.y - this.rect.height / 2
+  protected update(): void {
+    this.rect.moveSelf(this.position, 'center-center')
   }
 
   moveUp()    { hero.position.y -= 5 }
