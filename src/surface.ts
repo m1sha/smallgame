@@ -50,10 +50,7 @@ export class Surface {
     if (index === 0) throw Error('Zero is not a support value.')
     if (index < 0) index = 1 / Math.abs(index)
     
-    const canvas = this.cloneCanvas()
-    this.clear()
-    this.#ctx.drawImage(canvas, 0, 0, this.width, this.height, 0, 0, this.width * index, this.height * index)
-//    this.#rect.resizeSelf(this.width * index, this.height * index)
+    this.resize(this.width * index, this.height * index)
   }
 
   flip (position: 'x' | 'y' | 'xy') {
@@ -61,20 +58,29 @@ export class Surface {
     const h = position === 'x' ? 0 : this.height
     const x = position === 'y' ? 1 : -1
     const y = position === 'x' ? 1 : -1
-    
-    this.#ctx.translate(w, h)
-    this.#ctx.scale(x, y)
-    this.#ctx.drawImage(this.#canvas, 0, 0)
-  }
-
-  rotate (a: number) {
     const canvas = this.cloneCanvas()
     this.clear()
     
-    this.#ctx.translate(this.width / 2, this.height / 2)
-    this.#ctx.rotate(a * Math.PI / 180)
-    this.#ctx.translate(-this.width / 2, -this.height / 2)
+    this.#ctx.translate(w, h)
+    this.#ctx.scale(x, y)
     this.#ctx.drawImage(canvas, 0, 0)
+    this.#ctx.resetTransform()
+  }
+
+  rotate (a: number, pivot?: TPoint) {
+    const canvas = this.cloneCanvas()
+    this.clear()
+    let x = this.width / 2
+    let y = this.height / 2
+    if (pivot) {
+      ({ x, y } = pivot)
+    }
+    
+    this.#ctx.translate(x, y)
+    this.#ctx.rotate(a * Math.PI / 180)
+    this.#ctx.translate(-x, -y)
+    this.#ctx.drawImage(canvas, 0, 0)
+    this.#ctx.resetTransform()
   }
 
   resize (width: number, height: number) {
