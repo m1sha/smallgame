@@ -1,11 +1,15 @@
-import { TPoint } from "point"
+import { copyPoint, isTPoint, Point, setPoint, TPoint, zeroPoint } from "./point"
 import { Sprite } from "./sprite"
 
 export type Pivote = 
   | 'top-left' 
   | 'top-right' 
+  | 'top-center'
   | 'bottom-left' 
   | 'bottom-right' 
+  | 'bottom-center'
+  | 'left-center'
+  | 'right-center'
   | 'center-center'
 
 export type TRect = { x: number, y: number, width: number, height: number }
@@ -175,11 +179,16 @@ export class Rect {
   private calcPivote(pivote?: Pivote) {
     if (!pivote) return [0, 0]
     switch (pivote) {
-      case 'top-left': return [0, 0]
-      case 'top-right': return [-this.width, 0]
-      case 'bottom-left': return [0, -this.height]
-      case 'bottom-right': return [-this.width, -this.height]
+      case 'bottom-right': return [0, 0]
+      case 'bottom-left': return [-this.width, 0]
+      case 'top-right': return [0, -this.height]
+      case 'top-left': return [-this.width, -this.height]
       case 'center-center': return [0 | -this.width / 2, 0 | -this.height  / 2]
+      case 'top-center': return [0 | -this.width / 2, 0 | -this.height]
+      case 'bottom-center': return [0 | -this.width / 2, 0]
+      case 'right-center': return [0, 0 | -this.height  / 2]
+      case 'left-center': return [-this.width, 0 | -this.height  / 2]
+  
       default: return [0, 0]
     }
   }
@@ -255,3 +264,148 @@ export class ObservableRect /* implicitly implements Observable */ {
     return this.#rect.resizeSelf(width, height)
   }
 }
+
+export class PolyRect {
+  #topLeft = zeroPoint()
+  #topRight = zeroPoint()
+  #bottomLeft = zeroPoint()
+  #bottomRight = zeroPoint()
+
+  constructor (topLeft: TPoint, topRight: TPoint, bottomLeft: TPoint, bottomRight: TPoint)
+  constructor (x: number, y: number, width: number, height: number)
+  constructor (...args: Array<any>) {
+    if (typeof args[0] === 'number' && typeof args[1] === 'number' && typeof args[2] === 'number' && typeof args[3] === 'number') {
+      this.#topLeft = setPoint(args[0], args[1])
+      this.#topRight = setPoint(args[0] + args[2], args[1])
+      this.#bottomRight = setPoint(args[0] + args[2], args[1] + args[3])
+      this.#bottomLeft = setPoint(args[0], args[1] + args[3])
+      return
+    }
+    if (isTPoint(args[0]) && isTPoint(args[1]) && isTPoint(args[2]) && isTPoint(args[3])) {
+      copyPoint(this.#topLeft, args[0])
+      copyPoint(this.#topRight, args[1])
+      copyPoint(this.#bottomLeft, args[2])
+      copyPoint(this.#bottomRight, args[3])
+      return
+    }
+  }
+
+  get x () {
+    return this.#topLeft.x
+  }
+
+  set x (value: number) {
+    this.moveSelf(value, 0)
+  }
+
+  get y () {
+    return this.#topLeft.y
+  }
+
+  set y (value: number) {
+    this.moveSelf(0, value)
+  }
+
+  get width () {
+    return 0 | Point.distance(this.#topLeft, this.#topRight)
+  }
+
+  get height () {
+    return  0 | Point.distance(this.#topLeft, this.#bottomLeft)
+  }
+
+  get topLeft () { 
+    return this.#topLeft
+  }
+
+  get topRight () { 
+    return this.#topRight
+  }
+
+  get bottomLeft () { 
+    return this.#bottomLeft
+  }
+
+  get bottomRight () { 
+    return this.#bottomRight
+  }
+
+  moveSelf (x: number, y: number): PolyRect
+  moveSelf (point: TPoint): PolyRect
+  moveSelf (...args: Array<any>): PolyRect {
+    let x = 0
+    let y = 0
+
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      [x, y] = args
+    } else if (isTPoint(args[1])) {
+      ({x, y} = args[1])
+    }
+    
+    const translate = (point: TPoint) => new DOMMatrix()
+      .translate(0 | x, 0 | y)
+      .transformPoint(point)
+    
+    let point = translate(this)
+    copyPoint(this.#topLeft, point, 'int')
+    point = translate(this.topRight)
+    copyPoint(this.#topRight, point, 'int')
+    point = translate(this.bottomRight)
+    copyPoint(this.#bottomRight, point, 'int')
+    point = translate(this.bottomLeft)
+    copyPoint(this.#bottomLeft, point, 'int')
+
+    return this 
+  }
+
+  rotateSelf (angle: number, point: TPoint): PolyRect
+  rotateSelf (angle: number, pivote?: Pivote): PolyRect
+  rotateSelf (...args: Array<any>): PolyRect {
+    let x = 0
+    let y = 0
+    if (typeof args[0] !== 'number') throw new Error('excepted number value')
+    const angle = args[0]
+
+    if (isTPoint(args[1])) {
+      ({x, y} = args[1])
+    } else {
+      [x, y] = this.calcPivote(this, args[1])
+    }
+    
+    const rotate = (point: TPoint) => {
+      return new DOMMatrix()
+        .translate(0 | x, 0 | y)
+        .rotate(angle)
+        .translate(0 | -x, 0 | -y)
+        .transformPoint(point)  
+    }
+    
+    let point = rotate(this)
+    copyPoint(this.#topLeft, point, 'int')
+    point = rotate(this.topRight)
+    copyPoint(this.#topRight, point, 'int')
+    point = rotate(this.bottomRight)
+    copyPoint(this.#bottomRight, point, 'int')
+    point = rotate(this.bottomLeft)
+    copyPoint(this.#bottomLeft, point, 'int')
+    return this
+  }
+
+  private calcPivote({x, y, width, height }: TRect, pivote?: Pivote) {
+    if (!pivote) return [x, y]
+    switch (pivote) {
+      case 'bottom-right': return [width + x, height + y]
+      case 'bottom-left': return [x, height + y]
+      case 'top-right': return [width + x, y]
+      case 'top-left': return [x, y]
+      case 'center-center': return [0 | width / 2 + x, 0 | height / 2 + y]
+      case 'bottom-center': return [0 | width / 2 + x, 0 | height + y]
+      case 'top-center': return [0 | width / 2 + x, y]
+      case 'left-center': return [0 | x, 0 | height  / 2 + y]
+      case 'right-center': return [0 | width + x, 0 | height  / 2 + y]
+      default: return [x, y]
+    }
+  }
+
+}
+

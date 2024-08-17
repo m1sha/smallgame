@@ -1,4 +1,6 @@
 export * from './circle'
 export * from './rectangle'
+export * from './polyrect'
+export * from './roundedrect'
 export * from './shape'
 export * from './line'

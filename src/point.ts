@@ -72,6 +72,12 @@ export class FPoint {
   }
 
   static get zero () { return new Point(0, 0) }
+
+  static distance (p0: TPoint, p1: TPoint): number {
+    const dx = Math.pow(p1.x - p0.x, 2)
+    const dy = Math.pow(p1.y - p0.y, 2)
+    return Math.sqrt(dx + dy)
+  }
 }
 
 export class Point extends FPoint {
@@ -101,4 +107,22 @@ export class Point extends FPoint {
   scaleY(dy: number) {
     return new Point(this.x, 0 | this.y * dy)
   }
+}
+
+export function isTPoint (value: any) {
+  const point = value as TPoint
+  return point && typeof point.x === 'number' && typeof point.y === 'number'
+}
+
+export function copyPoint (a: TPoint, b: TPoint, type: 'default' | 'int' = 'default') {
+  a.x = type === 'int' ? 0 | b.x : b.x
+  a.y = type === 'int' ? 0 | b.y : b.y
+}
+
+export function zeroPoint (): TPoint {
+  return { x: 0, y: 0 }
+}
+
+export function setPoint (x: number, y: number): TPoint {
+  return { x, y }
 }

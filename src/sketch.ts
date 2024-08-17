@@ -1,9 +1,10 @@
 import { ShapeStyle, TShapeStyle, applyStroke } from './styles/shape-style'
 import { Drawable } from './drawable'
 import { Surface } from './surface'
-import { Rect, TRect } from './rect'
+import { PolyRect, Rect, TRect } from './rect'
 import { Point, TPoint } from './point'
-import { Shape, Rectangle, Circle, Line } from './shapes'
+import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle } from './shapes'
+
 
 
 export class Sketch extends Drawable {
@@ -15,6 +16,28 @@ export class Sketch extends Drawable {
 
   rect (style: ShapeStyle | TShapeStyle, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
     const shape: Shape = { type: 'rectangle', ...rect, style: ShapeStyle.from(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  polyrect (style: ShapeStyle | TShapeStyle, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle & { style: ShapeStyle } {
+    const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: ShapeStyle.from(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  roundedrect (style: ShapeStyle | TShapeStyle, { x, y, width, height }: TRect, radii?: number | number[]): RoundedRectangle & { style: ShapeStyle } {
+    let topLeft = 0; let topRight = 0; let bottomRight = 0; let bottomLeft = 0;
+    if (radii) {
+      if (typeof radii === 'number') {
+        topLeft = topRight = bottomRight = bottomLeft = radii
+      }
+      if (Array.isArray(radii)) {
+        topLeft = radii[0]; topRight = radii[1]; bottomRight = radii[2]; bottomLeft = radii[3]
+      }
+    }
+
+    const shape: Shape = { type: 'roundedrectangle', x, y, width, height, topLeft, topRight, bottomRight, bottomLeft, style: ShapeStyle.from(style) }
     this._shapes.push(shape)
     return shape
   }
@@ -39,6 +62,19 @@ export class Sketch extends Drawable {
       switch (shape.type) {
         case 'rectangle': {
           suface.draw.rect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy)
+          break
+        }
+        case 'polyrectangle': {
+          suface.draw.moveTo(this.x + shape.topLeft.x * this.sx, this.y + shape.topLeft.y * this.sy)
+          suface.draw.lineTo(this.x + shape.topRight.x * this.sx, this.y + shape.topRight.y * this.sy)
+          suface.draw.lineTo(this.x + shape.bottomRight.x * this.sx, this.y + shape.bottomRight.y * this.sy)
+          suface.draw.lineTo(this.x + shape.bottomLeft.x * this.sx, this.y + shape.bottomLeft.y * this.sy)
+          suface.draw.closePath()
+          break
+        }
+        case 'roundedrectangle': {
+          const radii = [shape.topLeft, shape.topRight, shape.bottomRight, shape.bottomLeft].filter(p => p)
+          suface.draw.roundRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy, radii)
           break
         }
         case 'circle': {
