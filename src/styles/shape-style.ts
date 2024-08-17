@@ -47,6 +47,7 @@ export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
   ctx.strokeStyle = style.stroke
   ctx.lineWidth = style.lineWidth || 1
   ctx.lineJoin = style.lineJoin || 'bevel'
+  if (style.lineDash) ctx.setLineDash(style.lineDash)
   ctx.lineDashOffset = style.lineDashOffset || 0
   ctx.lineCap = style.lineCap || 'butt'
   if (style.lineDash) ctx.setLineDash(style.lineDash)
