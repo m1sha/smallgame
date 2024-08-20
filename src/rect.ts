@@ -295,6 +295,17 @@ export class ObservableRect /* implicitly implements Observable */ {
   unionSelf (rect: TRect) {
     return this.#rect.unionSelf(rect)
   }
+  rotate (a: number, pivot?: number | TPoint) {
+    return this.#rect.rotate(a, pivot)
+  }
+  static get zero () { return Rect.zero }
+  static size (width: number, height: number) {
+    return Rect.size(width, height)
+  }
+  static from (rect: TRect) {
+    return Rect.from(rect)
+  }
+  private calcPivote(pivote?: Pivote) { return [0, 0] }
 }
 
 export class PolyRect {

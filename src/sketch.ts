@@ -23,28 +23,32 @@ export class Sketch extends Drawable {
 
   getStyle (name: string) { return this._styleList[name] }
 
-  copyStyles (sketch: Sketch) { sketch._styleList = this._styleList }
-
-  cloneStyles (sketch: Sketch) { 
-    sketch._styleList = {} 
-    const names = this.styleNames
-    for (const name of names)
-      sketch._styleList[name] = this._styleList[name].clone()
+  copyStyles (source: Sketch) { 
+    if (!source) throw new Error('source is undefined')
+    this._styleList = source._styleList 
   }
 
-  rect (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
+  cloneStyles (source: Sketch) {
+    if (!source) throw new Error('source is undefined') 
+    this._styleList = {} 
+    const names = source.styleNames
+    for (const name of names)
+      this._styleList[name] = source._styleList[name].clone()
+  }
+
+  rect (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect): Rectangle  {
     const shape: Shape = { type: 'rectangle', ...rect, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  polyrect (style: ShapeStyle | TShapeStyle | string, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle & { style: ShapeStyle } {
+  polyrect (style: ShapeStyle | TShapeStyle | string, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle {
     const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  roundedrect (style: ShapeStyle | TShapeStyle | string, { x, y, width, height }: TRect, radii?: number | number[]): RoundedRectangle & { style: ShapeStyle } {
+  roundedrect (style: ShapeStyle | TShapeStyle | string, { x, y, width, height }: TRect, radii?: number | number[]): RoundedRectangle {
     let topLeft = 0; let topRight = 0; let bottomRight = 0; let bottomLeft = 0;
     if (radii) {
       if (typeof radii === 'number') {
@@ -60,13 +64,13 @@ export class Sketch extends Drawable {
     return shape
   }
 
-  circle (style: ShapeStyle | TShapeStyle | string, center: Point | TPoint, radius: number): Circle & { style: ShapeStyle }  {
+  circle (style: ShapeStyle | TShapeStyle | string, center: Point | TPoint, radius: number): Circle  {
     const shape: Shape = { type: 'circle', ...center, radius, style: this.initStyle(style), x : center.x, y: center.y }
     this._shapes.push(shape)
     return shape
   }
 
-  line (style: ShapeStyle | TShapeStyle | string, p0: Point | TPoint, p1: Point | TPoint): Line & { style: ShapeStyle }  {
+  line (style: ShapeStyle | TShapeStyle | string, p0: Point | TPoint, p1: Point | TPoint): Line  {
     const shape: Shape = {  type: 'line', p0, p1, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape

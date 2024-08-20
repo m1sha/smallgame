@@ -1,4 +1,3 @@
-import { ShapeStyle } from '../styles/shape-style'
 import { Circle } from './circle'
 import { Line } from './line'
 import { PolyRectangle } from './polyrect'
@@ -11,4 +10,4 @@ export type Shape = (
   | RoundedRectangle
   | Circle
   | Line
-) & { style: ShapeStyle } 
+) 

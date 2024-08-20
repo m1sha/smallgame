@@ -1,4 +1,4 @@
-import { copyRect, Rect, setRect, TRect } from "../rect";
+import { Rect, setRect, TRect } from "../rect";
 import { Shape } from "./shape"
 import { Rectangle } from "./rectangle";
 import { RoundedRectangle } from "./roundedrect";
@@ -29,17 +29,20 @@ export class Boundedrect {
   }
 
   private static getRectangle(rect: Rectangle | RoundedRectangle): TRect {
-    return copyRect(rect)
+    const border = rect.style.lineWidth
+    return Rect.from(rect).outline(-border)
   }
 
-  private static getCircle({ x, y, radius}: Circle): TRect {
-    return setRect(x - radius, y - radius, radius * 2, radius * 2)
+  private static getCircle({ x, y, radius, style }: Circle): TRect {
+    const border = style.lineWidth
+    return setRect(x - radius, y - radius, radius * 2 + border, radius * 2 + border)
   }
 
-  private static getLine ({ p0, p1 }: Line): TRect {
+  private static getLine ({ p0, p1, style }: Line): TRect {
+    const border = style.lineWidth
     const min = setPoint(Math.min(p0.x, p1.y), Math.min(p0.x, p1.y))
     const max = setPoint(Math.max(p0.x, p1.y), Math.max(p0.x, p1.y))
-    return setRect(min.x, min.y, max.x - min.x, max.y - min.x)
+    return new Rect(min.x, min.y, max.x - min.x, max.y - min.x).outline(-border)
   }
 
 }
