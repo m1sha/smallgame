@@ -1,4 +1,4 @@
-import { TPoint } from "point"
+import { TPoint } from "../point"
 
 export type PolyRectangle = {
   type: 'polyrectangle'
