@@ -8,25 +8,43 @@ import { Boundedrect } from './shapes/boundedrect'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
+  private _styleList: Record<string, ShapeStyle> = {}
   x: number = 0
   y: number = 0
   sx: number = 1
   sy: number = 1
   aa: boolean = false // if true a line thickness 1px
 
-  rect (style: ShapeStyle | TShapeStyle, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
-    const shape: Shape = { type: 'rectangle', ...rect, style: ShapeStyle.from(style) }
+  defineStyle (name: string, style: TShapeStyle): ShapeStyle {
+    return this._styleList[name] = ShapeStyle.from(style)
+  }
+
+  get styleNames () { return Object.keys(this._styleList) }
+
+  getStyle (name: string) { return this._styleList[name] }
+
+  copyStyles (sketch: Sketch) { sketch._styleList = this._styleList }
+
+  cloneStyles (sketch: Sketch) { 
+    sketch._styleList = {} 
+    const names = this.styleNames
+    for (const name of names)
+      sketch._styleList[name] = this._styleList[name].clone()
+  }
+
+  rect (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
+    const shape: Shape = { type: 'rectangle', ...rect, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  polyrect (style: ShapeStyle | TShapeStyle, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle & { style: ShapeStyle } {
-    const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: ShapeStyle.from(style) }
+  polyrect (style: ShapeStyle | TShapeStyle | string, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle & { style: ShapeStyle } {
+    const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  roundedrect (style: ShapeStyle | TShapeStyle, { x, y, width, height }: TRect, radii?: number | number[]): RoundedRectangle & { style: ShapeStyle } {
+  roundedrect (style: ShapeStyle | TShapeStyle | string, { x, y, width, height }: TRect, radii?: number | number[]): RoundedRectangle & { style: ShapeStyle } {
     let topLeft = 0; let topRight = 0; let bottomRight = 0; let bottomLeft = 0;
     if (radii) {
       if (typeof radii === 'number') {
@@ -37,19 +55,19 @@ export class Sketch extends Drawable {
       }
     }
 
-    const shape: Shape = { type: 'roundedrectangle', x, y, width, height, topLeft, topRight, bottomRight, bottomLeft, style: ShapeStyle.from(style) }
+    const shape: Shape = { type: 'roundedrectangle', x, y, width, height, topLeft, topRight, bottomRight, bottomLeft, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
 
-  circle (style: ShapeStyle | TShapeStyle, center: Point | TPoint, radius: number): Circle & { style: ShapeStyle }  {
-    const shape: Shape = { type: 'circle', ...center, radius, style: ShapeStyle.from(style), x : center.x, y: center.y }
+  circle (style: ShapeStyle | TShapeStyle | string, center: Point | TPoint, radius: number): Circle & { style: ShapeStyle }  {
+    const shape: Shape = { type: 'circle', ...center, radius, style: this.initStyle(style), x : center.x, y: center.y }
     this._shapes.push(shape)
     return shape
   }
 
-  line (style: ShapeStyle | TShapeStyle, p0: Point | TPoint, p1: Point | TPoint): Line & { style: ShapeStyle }  {
-    const shape: Shape = {  type: 'line', p0, p1, style: ShapeStyle.from(style) }
+  line (style: ShapeStyle | TShapeStyle | string, p0: Point | TPoint, p1: Point | TPoint): Line & { style: ShapeStyle }  {
+    const shape: Shape = {  type: 'line', p0, p1, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
@@ -89,17 +107,16 @@ export class Sketch extends Drawable {
         }
       }
 
-      
-
       if (shape.style.fillStrokeOrder === 'stroke-first') {
         if (shape.style.stroke) suface.draw.stroke()
         if (shape.style.fill) suface.draw.fill()
-        
+        if (this.aa) suface.draw.resetTransform()
         return
       }
       
       if (shape.style.fill) suface.draw.fill()
       if (shape.style.stroke) suface.draw.stroke()
+      if (this.aa) suface.draw.resetTransform()
     }
   }
 
@@ -120,5 +137,14 @@ export class Sketch extends Drawable {
     const suface = new Surface(w, h)
     this.draw(suface)
     return suface
+  }
+
+  private initStyle (style: ShapeStyle | TShapeStyle | string): ShapeStyle {
+    if (typeof style === 'string' || style instanceof String) {
+      const st = this._styleList[style as string]
+      if (!st) throw new Error(style + ' is not found.')
+      return st
+    }
+    return ShapeStyle.from(style)
   }
 }

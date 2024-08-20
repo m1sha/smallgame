@@ -41,6 +41,10 @@ export class ShapeStyle {
     return new ShapeStyle(style)
   }
 
+  clone () {
+    return new ShapeStyle(this)
+  }
+
 }
 
 export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
