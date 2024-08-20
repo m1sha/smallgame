@@ -83,5 +83,5 @@ export class Group {
 
 
 function collide(sprite1: Sprite, sprite2: Sprite) {
-  return sprite1 !== sprite2 && sprite1.rect && sprite2.rect && sprite1.rect.overlaps(sprite2.rect)
+  return sprite1 !== sprite2 && sprite1.rect && sprite2.rect && sprite1.rect.overlaps(sprite2.rect as any)
 }

@@ -1,15 +1,15 @@
-import { Rect } from "../rect"
+import { MutableRect, Rect } from "../rect"
 import { removeItem } from "./array"
 
-export class CollisionHashmap<T extends { rect: Rect | null }> {
+export class CollisionHashmap<T extends { rect: MutableRect | null }> {
   readonly rows: number
   readonly cols: number
   readonly width: number
   readonly height: number
   readonly cellWidth: number
   readonly cellHeight: number
-  private rects: Map<Rect, T[]> = new Map()
-  private sprites: Map<T, Rect[]> = new Map()
+  private rects: Map<MutableRect, T[]> = new Map()
+  private sprites: Map<T, MutableRect[]> = new Map()
 
   constructor (rows: number, cols: number, width: number, height: number) {
     this.rows = rows
@@ -51,9 +51,9 @@ export class CollisionHashmap<T extends { rect: Rect | null }> {
     this.sprites.set(sprite, newRects)
   }
 
-  private getRects(sprite: T): Rect[] {
+  private getRects(sprite: T): MutableRect[] {
     if (!sprite.rect) return []
-    const result: Rect[] = []
+    const result: MutableRect[] = []
     this.rects.forEach((_, rect) => { 
       if (rect.overlaps(sprite.rect!)) result.push(rect) 
     })

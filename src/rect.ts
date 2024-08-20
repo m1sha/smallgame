@@ -14,7 +14,41 @@ export type Pivote =
 
 export type TRect = { x: number, y: number, width: number, height: number }
 
-export class Rect {
+export interface MutableRect {
+  x: number
+  y: number
+  width: number 
+  height: number
+  readonly topLeft: TPoint
+  readonly topRight: TPoint
+  readonly bottomLeft: TPoint
+  readonly center: TPoint
+  readonly absCenter: TPoint
+  readonly absWidth: number
+  readonly diagonal: number
+  overlaps (rect: MutableRect): boolean
+  touchSide (rect: MutableRect): ('left' | 'right' | 'top' | 'bottom')[]
+  contains (rect: MutableRect): boolean
+  containsPoint({x, y}: TPoint): boolean 
+  equals(rect: MutableRect | TRect): boolean
+  outline (padding: number): MutableRect
+  outline (top: number, left: number, bottom: number, right: number): MutableRect
+  outline (...args: Array<any>): MutableRect
+  clone (): MutableRect
+  move (point: TPoint, pivote?: Pivote): MutableRect
+  move (x: number, y: number, pivote?: Pivote): MutableRect
+  move (...args: Array<any>): MutableRect
+  moveSelf (point: TPoint, pivote?: Pivote): MutableRect
+  moveSelf (x: number, y: number, pivote?: Pivote): MutableRect
+  moveSelf (...args: Array<any>): MutableRect
+  resize (width: number, height: number): MutableRect
+  resizeSelf (width: number, height: number): MutableRect
+  union (rect: MutableRect): MutableRect
+  unionSelf (rect: MutableRect): MutableRect
+  rotate (a: number, pivot?: number | TPoint): PolyRect
+}
+
+export class Rect implements MutableRect {
   x: number
   y: number
   width: number
@@ -220,7 +254,7 @@ export class Rect {
   }
 }
 
-export class ObservableRect /* implicitly implements Observable */ {
+export class ObservableRect implements MutableRect /* implicitly implements Observable */ {
   /** @internal */ protected /*Observable.*/callback: ((sprite: Sprite) => void) | null = null
   #sprite: Sprite
 
@@ -298,14 +332,6 @@ export class ObservableRect /* implicitly implements Observable */ {
   rotate (a: number, pivot?: number | TPoint) {
     return this.#rect.rotate(a, pivot)
   }
-  static get zero () { return Rect.zero }
-  static size (width: number, height: number) {
-    return Rect.size(width, height)
-  }
-  static from (rect: TRect) {
-    return Rect.from(rect)
-  }
-  private calcPivote(pivote?: Pivote) { return [0, 0] }
 }
 
 export class PolyRect {
