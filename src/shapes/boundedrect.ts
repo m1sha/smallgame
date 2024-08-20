@@ -4,7 +4,7 @@ import { Rectangle } from "./rectangle";
 import { RoundedRectangle } from "./roundedrect";
 import { Circle } from "./circle";
 import { Line } from "./line";
-import { setPoint } from "point";
+import { setPoint } from "../point";
 
 export class Boundedrect {
   static getShapesBounds (shapes: Shape[]): Rect { 
