@@ -17,12 +17,13 @@ index.html
 
 index.ts
 ```ts
-import { Game, Surface, Point } from 'smallgame'
+import { Game, Surface, Key } from 'smallgame'
 
 const GAME_WIDTH       = 800
 const GAME_HEIGHT      = 800
 const HERO_WIDTH       = 100
 const HERO_HEIGHT      = 100
+const HERO_SPEED       = 5
 const container        = document.getElementById('container')
 const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
 const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT)
@@ -32,10 +33,10 @@ hero.rect.moveSelf(screen.rect.center, 'center-center')
 game.loop(() => {
   const keys = game.key.getPressed()
   
-  if (keys[Key.K_A] || keys[Key.LEFT])  { hero.rect.x -= 5 }
-  if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.rect.x += 5 }
-  if (keys[Key.K_W] || keys[Key.UP])    { hero.rect.y -= 5 }
-  if (keys[Key.K_S] || keys[Key.DOWN])  { hero.rect.y += 5 }
+  if (keys[Key.K_A] || keys[Key.LEFT])  { hero.rect.x -= HERO_SPEED }
+  if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.rect.x += HERO_SPEED }
+  if (keys[Key.K_W] || keys[Key.UP])    { hero.rect.y -= HERO_SPEED }
+  if (keys[Key.K_S] || keys[Key.DOWN])  { hero.rect.y += HERO_SPEED }
 
   screen.clear()
   screen.blit(hero, hero.rect))
@@ -60,6 +61,23 @@ async function main () {
 
 main()
 ```
+
+### Sketchs (Vector graphics)
+
+```ts
+import { Game, Sketch } from 'smallgame'
+
+const GAME_WIDTH  = 400
+const GAME_HEIGHT = 400
+const container  = document.getElementById('container')
+const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+const heroSketch = Sketch()
+heroSketch.roundedrect({ fill: 'tomato' }, new Rect(10, 10, 200, 200), 16)
+  
+const hero = heroSketch.toSurface()
+screen.blit(hero, hero.rect)
+```
+
 
 ### Works with sprites
 
@@ -150,9 +168,7 @@ function createTileBackgroud() {
   const rect = new Rect(0, 0, TILE_WIDTH + GAP, TILE_HEIGHT + GAP)
   const sketch = new Sketch()
   sketch.rect({ fill: 'gray' }, rect)
-  const surface = new Surface(rect.width, rect.height)
-  sketch.draw(surface)
-  return surface
+  return sketch.toSurface(rect.width, rect.height)  
 }
 
 main()
