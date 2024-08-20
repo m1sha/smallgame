@@ -1,6 +1,6 @@
 {
   "name": "smallgame",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "A simple graphics library for developing 2D games and interactive applications",
   "main": "src/index.ts",
   "scripts": {
@@ -10,7 +10,11 @@
   "repository": {
     "url": "https://github.com/m1sha/smallgame"
   },
-  "keywords": [],
+  "keywords": [
+    "2D games",
+    "graphics library",
+    "canvas"
+  ],
   "author": "m1hailostertag@gmail.com",
   "license": "MIT",
   "devDependencies": {
