@@ -3,16 +3,16 @@ import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 
 export class Surface {
-  #canvas: HTMLCanvasElement | OffscreenCanvas
+  protected canvas: HTMLCanvasElement | OffscreenCanvas
   #ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   #rect: Rect
   
   constructor(width: number, height: number, useAlpha: boolean = true, virtual: boolean = false) {
-    this.#canvas = virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
-    this.#canvas.width = width
-    this.#canvas.height = height
+    this.canvas = virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+    this.canvas.width = width
+    this.canvas.height = height
     this.#rect = new Rect(0, 0, width, height)
-    this.#ctx = this.#canvas.getContext('2d', { alpha: useAlpha })! as CanvasRenderingContext2D
+    this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha })! as CanvasRenderingContext2D
   }
 
   get draw () { return this.#ctx }
@@ -23,8 +23,9 @@ export class Surface {
 
   get height () { return this.#rect.height }
 
+
   clear () {
-    this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
+    this.#ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
   fill (color: string) {
@@ -85,8 +86,8 @@ export class Surface {
 
   resize (width: number, height: number) {
     const canvas = this.cloneCanvas()
-    this.#canvas.width = width
-    this.#canvas.height = height
+    this.canvas.width = width
+    this.canvas.height = height
     this.#ctx.drawImage(canvas, 0, 0, width, height)
     this.#rect.resizeSelf(width, height)
   }
@@ -96,8 +97,8 @@ export class Surface {
     this.clear()
     const shiftX = shiftToCenter ? (width - canvas.width) / 2 : 0
     const shiftY = shiftToCenter ? (height - canvas.height) / 2: 0
-    this.#canvas.width = width
-    this.#canvas.height = height
+    this.canvas.width = width
+    this.canvas.height = height
     this.#ctx.fillStyle = '#119922'
     this.#ctx.fillRect(0,0,width, height)
     this.#ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
@@ -113,14 +114,14 @@ export class Surface {
   }
 
   toDataURL (type?: string, quality?: any): string {
-    if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
-    return this.#canvas.toDataURL(type, quality)
+    if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+    return this.canvas.toDataURL(type, quality)
   }
 
   save (type?: string, quality?: any): Promise<Blob | null> {
     return new Promise((resolve) => {
-      if (this.#canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
-      this.#canvas.toBlob(blob => resolve(blob), type, quality)
+      if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+      this.canvas.toBlob(blob => resolve(blob), type, quality)
     })
   }
 
@@ -132,7 +133,7 @@ export class Surface {
   clone () {
     const surface = new Surface(this.width, this.height, true)
     const canvas = this.cloneCanvas()
-    surface.#canvas = canvas
+    surface.canvas = canvas
     surface.#ctx = canvas.getContext('2d')!
     return surface
   }

@@ -4,8 +4,7 @@ import { Surface } from './surface'
 import { PolyRect, Rect, TRect } from './rect'
 import { Point, TPoint } from './point'
 import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle } from './shapes'
-
-
+import { Boundedrect } from './shapes/boundedrect'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -13,6 +12,7 @@ export class Sketch extends Drawable {
   y: number = 0
   sx: number = 1
   sy: number = 1
+  aa: boolean = false // if true a line thickness 1px
 
   rect (style: ShapeStyle | TShapeStyle, rect: Rect | TRect): Rectangle & { style: ShapeStyle }  {
     const shape: Shape = { type: 'rectangle', ...rect, style: ShapeStyle.from(style) }
@@ -56,6 +56,7 @@ export class Sketch extends Drawable {
 
   draw (suface: Surface): void {
     for (const shape of this._shapes) {
+      if (this.aa) suface.draw.translate(0.5, 0.5)
       suface.draw.beginPath()
       if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
       if (shape.style.fill) suface.draw.fillStyle = shape.style.fill
@@ -88,6 +89,8 @@ export class Sketch extends Drawable {
         }
       }
 
+      
+
       if (shape.style.fillStrokeOrder === 'stroke-first') {
         if (shape.style.stroke) suface.draw.stroke()
         if (shape.style.fill) suface.draw.fill()
@@ -100,8 +103,21 @@ export class Sketch extends Drawable {
     }
   }
 
-  toSurface (width: number, height: number) {
-    const suface = new Surface(width, height)
+  get bounds () {
+    return Boundedrect.getShapesBounds(this._shapes)
+  }
+
+  toSurface (width?: number, height?: number) {
+    let w = 0; let h = 0
+    
+    if (!width || !height) {
+      const { absWidth, absHeight } = this.bounds
+      w = absWidth; h = absHeight
+    } else {
+      w = width; h = height
+    }
+
+    const suface = new Surface(w, h)
     this.draw(suface)
     return suface
   }

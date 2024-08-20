@@ -168,12 +168,38 @@ export class Rect {
     return this
   }
 
+  union (rect: TRect) {
+    return new Rect(
+      Math.min(this.x, rect.x), 
+      Math.min(this.y, rect.y), 
+      Math.max(this.width, rect.width),
+      Math.max(this.height, rect.height)
+    )
+  }
+
+  unionSelf (rect: TRect) {
+    this.x = Math.min(this.x, rect.x)
+    this.y = Math.min(this.y, rect.y) 
+    this.width = Math.max(this.width, rect.width)
+    this.height = Math.max(this.height, rect.height)
+    return this
+  }
+
+  rotate (a: number, pivot?: number | TPoint) {
+    const { x, y, width, height } = this
+    return new PolyRect(x, y, width, height).rotateSelf(a, pivot as any)
+  }
+
   static get zero () {
     return new Rect(0, 0, 0, 0)
   }
 
   static size (width: number, height: number) {
     return new Rect(0, 0, width, height)
+  }
+
+  static from ({ x, y, width, height }: TRect) {
+    return new Rect(x, y, width, height)
   }
 
   private calcPivote(pivote?: Pivote) {
@@ -262,6 +288,12 @@ export class ObservableRect /* implicitly implements Observable */ {
   }
   resizeSelf (width: number, height: number) {
     return this.#rect.resizeSelf(width, height)
+  }
+  union (rect: TRect) {
+    return this.#rect.union(rect)
+  }
+  unionSelf (rect: TRect) {
+    return this.#rect.unionSelf(rect)
   }
 }
 
@@ -407,5 +439,13 @@ export class PolyRect {
     }
   }
 
+}
+
+export function copyRect({ x, y, width, height }: TRect): TRect {
+  return { x, y, width, height }
+}
+
+export function setRect( x: number, y: number, width: number, height: number): TRect {
+  return { x, y, width, height }
 }
 
