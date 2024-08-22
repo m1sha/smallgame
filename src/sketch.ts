@@ -76,6 +76,19 @@ export class Sketch extends Drawable {
     return shape
   }
 
+  segmentline (style: ShapeStyle | TShapeStyle | string, startPoint: Point | TPoint) {
+    const points: TPoint[] = []
+    const shape: Shape = { 
+      type: 'segmentline', 
+      startPoint, 
+      points, 
+      style: this.initStyle(style),
+      addSegment: (point: Point | TPoint) => points.push(point)
+    }
+    this._shapes.push(shape)
+    return shape
+  }
+
   draw (suface: Surface): void {
     for (const shape of this._shapes) {
       if (this.aa) suface.draw.translate(0.5, 0.5)
@@ -107,6 +120,14 @@ export class Sketch extends Drawable {
         case 'line': {
           suface.draw.moveTo(this.x + shape.p0.x * this.sx, this.y + shape.p0.y * this.sy)
           suface.draw.lineTo(this.x + shape.p1.x * this.sx, this.y + shape.p1.y * this.sy)
+          break
+        }
+        case 'segmentline': {
+          const startPoint = shape.startPoint
+          suface.draw.moveTo(this.x + startPoint.x * this.sx, this.y + startPoint.y * this.sy)
+          for (const point of shape.points) {
+            suface.draw.lineTo(this.x + point.x * this.sx, this.y + point.y * this.sy)
+          }
           break
         }
       }

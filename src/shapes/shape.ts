@@ -3,6 +3,7 @@ import { Line } from './line'
 import { PolyRectangle } from './polyrect'
 import { Rectangle } from './rectangle'
 import { RoundedRectangle } from './roundedrect'
+import { SegmentLine } from './segment-line'
   
 export type Shape = (
   | Rectangle 
@@ -10,4 +11,5 @@ export type Shape = (
   | RoundedRectangle
   | Circle
   | Line
+  | SegmentLine
 ) 
