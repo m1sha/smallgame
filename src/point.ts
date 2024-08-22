@@ -71,6 +71,16 @@ export class FPoint {
     return new Point(this.x, this.y * dy)
   }
 
+  negative () {
+    return new Point(-this.x, -this.y)
+  }
+
+  negativeSelf () {
+    this.x *= -1
+    this.y *= -1
+    return this
+  }
+
   static get zero () { return new Point(0, 0) }
 
   static distance (p0: TPoint, p1: TPoint): number {
