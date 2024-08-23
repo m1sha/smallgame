@@ -1,4 +1,5 @@
 export * from './drawable'
+export * from './events/game-event'
 export * from './game'
 export * from './group'
 export * from './point'

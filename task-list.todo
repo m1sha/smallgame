@@ -2,7 +2,7 @@ LIST OF FEATURE
 
 [x] Sketch segment line
 [ ] Point and Rect methods
-[ ] MOUSE_LEAVE event
+[x] MOUSEENTER and MOUSELEAVE events
 [ ] Shapes in Sketch (ellipse, bezier)
 [ ] Bounded rects for all type of Shapes in Sketch
 [ ] Vector transformation for Sketch (move, rotate, scale, etc.)

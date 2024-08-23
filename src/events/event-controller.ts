@@ -15,6 +15,7 @@ export class EventController {
     let keypressed = false
     let mousemown = false
     const queue = unsafecast<EventQueue>(key)
+    let leave = true
 
     document.addEventListener('keydown', e => {
       queue.push(e)
@@ -34,22 +35,70 @@ export class EventController {
 
     const canvas = screen.draw.canvas
 
-    canvas.addEventListener('mousedown', e => {
+    canvas.addEventListener('pointerdown', e => {
+      leave = false
+
       if (mousemown) return
       mousemown = true
       event.push('MOUSEDOWN', e)
     })
 
-    canvas.addEventListener('mouseup', e => {
+    canvas.addEventListener('pointerup', e => {
+      leave = false
+
       if (!mousemown) return
       mousemown = false
       event.push('MOUSEUP', e)
     })
 
-    canvas.addEventListener('mousemove', e => {
+    canvas.addEventListener('pointermove', e => {
+      leave = false
+
       if (event.has('MOUSEMOVE')) return
+      
+      if (e instanceof PointerEvent) {
+        if (e.pointerType === 'pen')
+        if (e.getCoalescedEvents) {
+          const events = e.getCoalescedEvents()
+          console.dir(events)
+          for (const ev of events)
+            event.push('MOUSEMOVE', ev)
+          
+          return
+        }
+        
+      }
       event.push('MOUSEMOVE', e)
     })
 
+    canvas.addEventListener('pointerleave', e => {
+      if (leave) return
+      event.push('MOUSELEAVE', e)
+      leave = true
+    })
+
+    canvas.addEventListener('pointercancel', e => {
+      if (leave) return
+      event.push('MOUSELEAVE', e)
+      leave = true
+    })
+
+    canvas.addEventListener('pointerout', e => {
+      if (leave) return
+      event.push('MOUSELEAVE', e)
+      leave = true
+    })
+
+    canvas.addEventListener('pointerover', e => {
+      if (!leave) return
+      event.push('MOUSEENTER', e)
+      leave = false
+    })
+    
+    canvas.addEventListener('pointerenter', e => {
+      if (!leave) return
+      event.push('MOUSEENTER', e)
+      leave = false
+    })
   }
 }

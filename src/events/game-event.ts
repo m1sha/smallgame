@@ -1,6 +1,9 @@
 import { Keys } from "../keys/keys"
 
-export type GameEventType = 'KEYDOWN' | 'KEYUP' | 'USEREVENT' | 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE'
+export type MouseEventTypeNames = | 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE' | 'MOUSELEAVE' | 'MOUSEENTER'
+export type KeyBoardTypeNames = 'KEYDOWN' | 'KEYUP' 
+
+export type GameEventType = KeyBoardTypeNames | MouseEventTypeNames | 'USEREVENT'
 
 class InputGameEvent<T> {
   altKey: boolean
@@ -16,22 +19,22 @@ class InputGameEvent<T> {
   }
 }
 
-class KeyboardGameEvent extends InputGameEvent<KeyboardEvent> {
-  type: 'KEYDOWN' | 'KEYUP'
+export class KeyboardGameEvent extends InputGameEvent<KeyboardEvent> {
+  type: KeyBoardTypeNames
   key: number = 0
   
-  constructor (type: 'KEYDOWN' | 'KEYUP', e: KeyboardEvent) {
+  constructor (type: KeyBoardTypeNames, e: KeyboardEvent) {
     super(e)
     this.type = type
     this.key = Keys.getKeyCode(e.code)
   }
 }
 
-class MouseGameEvent extends InputGameEvent<MouseEvent> {
-  type: 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE'
+export class MouseGameEvent extends InputGameEvent<MouseEvent> {
+  type: MouseEventTypeNames
   pos: { x: number, y: number}
   button: number = -1
-  constructor (type: 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE', e: MouseEvent) {
+  constructor (type: MouseEventTypeNames, e: MouseEvent) {
     super(e)
     this.type = type
     this.pos = { x: e.offsetX, y: e.offsetY }
@@ -62,6 +65,8 @@ export class GameEvents {
       case 'MOUSEDOWN': 
       case 'MOUSEUP':
       case 'MOUSEMOVE':
+      case 'MOUSELEAVE':
+      case 'MOUSEENTER':
         this.items.push(new MouseGameEvent(type, e as MouseEvent))
         break
     }
