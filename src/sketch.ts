@@ -3,7 +3,7 @@ import { Drawable } from './drawable'
 import { Surface } from './surface'
 import { PolyRect, Rect, TRect } from './rect'
 import { Point, TPoint } from './point'
-import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle } from './shapes'
+import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine } from './shapes'
 import { Boundedrect } from './shapes/boundedrect'
 
 export class Sketch extends Drawable {
@@ -76,6 +76,18 @@ export class Sketch extends Drawable {
     return shape
   }
 
+  vline (style: ShapeStyle | TShapeStyle | string, p: Point | TPoint, height: number): VLine  {
+    const shape: Shape = {  type: 'vline', p, height, style: this.initStyle(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  hline (style: ShapeStyle | TShapeStyle | string, p: Point | TPoint, width: number): HLine  {
+    const shape: Shape = {  type: 'hline', p, width, style: this.initStyle(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
   segmentline (style: ShapeStyle | TShapeStyle | string, startPoint: Point | TPoint) {
     const points: TPoint[] = []
     const shape: Shape = { 
@@ -84,6 +96,17 @@ export class Sketch extends Drawable {
       points, 
       style: this.initStyle(style),
       addSegment: (point: Point | TPoint) => points.push(point)
+    }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  setPixel (style: ShapeStyle | TShapeStyle | string, point: Point | TPoint) {
+    const shape: Shape = { 
+      type: 'pixel', 
+      x: point.x, 
+      y: point.y, 
+      style: this.initStyle(style),
     }
     this._shapes.push(shape)
     return shape
@@ -122,13 +145,26 @@ export class Sketch extends Drawable {
           suface.draw.lineTo(this.x + shape.p1.x * this.sx, this.y + shape.p1.y * this.sy)
           break
         }
+        case 'vline': {
+          suface.draw.fillRect(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, 1, shape.height)
+          break
+        }
+        case 'hline': {
+          suface.draw.fillRect(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.width, 1)
+          break
+        }
         case 'segmentline': {
           const startPoint = shape.startPoint
           suface.draw.moveTo(this.x + startPoint.x * this.sx, this.y + startPoint.y * this.sy)
           for (const point of shape.points) {
             suface.draw.lineTo(this.x + point.x * this.sx, this.y + point.y * this.sy)
+            suface.draw.moveTo(this.x + point.x * this.sx, this.y + point.y * this.sy)
           }
           break
+        }
+        case 'pixel': {
+          suface.draw.fillRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, 1, 1)
+          continue
         }
       }
 

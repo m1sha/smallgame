@@ -1,9 +1,12 @@
 import { Circle } from './circle'
+import { HLine } from './hline'
 import { Line } from './line'
+import { Pixel } from './pixel'
 import { PolyRectangle } from './polyrect'
 import { Rectangle } from './rectangle'
 import { RoundedRectangle } from './roundedrect'
 import { SegmentLine } from './segment-line'
+import { VLine } from './vline'
   
 export type Shape = (
   | Rectangle 
@@ -11,5 +14,8 @@ export type Shape = (
   | RoundedRectangle
   | Circle
   | Line
+  | VLine
+  | HLine
   | SegmentLine
+  | Pixel
 ) 
