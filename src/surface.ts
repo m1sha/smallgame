@@ -15,6 +15,13 @@ export class Surface {
     this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha })! as CanvasRenderingContext2D
   }
 
+  get imageRendering () { 
+    const value = (this.canvas as HTMLCanvasElement).style.imageRendering ?? 'auto' 
+    return value === 'auto' ? 'auto' : 'pixelated'
+  }
+
+  set imageRendering (value: 'auto' | 'pixelated') { ;(this.canvas as HTMLCanvasElement).style.imageRendering = value }
+
   get draw () { return this.#ctx }
 
   get rect () { return this.#rect }
