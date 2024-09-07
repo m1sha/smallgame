@@ -7,6 +7,11 @@ export async function loadImage (url: string): Promise<Surface> {
   return Surface.fromImage(img, rect)
 }
 
+export async function loadBlob (blob: Blob): Promise<Surface> {
+  const [img, rect] = await __loadBlob(blob)
+  return Surface.fromImage(img, rect)
+}
+
 export async function loadTileMap(tileWidth: number, titleHight: number, url: string, options?: TileMapInitOptions): Promise<TileMap> {
   const [img, rect] = await __loadImage(url)
   return TileMap.fromImage(tileWidth, titleHight, img, rect, options)
@@ -33,5 +38,20 @@ function __loadImage (url: string): Promise<[HTMLImageElement, Rect]> {
       resolve([img, rect])
     }
     img.onerror = e => reject(e)
+  })
+}
+
+function __loadBlob (blob: Blob): Promise<[HTMLImageElement, Rect]> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    
+    reader.onload = () => {
+      __loadImage(reader.result as string)
+        .then(value => resolve(value))
+        .catch(e => reject(e))
+    }
+
+    reader.onerror = e => reject(e)
+    reader.readAsDataURL(blob)
   })
 }
