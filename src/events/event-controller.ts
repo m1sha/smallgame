@@ -2,6 +2,7 @@ import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
 import { Game } from "../game"
 import { Surface } from "../surface"
+import { Point } from "../point"
 
 export class EventController {
   private readonly game: Game
@@ -16,6 +17,7 @@ export class EventController {
     let mousemown = false
     const queue = unsafecast<EventQueue>(key)
     let leave = true
+    const prevMousePos = Point.zero
 
     document.addEventListener('keydown', e => {
       queue.push(e)
@@ -31,6 +33,7 @@ export class EventController {
       if (!keypressed) return
       keypressed = false
       event.push('KEYUP', e)
+      prevMousePos.moveSelf(0, 0)
     })
 
     const canvas = screen.draw.canvas
@@ -53,9 +56,13 @@ export class EventController {
 
     canvas.addEventListener('pointermove', e => {
       leave = false
+      const ev = e as any
+      ev.prevMousePos = prevMousePos
 
-      if (event.has('MOUSEMOVE')) return
-      
+      if (event.has('MOUSEMOVE')) {
+        return
+      }
+
       if (e instanceof PointerEvent) {
         if (e.pointerType === 'pen')
         if (e.getCoalescedEvents) {
@@ -66,39 +73,45 @@ export class EventController {
           
           return
         }
-        
       }
+
       event.push('MOUSEMOVE', e)
+      prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
     })
 
     canvas.addEventListener('pointerleave', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
+      prevMousePos.moveSelf(0, 0)
     })
 
     canvas.addEventListener('pointercancel', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
+      prevMousePos.moveSelf(0, 0)
     })
 
     canvas.addEventListener('pointerout', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
+      prevMousePos.moveSelf(0, 0)
     })
 
     canvas.addEventListener('pointerover', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
       leave = false
+      prevMousePos.moveSelf(0, 0)
     })
     
     canvas.addEventListener('pointerenter', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
       leave = false
+      prevMousePos.moveSelf(0, 0)
     })
   }
 }
