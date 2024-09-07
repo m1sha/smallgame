@@ -88,6 +88,16 @@ export class FPoint {
     const dy = Math.pow(p1.y - p0.y, 2)
     return Math.sqrt(dx + dy)
   }
+
+  static inCircle(p0: TPoint, p1: TPoint, r: number) {
+    const dx = Math.pow(p1.x - p0.x, 2)
+    const dy = Math.pow(p1.y - p0.y, 2)
+    return (dx + dy) < r * r
+  }
+
+  static middle(p0: TPoint, p1: TPoint): TPoint {
+    return { x: (p0.x + p1.x) / 2 , y: (p0.y + p1.y) / 2 }
+  }
 }
 
 export class Point extends FPoint {
