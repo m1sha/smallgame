@@ -3,7 +3,7 @@ import { Drawable } from './drawable'
 import { Surface } from './surface'
 import { PolyRect, Rect, TRect } from './rect'
 import { Point, TPoint } from './point'
-import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine } from './shapes'
+import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots } from './shapes'
 import { Boundedrect } from './shapes/boundedrect'
 
 export class Sketch extends Drawable {
@@ -36,6 +36,10 @@ export class Sketch extends Drawable {
       this._styleList[name] = source._styleList[name].clone()
   }
 
+  clear () {
+    this._shapes = []
+  }
+
   rect (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect): Rectangle  {
     const shape: Shape = { type: 'rectangle', ...rect, style: this.initStyle(style) }
     this._shapes.push(shape)
@@ -44,6 +48,18 @@ export class Sketch extends Drawable {
 
   polyrect (style: ShapeStyle | TShapeStyle | string, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle {
     const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: this.initStyle(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  polygon (style: ShapeStyle | TShapeStyle | string, points: TPoint[]): Polygon {
+    const shape: Shape = { type: 'polygon', points, style: this.initStyle(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  polydots (style: ShapeStyle | TShapeStyle | string, points: TPoint[], radius: number = 1): Polydots {
+    const shape: Shape = { type: 'polydots', points, radius, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
@@ -131,6 +147,29 @@ export class Sketch extends Drawable {
           suface.draw.closePath()
           break
         }
+        case 'polygon': {
+          if (shape.points.length < 2) return
+          suface.draw.moveTo(this.x + shape.points[0].x * this.sx, this.y + shape.points[0].y * this.sy)
+          for (let i = 1; i < shape.points.length; i++) {
+            suface.draw.lineTo(this.x + shape.points[i].x * this.sx, this.y + shape.points[i].y * this.sy)
+          }
+          suface.draw.closePath()
+          break
+        }
+        case 'polydots': {
+          for (let i = 0; i < shape.points.length; i++) {
+            suface.draw.ellipse(
+              this.x + shape.points[i].x * this.sx, 
+              this.y + shape.points[i].y * this.sy, 
+              shape.radius * this.sx, 
+              shape.radius * this.sy, 0, 0, 2*Math.PI
+            )
+            this.pushToBlitQueue(shape, suface)
+            suface.draw.beginPath()
+          }
+          break
+        }
+        
         case 'roundedrectangle': {
           const radii = [shape.topLeft, shape.topRight, shape.bottomRight, shape.bottomLeft].filter(p => p)
           suface.draw.roundRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy, radii)
@@ -168,16 +207,7 @@ export class Sketch extends Drawable {
         }
       }
 
-      if (shape.style.fillStrokeOrder === 'stroke-first') {
-        if (shape.style.stroke) suface.draw.stroke()
-        if (shape.style.fill) suface.draw.fill()
-        if (this.aa) suface.draw.resetTransform()
-        return
-      }
-      
-      if (shape.style.fill) suface.draw.fill()
-      if (shape.style.stroke) suface.draw.stroke()
-      if (this.aa) suface.draw.resetTransform()
+      this.pushToBlitQueue(shape, suface)
     }
   }
 
@@ -198,6 +228,19 @@ export class Sketch extends Drawable {
     const suface = new Surface(w, h)
     this.draw(suface)
     return suface
+  }
+
+  private pushToBlitQueue(shape: Shape, suface: Surface) {
+    if (shape.style.fillStrokeOrder === 'stroke-first') {
+      if (shape.style.stroke) suface.draw.stroke()
+      if (shape.style.fill) suface.draw.fill()
+      if (this.aa) suface.draw.resetTransform()
+      return
+    }
+    
+    if (shape.style.fill) suface.draw.fill()
+    if (shape.style.stroke) suface.draw.stroke()
+    if (this.aa) suface.draw.resetTransform()
   }
 
   private initStyle (style: ShapeStyle | TShapeStyle | string): ShapeStyle {

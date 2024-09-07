@@ -2,6 +2,8 @@ import { Circle } from './circle'
 import { HLine } from './hline'
 import { Line } from './line'
 import { Pixel } from './pixel'
+import { Polydots } from './polydots'
+import { Polygon } from './polygon'
 import { PolyRectangle } from './polyrect'
 import { Rectangle } from './rectangle'
 import { RoundedRectangle } from './roundedrect'
@@ -12,6 +14,8 @@ export type Shape = (
   | Rectangle 
   | PolyRectangle
   | RoundedRectangle
+  | Polygon
+  | Polydots
   | Circle
   | Line
   | VLine
