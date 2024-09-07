@@ -47,8 +47,11 @@ export class Game {
     })
   }
 
-  static create(width: number, height: number, containter: HTMLElement) {
+  static create(width: number, height: number, containter: HTMLElement, willReadFrequently = true) {
+    Game.willReadFrequently = willReadFrequently
     const game = new Game()
     return { game, screen: game.init(width, height, containter) }
   }
+
+  static willReadFrequently = true
 }

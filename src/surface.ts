@@ -1,6 +1,7 @@
 import { Point, TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
+import { Game } from "./game"
 
 export class Surface {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
@@ -12,7 +13,7 @@ export class Surface {
     this.canvas.width = width
     this.canvas.height = height
     this.#rect = new Rect(0, 0, width, height)
-    this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha })! as CanvasRenderingContext2D
+    this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
   }
 
   get imageRendering () { 
