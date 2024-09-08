@@ -4,18 +4,32 @@ import { Surface } from "./surface"
 import { CollisionHashmap } from "./utils/collision-hashmap"
 import { TPoint } from "./point"
 
+export type GroupOptions = {
+  collisionHashmap?: {
+    rows: number
+    cols: number
+    spaceWidth: number
+    spaceHeight: number
+  }
+  useSpriteCollideRect?: boolean
+}
+
 
 export class Group {
   #sprites: Sprite[] = []
   #hashmap: CollisionHashmap<Sprite> | null = null
   #collidedlist: Map<Sprite, Sprite> = new Map()
   readonly useCollisionHashmap: boolean = false
+  readonly useSpriteCollideRect: boolean = false
 
-  constructor (options?: { useCollisionHashmap: boolean, hashmapRows: number, hashmapCols: number, spaceWidth: number, spaceHeight: number  }) {
-    if (options && options.useCollisionHashmap) {
-      this.#hashmap = new CollisionHashmap<Sprite>(options.hashmapRows, options.hashmapCols, options.spaceWidth, options.spaceHeight)
+  constructor (options?: GroupOptions) {
+    if (options && options.collisionHashmap) {
+      const { rows, cols, spaceWidth, spaceHeight } = options.collisionHashmap
+      this.#hashmap = new CollisionHashmap<Sprite>(rows, cols, spaceWidth, spaceHeight)
       this.useCollisionHashmap = true
     }
+
+    this.useSpriteCollideRect = Boolean(options && options.useSpriteCollideRect)
   }
 
   get sprites (): ReadonlyArray<Sprite> {
@@ -46,7 +60,8 @@ export class Group {
 
   collidePoint (point: TPoint, callback: (sprite: Sprite) => void): void {
     this.sprites.forEach( sprt => {
-      if (sprt.rect && sprt.rect.containsPoint(point)) 
+      const rect = this.useSpriteCollideRect ? sprt.collideRect : sprt.rect
+      if (rect && rect.containsPoint(point)) 
         callback(sprt)
     })
   }
@@ -77,7 +92,7 @@ export class Group {
 
   collideSprites(sprite: Sprite, sprites: Sprite[], callback: (sprite1: Sprite, sprite2: Sprite) => void) {
     sprites.forEach( sprt => {
-      if (collide(sprite, sprt)) {
+      if (collide(sprite, sprt, this.useSpriteCollideRect)) {
         if (!this.#collidedlist.get(sprt))
           callback(sprt, sprite)
         this.#collidedlist.set(sprt, sprite)  
@@ -90,6 +105,8 @@ export class Group {
 }
 
 
-function collide(sprite1: Sprite, sprite2: Sprite) {
-  return sprite1 !== sprite2 && sprite1.rect && sprite2.rect && sprite1.rect.overlaps(sprite2.rect as any)
+function collide(sprite1: Sprite, sprite2: Sprite, useSpriteCollideRect: boolean) {
+  const rect1 = useSpriteCollideRect ? sprite1.collideRect : sprite1.rect
+  const rect2 = useSpriteCollideRect ? sprite2.collideRect : sprite2.rect
+  return sprite1 !== sprite2 && rect1 && rect2 && rect1.overlaps(rect2 as any)
 }
