@@ -1,6 +1,6 @@
 {
   "name": "smallgame",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple graphics library for developing 2D games and interactive applications",
   "main": "src/index.ts",
   "scripts": {
