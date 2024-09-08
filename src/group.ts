@@ -2,6 +2,7 @@ import { removeItem } from "./utils/array"
 import { Sprite } from "./sprite"
 import { Surface } from "./surface"
 import { CollisionHashmap } from "./utils/collision-hashmap"
+import { TPoint } from "./point"
 
 
 export class Group {
@@ -41,6 +42,13 @@ export class Group {
 
   remove (sprite: Sprite): void {
     removeItem(this.#sprites, p => p === sprite)
+  }
+
+  collidePoint (point: TPoint, callback: (sprite: Sprite) => void): void {
+    this.sprites.forEach( sprt => {
+      if (sprt.rect && sprt.rect.containsPoint(point)) 
+        callback(sprt)
+    })
   }
 
   collideSprite (sprite: Sprite, callback: (sprite: Sprite) => void): void {
