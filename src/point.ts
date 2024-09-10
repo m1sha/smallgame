@@ -143,6 +143,26 @@ export function zeroPoint (): TPoint {
   return { x: 0, y: 0 }
 }
 
+export function nigativePoint (point: TPoint): TPoint {
+  return { x: -point.x, y: -point.y}
+}
+
 export function setPoint (x: number, y: number): TPoint {
   return { x, y }
+}
+
+export function mulPoints (p0: TPoint, p1: TPoint): TPoint {
+  return { x: p0.x * p1.x, y: p0.y * p1.y}
+}
+
+export function divPoints (p0: TPoint, p1: TPoint): TPoint {
+  return { x: p0.x / p1.x, y: p0.y / p1.y}
+}
+
+export function sumPoints (p0: TPoint, p1: TPoint): TPoint {
+  return { x: p0.x + p1.x, y: p0.y + p1.y}
+}
+
+export function subPoints (p0: TPoint, p1: TPoint): TPoint {
+  return { x: p0.x - p1.x, y: p0.y - p1.y}
 }

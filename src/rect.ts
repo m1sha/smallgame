@@ -486,3 +486,10 @@ export function setRect( x: number, y: number, width: number, height: number): T
   return { x, y, width, height }
 }
 
+export function resetRect(rect: TRect, x?: number, y?: number, width?: number, height?: number): void {
+  if (typeof x === 'number') rect.x = x
+  if (typeof y === 'number') rect.y = y
+  if (typeof width === 'number') rect.width = width
+  if (typeof height === 'number') rect.height = height 
+}
+
