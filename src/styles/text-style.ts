@@ -1,4 +1,4 @@
-import { FillStrokeOrder } from "./fill-stroke-order"
+import { PaintOrder } from "./paint-order"
 
 export type FontWeight = 'normal' | 'bold' | 'lighter' | 'bolder' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 export type FontVariant = 'normal' | 'small-caps'
@@ -11,7 +11,7 @@ export interface TTextStyle {
   bold? : boolean | FontWeight
   italic?: boolean
   fontVariant?: FontVariant
-  fillStrokeOrder?: FillStrokeOrder
+  paintOrder?: PaintOrder
   // readonly shadow?: Shadow
 }
 
@@ -24,7 +24,7 @@ export class TextStyle {
   bold : boolean | FontWeight
   italic: boolean
   fontVariant: FontVariant
-  fillStrokeOrder: FillStrokeOrder
+  paintOrder: PaintOrder
   // #shadow?: Shadow
 
   constructor (style: TTextStyle) {
@@ -37,7 +37,7 @@ export class TextStyle {
     this.bold = style.bold ? style.bold : 'normal'
     this.italic = style.italic ? style.italic : false
     this.fontVariant = style.fontVariant ? style.fontVariant : 'normal'
-    this.fillStrokeOrder = style.fillStrokeOrder ? style.fillStrokeOrder : 'fill-first'
+    this.paintOrder = style.paintOrder ? style.paintOrder : 'fill'
     //this.#shadow = style.shadow
     
   }

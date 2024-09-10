@@ -35,12 +35,12 @@ function assignTextStyle (ctx: CanvasRenderingContext2D, style: TextStyle) {
 }
 
 function drawText (ctx: CanvasRenderingContext2D, style: TextStyle, text: string, x: number, y: number) {
-  if (style.fillStrokeOrder === 'stroke-first') {
+  if (style.paintOrder === 'stroke') {
     strokeText(ctx, style, text, x, y)
     fillText(ctx, style, text, x, y)
   }
 
-  if (!style.fillStrokeOrder || style.fillStrokeOrder === 'fill-first') {
+  if (!style.paintOrder || style.paintOrder === 'fill') {
     fillText(ctx, style, text, x, y)
     strokeText(ctx, style, text, x, y)
   }

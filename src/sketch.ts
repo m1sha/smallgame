@@ -13,7 +13,7 @@ export class Sketch extends Drawable {
   y: number = 0
   sx: number = 1
   sy: number = 1
-  aa: boolean = false // if true a line thickness 1px
+  
 
   defineStyle (name: string, style: TShapeStyle): ShapeStyle {
     return this._styleList[name] = ShapeStyle.from(style)
@@ -130,7 +130,7 @@ export class Sketch extends Drawable {
 
   draw (suface: Surface): void {
     for (const shape of this._shapes) {
-      if (this.aa) suface.draw.translate(0.5, 0.5)
+      
       suface.draw.beginPath()
       if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
       if (shape.style.fill) suface.draw.fillStyle = shape.style.fill
@@ -231,16 +231,14 @@ export class Sketch extends Drawable {
   }
 
   private pushToBlitQueue(shape: Shape, suface: Surface) {
-    if (shape.style.fillStrokeOrder === 'stroke-first') {
+    if (shape.style.paintOrder === 'stroke') {
       if (shape.style.stroke) suface.draw.stroke()
       if (shape.style.fill) suface.draw.fill()
-      if (this.aa) suface.draw.resetTransform()
       return
     }
     
     if (shape.style.fill) suface.draw.fill()
     if (shape.style.stroke) suface.draw.stroke()
-    if (this.aa) suface.draw.resetTransform()
   }
 
   private initStyle (style: ShapeStyle | TShapeStyle | string): ShapeStyle {

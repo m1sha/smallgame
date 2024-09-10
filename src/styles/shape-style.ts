@@ -1,6 +1,6 @@
 /* global CanvasLineCap, CanvasLineJoin */
 
-import { FillStrokeOrder } from "./fill-stroke-order"
+import { PaintOrder } from "./paint-order"
 
 export type TShapeStyle = {
   fill?: string
@@ -11,7 +11,7 @@ export type TShapeStyle = {
   lineJoin?: CanvasLineJoin
   lineWidth?: number
   miterLimit?: number
-  fillStrokeOrder?: FillStrokeOrder
+  paintOrder?: PaintOrder
 }
 
 export class ShapeStyle {
@@ -23,11 +23,11 @@ export class ShapeStyle {
   lineJoin: CanvasLineJoin
   lineWidth: number
   miterLimit: number
-  fillStrokeOrder?: FillStrokeOrder
+  paintOrder?: PaintOrder
 
   constructor (style: TShapeStyle) {
-    this.fill = style.fill ?? "#fff"
-    this.stroke = style.stroke ?? "#222"
+    this.fill = style.fill ?? "transparent"
+    this.stroke = style.stroke ?? "transparent"
     this.lineCap = 'butt'
     this.lineDashOffset = 0
     this.lineDash = []
