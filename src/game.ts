@@ -20,7 +20,7 @@ export class Game {
   init (width: number, height: number, containter: HTMLElement): Screen {
     if (this.#screen) return this.#screen
     this.#screen = new Screen(width, height)
-    containter.append(this.#screen.draw.canvas as any)
+    containter.append(this.#screen.viewport.htmlContainer as any)
     this.controller.init(this.#screen)
     return this.#screen
   }
