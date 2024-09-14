@@ -58,7 +58,7 @@ export class Sketch extends Drawable {
     return shape
   }
 
-  polydots (style: ShapeStyle | TShapeStyle | string, points: TPoint[], radius: number = 1): Polydots {
+  dots (style: ShapeStyle | TShapeStyle | string, points: TPoint[], radius: number = 1): Polydots {
     const shape: Shape = { type: 'polydots', points, radius, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
