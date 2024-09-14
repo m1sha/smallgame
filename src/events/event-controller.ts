@@ -1,8 +1,8 @@
 import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
 import { Game } from "../game"
-import { Surface } from "../surface"
 import { Point } from "../point"
+import { Screen } from "../screen"
 
 export class EventController {
   private readonly game: Game
@@ -11,19 +11,22 @@ export class EventController {
     this.game = game
   }
 
-  init (screen: Surface) {
+  init (screen: Screen) {
     const { event, key } = this.game
     let keypressed = false
     let mousemown = false
     const queue = unsafecast<EventQueue>(key)
     let leave = true
     const prevMousePos = Point.zero
+    let lastKey = ''
 
     document.addEventListener('keydown', e => {
       queue.push(e)
 
-      if (keypressed) return
+      if (keypressed && lastKey === e.key) return
+      
       keypressed = true
+      lastKey = e.key
       event.push('KEYDOWN', e)
     })
 
@@ -36,7 +39,7 @@ export class EventController {
       prevMousePos.moveSelf(0, 0)
     })
 
-    const canvas = screen.draw.canvas
+    const canvas = screen.originCanvas
 
     canvas.addEventListener('pointerdown', e => {
       leave = false
