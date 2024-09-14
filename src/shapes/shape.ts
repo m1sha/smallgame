@@ -8,6 +8,7 @@ import { PolyRectangle } from './polyrect'
 import { Rectangle } from './rectangle'
 import { RoundedRectangle } from './roundedrect'
 import { SegmentLine } from './segment-line'
+import { Vectors } from './vectors'
 import { VLine } from './vline'
   
 export type Shape = (
@@ -22,4 +23,5 @@ export type Shape = (
   | HLine
   | SegmentLine
   | Pixel
+  | Vectors
 ) 

@@ -2,9 +2,10 @@ import { ShapeStyle, TShapeStyle, applyStroke } from './styles/shape-style'
 import { Drawable } from './drawable'
 import { Surface } from './surface'
 import { PolyRect, Rect, TRect } from './rect'
-import { Point, TPoint } from './point'
-import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots } from './shapes'
+import { Point, setPoint, TPoint } from './point'
+import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots, Vectors } from './shapes'
 import { Boundedrect } from './shapes/boundedrect'
+import { TVector } from './vector'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -60,6 +61,14 @@ export class Sketch extends Drawable {
 
   dots (style: ShapeStyle | TShapeStyle | string, points: TPoint[], radius: number = 1): Polydots {
     const shape: Shape = { type: 'polydots', points, radius, style: this.initStyle(style) }
+    this._shapes.push(shape)
+    return shape
+  }
+
+  vectors (style: ShapeStyle | TShapeStyle | string, vectors: TVector[], options?: { arrowRadius?: number, arrowAngle?: number }): Vectors {
+    const arrowRadius = options && options.arrowRadius ? options.arrowRadius : 12
+    const arrowAngle = options && options.arrowAngle ? options.arrowAngle : Math.PI / 7
+    const shape: Shape = { type: 'vectors', vectors, arrowRadius, arrowAngle, style: this.initStyle(style) }
     this._shapes.push(shape)
     return shape
   }
@@ -169,7 +178,49 @@ export class Sketch extends Drawable {
           }
           break
         }
-        
+        case 'vectors':
+          const alfa = (vector: TVector): number => {
+            const { x, y } = setPoint(vector.p1.x - vector.p0.x, vector.p1.y - vector.p0.y) //new Point(vector.ep).dec(vector.sp)
+            return Math.atan2(y, x)
+          }
+
+          const arrow = (vector: TVector, dir: number): TPoint[] => {
+            const result = []
+            const angle = alfa(vector)
+            const point = dir < 0 ? vector.p0 : vector.p1
+            const r = shape.arrowRadius
+            const turn = shape.arrowAngle
+            const cos1 = dir * Math.cos(angle - turn)
+            const sin1 = dir * Math.sin(angle - turn)
+            result.push({ x: point.x - r * cos1, y: point.y - r * sin1 })
+            result.push({ x: point.x, y: point.y })
+            result.push({ x: point.x, y: point.y })
+            const cos2 = dir * Math.cos(angle + turn)
+            const sin2 = dir * Math.sin(angle + turn)
+            result.push({ x: point.x - r * cos2, y: point.y - r * sin2 })
+            return result
+          }
+
+          for (let i = 0; i < shape.vectors.length; i++) {
+            const { p0, p1 } = shape.vectors[i]
+            suface.draw.moveTo(this.x + p0.x * this.sx, this.y + p0.y * this.sy)
+            suface.draw.lineTo(this.x + p1.x * this.sx, this.y + p1.y * this.sy)
+            this.pushToBlitQueue(shape, suface)
+            suface.draw.beginPath()
+            const points = arrow(shape.vectors[i], 1)
+            suface.draw.moveTo(this.x + points[0].x * this.sx, this.y + points[0].y * this.sy)
+            for (let j = 1; j < points.length; j++) {
+              const p = points[j]
+              const x = this.x + p.x * this.sx 
+              const y = this.y + p.y * this.sy
+              suface.draw.lineTo(x, y)
+            }
+            suface.draw.closePath()
+            suface.draw.fillStyle = shape.style.stroke
+            suface.draw.fill()
+            suface.draw.beginPath()
+          }
+          break
         case 'roundedrectangle': {
           const radii = [shape.topLeft, shape.topRight, shape.bottomRight, shape.bottomLeft].filter(p => p)
           suface.draw.roundRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy, radii)
