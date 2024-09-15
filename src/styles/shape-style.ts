@@ -10,6 +10,7 @@ export type TShapeStyle = {
   lineDash?: number[]
   lineJoin?: CanvasLineJoin
   lineWidth?: number
+  ddaline?: boolean
   miterLimit?: number
   paintOrder?: PaintOrder
 }
@@ -22,6 +23,7 @@ export class ShapeStyle {
   lineDash: number[]
   lineJoin: CanvasLineJoin
   lineWidth: number
+  ddaline: boolean
   miterLimit: number
   paintOrder?: PaintOrder
 
@@ -34,6 +36,7 @@ export class ShapeStyle {
     this.lineJoin = 'bevel'
     this.lineWidth = style.lineWidth ?? 1
     this.miterLimit = 0
+    this.ddaline = Boolean(style.ddaline) && style.lineWidth === 1
   }
 
   static from(style: TShapeStyle | ShapeStyle): ShapeStyle {
@@ -54,6 +57,6 @@ export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
   if (style.lineDash) ctx.setLineDash(style.lineDash)
   ctx.lineDashOffset = style.lineDashOffset || 0
   ctx.lineCap = style.lineCap || 'butt'
-  if (style.lineDash) ctx.setLineDash(style.lineDash)
+  
 }
 
