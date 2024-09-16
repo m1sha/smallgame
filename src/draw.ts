@@ -137,8 +137,11 @@ export class Draw {
     this.#ctx.strokeStyle = value
   }
 
-  drawImage (src: HTMLImageElement, x: number, y: number, w: number, h: number, sx: number, sy: number, sw: number, sh: number) {
-    this.#ctx.drawImage(src, x, y, w, h, sx, sy, sw, sh)
+  drawImage (src: CanvasImageSource, x: number, y: number, w?: number, h?: number, sx?: number, sy?: number, sw?: number, sh?: number) {
+    if (typeof w === 'number' && typeof h === 'number' && typeof sx === 'number' && typeof sy === 'number' && typeof sw === 'number' && typeof sh === 'number')
+      this.#ctx.drawImage(src, x, y, w, h, sx, sy, sw, sh)
+    else
+      this.#ctx.drawImage(src, x, y)
   }
     
 }

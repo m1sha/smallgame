@@ -23,7 +23,7 @@ export class PixelMask {
     }
     const img = await createImageBitmap(imageData)
     const surface = new Surface(this.width, this.height, false)
-    surface.draw.drawImage(img, 0, 0)
+    surface.draw.origin.drawImage(img, 0, 0)
     return surface
   }
 

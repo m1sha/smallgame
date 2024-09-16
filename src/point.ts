@@ -143,7 +143,7 @@ export function zeroPoint (): TPoint {
   return { x: 0, y: 0 }
 }
 
-export function nigativePoint (point: TPoint): TPoint {
+export function negativePoint (point: TPoint): TPoint {
   return { x: -point.x, y: -point.y}
 }
 
