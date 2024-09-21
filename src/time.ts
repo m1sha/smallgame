@@ -2,13 +2,13 @@
  * Internal time setter
  * @internal
  */
-const TimeInternal = {
+const InternalTimeSetter = {
   deltaTime: 0
 }
 
 const Time = {
-  get deltaTime () { return TimeInternal.deltaTime },
+  get deltaTime () { return InternalTimeSetter.deltaTime },
   get time () { return Date.now() / 1000.0 }
 }
 
-export { Time, TimeInternal }
+export { Time, InternalTimeSetter }

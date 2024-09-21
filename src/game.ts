@@ -2,7 +2,7 @@ import { Screen } from "./screen"
 import { EventController } from "./events/event-controller"
 import { GameEvents } from "./events/game-event"
 import { Keys } from "./keys/keys"
-import { TimeInternal } from "./time"
+import { InternalTimeSetter } from "./time"
 
 export class Game {
   readonly event: GameEvents
@@ -43,10 +43,9 @@ export class Game {
         this.loop(callback)
         return
       }
-     
-      const delay = timestamp - this.#clock
-      this.#dt = delay / 1000
-      TimeInternal.deltaTime = this.#dt
+      
+      this.#dt = (timestamp - this.#clock) / 1000
+      InternalTimeSetter.deltaTime = this.#dt
       this.#fps = 1 / this.#dt
       this.#clock = timestamp
       this.loop(callback)
