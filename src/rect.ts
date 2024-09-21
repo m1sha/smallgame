@@ -89,6 +89,10 @@ export class Rect implements MutableRect {
     return { x: this.width / 2, y: this.height / 2 }
   }
 
+  set center (value: TPoint) {
+    this.moveSelf(value, 'center-center')
+  }
+
   get absCenter () {
     const { x, y } = this.center
     return { x: this.x + x, y: this.y + y }
@@ -109,7 +113,7 @@ export class Rect implements MutableRect {
     return e1 || e2 || e3 || e4 || e5 || e6 || e7 || e8
   }
 
-  touchSide (rect: Rect): ('left' | 'right' | 'top' | 'bottom')[] {
+  touchSide (rect: TRect): ('left' | 'right' | 'top' | 'bottom')[] {
     const result: ('left' | 'right' | 'top' | 'bottom')[] = new Array(2)
     const { x, y } = this.absCenter
     if (x > rect.x) result[0] = 'right'
