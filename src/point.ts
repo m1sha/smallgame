@@ -175,19 +175,3 @@ export function sumPoints (p0: TPoint, p1: TPoint): TPoint {
 export function subPoints (p0: TPoint, p1: TPoint): TPoint {
   return { x: p0.x - p1.x, y: p0.y - p1.y}
 }
-
-export function vectorPoints(p0: TPoint, p1: TPoint): TPoint {
-  return subPoints(p1, p0)
-}
-
-export function normalizePoint(point: TPoint): TPoint  {
-  const abs = absPoint(point)
-  return setPoint(
-    abs.x !== 0 ? 0 | point.x / abs.x : 0, 
-    abs.y !== 0 ? 0 | point.y / abs.y : 0
-  )
-}
-
-export function dotPoints(p0: TPoint, p1: TPoint): number {
-  return p0.x * p1.x + p0.y * p1.y
-}
