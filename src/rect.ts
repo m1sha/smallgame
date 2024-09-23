@@ -1,4 +1,4 @@
-import { copyPoint, isTPoint, Point, setPoint, TPoint, zeroPoint } from "./point"
+import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, TPoint, zeroPoint } from "./point"
 import { Sprite } from "./sprite"
 
 export type Pivote = 
@@ -238,6 +238,11 @@ export class Rect implements MutableRect {
 
   static from ({ x, y, width, height }: TRect) {
     return new Rect(x, y, width, height)
+  }
+
+  static fromTwoPoints (p0: TPoint, p1: TPoint) {
+    const p = absPoint(subPoints(p1, p0))
+    return new Rect(p0.x, p0.y, p.x, p.y)
   }
 
   private calcPivote(pivote?: Pivote) {

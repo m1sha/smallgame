@@ -3,20 +3,23 @@ import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 import { Game } from "./game"
 import { Draw } from "./draw"
+import { type CoordinateSystem } from "./coords"
 
 export class Surface {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
   #ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   #rect: Rect
   readonly draw: Draw
+  // #coordinateSystem: CoordinateSystem = 'screen'
   
-  constructor(width: number, height: number, useAlpha: boolean = true, virtual: boolean = false) {
+  constructor(width: number, height: number, useAlpha: boolean = true, virtual: boolean = false, coordinateSystem: CoordinateSystem = 'screen') {
     this.canvas = virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
     this.canvas.width = width
     this.canvas.height = height
     this.#rect = new Rect(0, 0, width, height)
     this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
-    this.draw = new Draw(this.#ctx)
+    // this.#coordinateSystem = coordinateSystem
+    this.draw = new Draw(this.#ctx, coordinateSystem)
   }
 
   get imageRendering () { 

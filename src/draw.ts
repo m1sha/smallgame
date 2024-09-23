@@ -1,10 +1,20 @@
+import { setPoint, TPoint } from "./point"
+import { CoordinateSystem, fromMathCoord } from "./coords"
 import { ddaline } from "./utils/dda-line"
+import { Rect } from "./rect"
 
 export class Draw {
   #ctx: CanvasRenderingContext2D
+  #conv: (point: TPoint) => TPoint
 
-  constructor (ctx: CanvasRenderingContext2D) {
+  constructor (ctx: CanvasRenderingContext2D, coordinateSystem: CoordinateSystem) {
     this.#ctx = ctx
+    this.#conv = point => {
+      switch (coordinateSystem) {
+        case "screen": return point
+        case "math": return fromMathCoord(point.x, point.y, ctx.canvas.width / 2, ctx.canvas.height / 2)
+      }
+    }
   }
 
   get origin () {
@@ -12,11 +22,13 @@ export class Draw {
   }
 
   roundRect (x: number, y: number, w: number, h: number, radii?: number | DOMPointInit | Iterable<number | DOMPointInit>): void {
-    this.#ctx.roundRect(x, y, w, h, radii)
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y + h)))
+    this.#ctx.roundRect(rect.x, rect.y, rect.width, rect.height, radii)
   }
 
   arc (x: number, y: number, radius: number, startAngle: number, endAngle: number, counterclockwise?: boolean): void {
-    this.#ctx.arc(x, y, radius, startAngle, endAngle, counterclockwise)
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + radius, y + radius)))
+    this.#ctx.arc(rect.x, rect.y, rect.width, startAngle, endAngle, counterclockwise)
   }
     
   arcTo (x1: number, y1: number, x2: number, y2: number, radius: number): void {
@@ -32,15 +44,18 @@ export class Draw {
   }
   
   ellipse (x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number, counterclockwise?: boolean): void {
-    this.#ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, counterclockwise)
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + radiusX, y + radiusY)))
+    this.#ctx.ellipse(rect.x, rect.y, rect.width, rect.height, rotation, startAngle, endAngle, counterclockwise)
   }
   
   lineTo (x: number, y: number): void{
-    this.#ctx.lineTo(x, y)
+    const point = this.#conv(setPoint(x, y))
+    this.#ctx.lineTo(point.x, point.y)
   }
   
   moveTo (x: number, y: number): void{
-    this.#ctx.moveTo(x, y)
+    const point = this.#conv(setPoint(x, y))
+    this.#ctx.moveTo(point.x, point.y)
   }
   
   quadraticCurveTo (cpx: number, cpy: number, x: number, y: number): void{
@@ -48,11 +63,13 @@ export class Draw {
   }
   
   rect (x: number, y: number, w: number, h: number): void {
-    this.#ctx.rect(x, y, w, h)
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y + h)))
+    this.#ctx.rect(rect.x, rect.y, rect.width, rect.height)
   }
 
   fillRect (x: number, y: number, w: number, h: number): void {
-    this.#ctx.fillRect(x, y, w, h)
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y + h)))
+    this.#ctx.fillRect(rect.x, rect.y, rect.width, rect.height)
   }
 
   ddaline (x0: number, y0: number, x1: number, y1: number, rgba: [number, number, number, number]) {

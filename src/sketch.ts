@@ -6,6 +6,7 @@ import { Point, setPoint, TPoint } from './point'
 import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots, Arrows } from './shapes'
 import { Boundedrect } from './shapes/boundedrect'
 import { type TSegment } from './segment'
+import { CoordinateSystem } from './coords'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -266,7 +267,7 @@ export class Sketch extends Drawable {
     return Boundedrect.getShapesBounds(this._shapes)
   }
 
-  toSurface (width?: number, height?: number) {
+  toSurface (width?: number, height?: number, coordinateSystem?: CoordinateSystem) {
     let w = 0; let h = 0
     
     if (!width || !height) {
@@ -276,7 +277,7 @@ export class Sketch extends Drawable {
       w = width; h = height
     }
 
-    const suface = new Surface(w, h)
+    const suface = new Surface(w, h, true, false, coordinateSystem ?? 'screen')
     this.draw(suface)
     return suface
   }
