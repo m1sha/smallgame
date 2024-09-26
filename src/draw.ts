@@ -72,6 +72,17 @@ export class Draw {
     this.#ctx.fillRect(rect.x, rect.y, rect.width, rect.height)
   }
 
+  hline (x: number, y: number, w: number): void {
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y)))
+    this.#ctx.fillRect(rect.x, rect.y, rect.width, 1)
+  }
+
+  vline (x: number, y: number, h: number): void {
+    debugger
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x, y + h)))
+    this.#ctx.fillRect(rect.x, rect.y, 1, rect.height)
+  }
+
   ddaline (x0: number, y0: number, x1: number, y1: number, rgba: [number, number, number, number]) {
     const data = this.#ctx.getImageData(0, 0, this.#ctx.canvas.width, this.#ctx.canvas.height)
     ddaline(data, rgba, x0, y0, x1, y1)

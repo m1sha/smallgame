@@ -237,11 +237,11 @@ export class Sketch extends Drawable {
           break
         }
         case 'vline': {
-          suface.draw.fillRect(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, 1, shape.height)
+          suface.draw.vline(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.height)
           break
         }
         case 'hline': {
-          suface.draw.fillRect(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.width, 1)
+          suface.draw.hline(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.width)
           break
         }
         case 'segmentline': {
