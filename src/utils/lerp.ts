@@ -1,4 +1,4 @@
-import { TPoint } from "point"
+import { TPoint } from "../point"
 
 const _lerp = (g: number, c: number, dt: number): number => {
   const d = g - c
