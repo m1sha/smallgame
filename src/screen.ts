@@ -1,12 +1,11 @@
 import { CssViewport, TransformViewport, Viewport, ViewportType } from './viewport'
-import { Surface } from './surface'
-import { CoordinateSystem } from './coords'
+import { Surface, SurfaceCreateOptions } from './surface'
 import { TPoint } from './point'
 
 export class Screen extends Surface {
   readonly viewport: Viewport
 
-  constructor(viewportType: ViewportType, width: number, height: number, options?: { useAlpha?: boolean, virtual?: boolean, coordinateSystem?: CoordinateSystem }) { 
+  constructor(viewportType: ViewportType, width: number, height: number, options?: SurfaceCreateOptions) { 
     super(width, height, options)
     
     this.viewport = viewportType === 'css' 

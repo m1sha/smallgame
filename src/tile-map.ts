@@ -7,6 +7,7 @@ export type TileMapInitOptions = {
   surfaceHeight?: number
   alpha?: boolean
   offscreen?: boolean
+  smooth?: boolean
 }
 
 export class TileMap {
@@ -26,12 +27,12 @@ export class TileMap {
     this.image = image
     this.rect = rect
     this.framePosition = Point.zero
-    const opt = Object.assign({ 
-      surfaceWidth: tileWidth, 
-      surfaceHeight: titleHight, 
-      alpha: true, 
-      offscreen: false }, options)
-    this.surface = new Surface(opt.surfaceWidth, opt.surfaceHeight, opt.alpha, opt.offscreen)
+    const surfaceWidth = tileWidth
+    const surfaceHeight = titleHight
+    const useAlpha = options && typeof options.alpha === 'boolean' ? options.alpha : true 
+    const useOffscreen = options && typeof options.offscreen === 'boolean' ? options.offscreen : false
+    const useSmooth = options && typeof options.smooth === 'boolean' ? options.smooth : true
+    this.surface = new Surface(surfaceWidth, surfaceHeight, { useAlpha, useOffscreen, useSmooth })
   }
 
   get x () { return this.#x }

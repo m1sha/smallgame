@@ -22,7 +22,7 @@ export class PixelMask {
       imageData.data[i + 3] = bwValue
     }
     const img = await createImageBitmap(imageData)
-    const surface = new Surface(this.width, this.height, false)
+    const surface = new Surface(this.width, this.height, { useSmooth: false })
     surface.draw.origin.drawImage(img, 0, 0)
     return surface
   }

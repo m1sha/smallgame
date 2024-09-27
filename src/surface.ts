@@ -5,6 +5,13 @@ import { Game } from "./game"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
 
+export type SurfaceCreateOptions = {
+  useAlpha?: boolean
+  useSmooth?: boolean
+  useOffscreen?: boolean
+  coordinateSystem?: CoordinateSystem
+}
+
 export class Surface {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
   #ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
@@ -12,15 +19,17 @@ export class Surface {
   #conv: (point: TPoint) => TPoint
   readonly draw: Draw
   
-  constructor(width: number, height: number, options?: { useAlpha?: boolean, virtual?: boolean, coordinateSystem?: CoordinateSystem }) {
-    this.canvas = options && options.virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+  constructor(width: number, height: number, options?: SurfaceCreateOptions) {
+    this.canvas = options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
     this.canvas.width = width
     this.canvas.height = height
     const coordinateSystem = options && options.coordinateSystem ? options.coordinateSystem : 'screen'
     const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
+    const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth : true
     this.#conv = point => coordconv(coordinateSystem, point, width, height) 
     this.#rect = new Rect(0, 0, width, height)
     this.#ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
+    this.imageRendering = useSmooth ? 'auto' : 'pixelated'
     this.draw = new Draw(this.#ctx, coordinateSystem)
   }
 

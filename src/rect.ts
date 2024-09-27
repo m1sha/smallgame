@@ -196,6 +196,26 @@ export class Rect implements MutableRect {
     throw new Error('Unsupport arguments.')
   }
 
+  shiftSelf (point: TPoint, pivote?: Pivote): Rect
+  shiftSelf (x: number, y: number, pivote?: Pivote): Rect
+  shiftSelf (...args: Array<any>): Rect  {
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      const [x, y] = this.calcPivote(args[2])
+      this.x += args[0] + x
+      this.y += args[1] + y
+      return this
+    } else {
+      const point = args[0] as TPoint
+      const [x, y] = this.calcPivote(args[1])
+      if (point && typeof point.x === 'number' && typeof point.y === 'number') {
+        this.x += point.x + x
+        this.y += point.y + y
+        return this
+      }
+    }
+    throw new Error('Unsupport arguments.')
+  }
+
   resize (width: number, height: number) {
     return new Rect(this.x, this.y, width, height)
   }
