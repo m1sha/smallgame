@@ -1,5 +1,5 @@
 import { setPoint, TPoint } from "./point"
-import { CoordinateSystem, fromMathCoord } from "./coords"
+import { CoordinateSystem, coordconv } from "./coords"
 import { ddaline } from "./utils/dda-line"
 import { Rect } from "./rect"
 
@@ -9,12 +9,7 @@ export class Draw {
 
   constructor (ctx: CanvasRenderingContext2D, coordinateSystem: CoordinateSystem) {
     this.#ctx = ctx
-    this.#conv = point => {
-      switch (coordinateSystem) {
-        case "screen": return point
-        case "math": return fromMathCoord(point.x, point.y, ctx.canvas.width / 2, ctx.canvas.height / 2)
-      }
-    }
+    this.#conv = point => coordconv(coordinateSystem, point, ctx.canvas.width, ctx.canvas.height) 
   }
 
   get origin () {

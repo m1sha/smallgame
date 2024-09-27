@@ -3,6 +3,7 @@ import { EventController } from "./events/event-controller"
 import { GameEvents } from "./events/game-event"
 import { Keys } from "./keys/keys"
 import { InternalTimeSetter } from "./time"
+import { ViewportType } from "./viewport"
 
 export class Game {
   readonly event: GameEvents
@@ -19,9 +20,9 @@ export class Game {
     this.controller = new EventController(this)
   }
 
-  init (width: number, height: number, containter: HTMLElement): Screen {
+  init (width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform'): Screen {
     if (this.#screen) return this.#screen
-    this.#screen = new Screen(width, height)
+    this.#screen = new Screen(viewportType, width, height)
     containter.append(this.#screen.viewport.htmlContainer as any)
     this.controller.init(this.#screen)
     return this.#screen
@@ -53,10 +54,10 @@ export class Game {
     })
   }
 
-  static create(width: number, height: number, containter: HTMLElement, willReadFrequently = true) {
+  static create(width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform', willReadFrequently = true) {
     Game.willReadFrequently = willReadFrequently
     const game = new Game()
-    return { game, screen: game.init(width, height, containter) }
+    return { game, screen: game.init(width, height, containter, viewportType) }
   }
 
   static willReadFrequently = true

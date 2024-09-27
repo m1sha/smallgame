@@ -2,14 +2,14 @@ import { TileMap, TileMapInitOptions } from "./tile-map"
 import { Rect } from "./rect"
 import { Surface } from "./surface"
 
-export async function loadImage (url: string): Promise<Surface> {
+export async function loadImage (url: string, options?: { useAlpha?: boolean, useSmooth?: boolean }): Promise<Surface> {
   const [img, rect] = await __loadImage(url)
-  return Surface.fromImage(img, rect)
+  return Surface.fromImage(img, rect, options)
 }
 
-export async function loadBlob (blob: Blob): Promise<Surface> {
+export async function loadBlob (blob: Blob, options?: { useAlpha?: boolean, useSmooth?: boolean }): Promise<Surface> {
   const [img, rect] = await __loadBlob(blob)
-  return Surface.fromImage(img, rect)
+  return Surface.fromImage(img, rect, options)
 }
 
 export async function loadTileMap(tileWidth: number, titleHight: number, url: string, options?: TileMapInitOptions): Promise<TileMap> {

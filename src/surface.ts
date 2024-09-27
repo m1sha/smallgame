@@ -1,35 +1,38 @@
-import { Point, TPoint } from "./point"
+import { Point, setPoint, TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 import { Game } from "./game"
 import { Draw } from "./draw"
-import { type CoordinateSystem } from "./coords"
+import { coordconv, type CoordinateSystem } from "./coords"
 
 export class Surface {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
   #ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   #rect: Rect
+  #conv: (point: TPoint) => TPoint
   readonly draw: Draw
-  // #coordinateSystem: CoordinateSystem = 'screen'
   
-  constructor(width: number, height: number, useAlpha: boolean = true, virtual: boolean = false, coordinateSystem: CoordinateSystem = 'screen') {
-    this.canvas = virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+  constructor(width: number, height: number, options?: { useAlpha?: boolean, virtual?: boolean, coordinateSystem?: CoordinateSystem }) {
+    this.canvas = options && options.virtual ? new OffscreenCanvas(width, height) : document.createElement('canvas')
     this.canvas.width = width
     this.canvas.height = height
+    const coordinateSystem = options && options.coordinateSystem ? options.coordinateSystem : 'screen'
+    const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
+    this.#conv = point => coordconv(coordinateSystem, point, width, height) 
     this.#rect = new Rect(0, 0, width, height)
-    this.#ctx = this.canvas.getContext('2d', { alpha: useAlpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
-    // this.#coordinateSystem = coordinateSystem
+    this.#ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
     this.draw = new Draw(this.#ctx, coordinateSystem)
   }
 
   get imageRendering () { 
-    const value = (this.canvas as HTMLCanvasElement).style.imageRendering ?? 'auto' 
+    const value = (this.canvas as HTMLCanvasElement).style.imageRendering || 'auto' 
     return value === 'auto' ? 'auto' : 'pixelated'
   }
 
-  set imageRendering (value: 'auto' | 'pixelated') { ;(this.canvas as HTMLCanvasElement).style.imageRendering = value }
-
-  //get draw () { return this.#ctx }
+  set imageRendering (value: 'auto' | 'pixelated') { 
+    ;(this.canvas as HTMLCanvasElement).style.imageRendering = value 
+    this.#ctx.imageSmoothingEnabled = value === 'auto'
+  }
 
   get rect () { return this.#rect }
 
@@ -53,12 +56,15 @@ export class Surface {
       height: (rect as Rect).height ?? surface.height 
     })
 
+    const outrect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + width, y + height)))
+
     if (distRect) {
-      this.#ctx.drawImage(surface.#ctx.canvas, x, y, width, height, distRect.x, distRect.y, distRect.width, distRect.height)
+      const outDistrect = Rect.fromTwoPoints(this.#conv(distRect), this.#conv(setPoint(distRect.x + distRect.width, distRect.y + distRect.height)))
+      this.#ctx.drawImage(surface.#ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
       return  
     }
 
-    this.#ctx.drawImage(surface.#ctx.canvas, x, y, width, height)
+    this.#ctx.drawImage(surface.#ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height)
   }
 
   zoom (index: number) {
@@ -102,6 +108,7 @@ export class Surface {
     const canvas = this.cloneCanvas()
     this.canvas.width = width
     this.canvas.height = height
+    if (this.imageRendering === 'pixelated') this.#ctx.imageSmoothingEnabled = false
     this.#ctx.drawImage(canvas, 0, 0, width, height)
     this.#rect.resizeSelf(width, height)
   }
@@ -145,21 +152,26 @@ export class Surface {
   }
 
   clone () {
-    const surface = new Surface(this.width, this.height, true)
+    const surface = new Surface(this.width, this.height)
     const canvas = this.cloneCanvas()
     surface.canvas = canvas
+    surface.imageRendering = this.imageRendering
     surface.#ctx = canvas.getContext('2d')!
     return surface
   }
 
-  static fromImage(image: HTMLImageElement, rect: Rect, useAlpha: boolean = true) {
-    const surface = new Surface(rect.width, rect.height, useAlpha)
+  static fromImage(image: HTMLImageElement, rect: Rect, options?: { useAlpha?: boolean, useSmooth?: boolean }) {
+    const useAlpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha: true
+    const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth: true
+    const surface = new Surface(rect.width, rect.height, { useAlpha })
+    surface.imageRendering = useSmooth ? 'auto' : 'pixelated'
     surface.#ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     return surface
   }
 
-  static fromImages(images: HTMLImageElement[], rect: Rect, rows: number = 1, cols: number = -1, useAlpha: boolean = true,) {
-    const surface = new Surface(rect.width * images.length, rect.height, useAlpha)
+  static fromImages(images: HTMLImageElement[], rect: Rect, rows: number = 1, cols: number = -1, useAlpha: boolean = true, useSmooth: boolean = true) {
+    const surface = new Surface(rect.width * images.length, rect.height, { useAlpha })
+    surface.imageRendering = useSmooth ? 'auto' : 'pixelated'
 
     for (let i = 0; i < images.length; i++) {
       const image = images[i]

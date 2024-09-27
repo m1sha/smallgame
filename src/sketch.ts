@@ -277,7 +277,7 @@ export class Sketch extends Drawable {
       w = width; h = height
     }
 
-    const suface = new Surface(w, h, true, false, coordinateSystem ?? 'screen')
+    const suface = new Surface(w, h, { coordinateSystem })
     this.draw(suface)
     return suface
   }

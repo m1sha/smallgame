@@ -1,15 +1,17 @@
-import { setRect, TRect, resetRect } from "./rect"
+import { setRect, TRect, resetRect } from "../rect"
+import { ViewportBase } from "./viewport-base"
 
-export class Viewport {
-  #canvas: HTMLCanvasElement
+export class CssViewport extends ViewportBase {
   #htmlContainer: HTMLDivElement
   #rect: TRect
   #zoom: number = 1
+  readonly type = 'css'
 
   constructor (canvas: HTMLCanvasElement, scrollbarSize: number = 18) {
-    this.#canvas = canvas
+    super(canvas)
+    
     this.#htmlContainer = document.createElement('div')
-    this.#htmlContainer.append(this.#canvas)
+    this.#htmlContainer.append(canvas)
     this.#htmlContainer.style.overflow = 'auto'
     this.#htmlContainer.style.setProperty('--scrollbar-size', scrollbarSize + 'px')
     this.#htmlContainer.style.maxHeight = `calc(${canvas.height}px + var(--scrollbar-size))`
@@ -40,7 +42,7 @@ export class Viewport {
     if (!index) throw new Error('unsupport index value.')
     
     this.#zoom = index
-    this.#canvas.style.width = (this.#canvas.width * index) + 'px'
-    this.#canvas.style.height = (this.#canvas.height * index) + 'px'
+    this.canvas.style.width = (this.canvas.width * index) + 'px'
+    this.canvas.style.height = (this.canvas.height * index) + 'px'
   }
 }

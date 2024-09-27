@@ -1,4 +1,4 @@
-import { setPoint } from "./point"
+import { setPoint, TPoint } from "./point"
 
 export type CoordinateSystem = 'screen' | 'math'
 
@@ -11,4 +11,11 @@ const fromScreenCoord = (x: number, y: number, half_width: number, half_height: 
   setPoint(x / half_width - 1,  y / half_height - 1)
 )
 
-export { fromMathCoord, fromScreenCoord }
+const coordconv = (sys: CoordinateSystem, point: TPoint, width: number, height: number): TPoint => {
+  switch (sys) {
+    case "screen": return point
+    case "math": return fromMathCoord(point.x, point.y, width / 2, height / 2)
+  }
+}
+
+export { fromMathCoord, fromScreenCoord, coordconv }
