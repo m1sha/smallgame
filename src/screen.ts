@@ -1,6 +1,7 @@
 import { CssViewport, TransformViewport, Viewport, ViewportType } from './viewport'
 import { Surface, SurfaceCreateOptions } from './surface'
 import { TPoint } from './point'
+import { Rect } from './rect'
 
 export class Screen extends Surface {
   readonly viewport: Viewport
@@ -27,7 +28,17 @@ export class Screen extends Surface {
     this.originCanvas.style.cursor = value
   }
 
-  get originCanvas() {
+  get originCanvas () {
     return this.canvas as HTMLCanvasElement
+  }
+
+  
+  blit (surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null) {
+    if (this.viewport.type === 'css') {
+      this.blitx(surface, rect, distRect)  
+      return
+    }
+    
+    this.blitx(surface, rect, distRect, this.viewport.zoom, this.viewport.position)
   }
 }

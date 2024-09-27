@@ -1,4 +1,4 @@
-import { Point, setPoint, TPoint } from "./point"
+import { FPoint, mulPoints, Point, setPoint, sumPoints, TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 import { Game } from "./game"
@@ -60,15 +60,34 @@ export class Surface {
   }
 
   blit(surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null) {
+    this.blitx(surface, rect, distRect)
+  }
+
+  protected blitx(surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
     const { x, y, width, height } = Object.assign(rect, { 
       width: (rect as Rect).width ?? surface.width, 
       height: (rect as Rect).height ?? surface.height 
     })
 
-    const outrect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + width, y + height)))
+    let p0 = this.#conv(setPoint(x, y))
+    let p1 = this.#conv(setPoint(x + width, y + height))
+
+    if (shift) {
+      p0 = sumPoints(mulPoints(p0, setPoint(zoom, zoom)), shift)
+      p1 = sumPoints(mulPoints(p1, setPoint(zoom, zoom)), shift)
+    }
+
+    const outrect = Rect.fromTwoPoints(p0, p1)
 
     if (distRect) {
-      const outDistrect = Rect.fromTwoPoints(this.#conv(distRect), this.#conv(setPoint(distRect.x + distRect.width, distRect.y + distRect.height)))
+      let p2 = this.#conv(distRect)
+      let p3 = this.#conv(setPoint(distRect.x + distRect.width, distRect.y + distRect.height))
+      if (shift) {
+        p2 = sumPoints(mulPoints(p2, setPoint(zoom, zoom)), shift)
+        p3 = sumPoints(mulPoints(p3, setPoint(zoom, zoom)), shift)
+      }
+
+      const outDistrect = Rect.fromTwoPoints(p2, p3)
       this.#ctx.drawImage(surface.#ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
       return  
     }

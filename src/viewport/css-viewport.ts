@@ -1,3 +1,4 @@
+import { TPoint } from "../point"
 import { setRect, TRect, resetRect } from "../rect"
 import { ViewportBase } from "./viewport-base"
 
@@ -44,5 +45,14 @@ export class CssViewport extends ViewportBase {
     this.#zoom = index
     this.canvas.style.width = (this.canvas.width * index) + 'px'
     this.canvas.style.height = (this.canvas.height * index) + 'px'
+  }
+
+  get position (): TPoint {
+    return this.#rect
+  }
+
+  set position (value: TPoint) {
+    this.#rect.x = value.x
+    this.#rect.y = value.y
   }
 }
