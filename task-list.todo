@@ -1,5 +1,9 @@
-LIST OF FEATURE
+TROUBLES
 
+[ ] BUG Animation speed in different browsers
+[ ] BUG Sketch.toSurface() without paramters calls leak of memory
+
+LIST OF FEATURE
 
 [ ] Point and Rect methods
 [ ] Other types of events Pen, Touch, Gamepad
@@ -8,6 +12,7 @@ LIST OF FEATURE
 [ ] Vector transformation for Sketch (move, rotate, scale, etc.)
 [ ] Sprite Groups
 [ ] Pixel mask collision detection
+[ ] Mouse wheel event
 
 [x] Sketch segment line
 [x] MOUSEENTER and MOUSELEAVE events
