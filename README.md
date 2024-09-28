@@ -17,30 +17,54 @@ index.html
 
 index.ts
 ```ts
-import { Game, Surface, Key } from 'smallgame'
+import { Game, Key, Surface, Time, gameloop, lerp, zeroPoint } from 'smallgame'
 
-const GAME_WIDTH       = 800
-const GAME_HEIGHT      = 800
-const HERO_WIDTH       = 100
-const HERO_HEIGHT      = 100
-const HERO_SPEED       = 5
-const container        = document.getElementById('container')
-const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
-const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT)
-hero.fill('green')
-hero.rect.moveSelf(screen.rect.center, 'center-center')
+export function main (container: HTMLElement) {
+  const GAME_WIDTH       = 400
+  const GAME_HEIGHT      = 400
+  const HERO_WIDTH       = 100
+  const HERO_HEIGHT      = 100
+  const HERO_SPEED       = 20
+  const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+  const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT) // or use loadImage(url) function
+  hero.fill('green')
+  hero.rect.center = screen.rect.center
+  const velocity = zeroPoint()
+  const goal = zeroPoint()
 
-game.loop(() => {
-  const keys = game.key.getPressed()
+  gameloop(() => {
+    const keys = game.key.getPressed()
   
-  if (keys[Key.K_A] || keys[Key.LEFT])  { hero.rect.x -= HERO_SPEED }
-  if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.rect.x += HERO_SPEED }
-  if (keys[Key.K_W] || keys[Key.UP])    { hero.rect.y -= HERO_SPEED }
-  if (keys[Key.K_S] || keys[Key.DOWN])  { hero.rect.y += HERO_SPEED }
+    if (keys[Key.K_A] || keys[Key.LEFT]) { 
+      goal.x = -HERO_SPEED 
+    } 
+    else
+    if (keys[Key.K_D] || keys[Key.RIGHT]) { 
+      goal.x = HERO_SPEED 
+    } 
+    else {
+      goal.x = 0
+    }
+    
+    if (keys[Key.K_W] || keys[Key.UP]) { 
+      goal.y = -HERO_SPEED 
+    } 
+    else
+    if (keys[Key.K_S] || keys[Key.DOWN]) { 
+      goal.y = HERO_SPEED 
+    }
+    else {
+      goal.y = 0
+    }
 
-  screen.clear()
-  screen.blit(hero, hero.rect))
-})
+    lerp(goal, velocity, Time.deltaTime)
+    hero.rect.x += velocity.x
+    hero.rect.y += velocity.y
+
+    screen.fill('white')
+    screen.blit(hero, hero.rect)
+  })
+}
 ```
 
 ### Show an image
@@ -106,7 +130,7 @@ export class Hero extends Sprite {
 
 index.ts
 ```ts
-import { Game, Key } from 'smallgame'
+import { Game, gameloop, Key } from 'smallgame'
 import { Hero } from './hero'
 
 const GAME_WIDTH  = 800
@@ -120,7 +144,7 @@ async function main () {
   await hero.create()
   hero.position = screen.rect.center
 
-  game.loop(() => {
+  gameloop(() => {
     const keys = game.key.getPressed()
     if (keys[Key.K_A] || keys[Key.LEFT])  { hero.moveLeft() }
     if (keys[Key.K_D] || keys[Key.RIGHT]) { hero.moveRight() }
