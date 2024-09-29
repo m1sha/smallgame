@@ -1,7 +1,7 @@
-import { FPoint, mulPoints, Point, setPoint, sumPoints, TPoint } from "./point"
+import { mulPoints, Point, setPoint, sumPoints, TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
-import { Game } from "./game"
+//import { Game } from "./game"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
 
@@ -28,7 +28,7 @@ export class Surface {
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth : true
     this.#conv = point => coordconv(coordinateSystem, point, width, height) 
     this.#rect = new Rect(0, 0, width, height)
-    this.#ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: Game.willReadFrequently })! as CanvasRenderingContext2D
+    this.#ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
     this.imageRendering = useSmooth ? 'auto' : 'pixelated'
     this.draw = new Draw(this.#ctx, coordinateSystem)
   }

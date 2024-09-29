@@ -1,3 +1,4 @@
+export * from './anim'
 export * from './drawable'
 export * from './coords'
 export * from './events/game-event'
