@@ -20,6 +20,7 @@ export class Animator implements IAnimation {
 
   set (name: string): void {
     this.#current = this.#items.find(p => p.name === name) ?? null
+    this.play()
   }
 
   tick (): void {
