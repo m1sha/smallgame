@@ -103,7 +103,7 @@ screen.blit(hero, hero.rect)
 ```
 
 
-### Works with sprites
+### Sprites
 
 hero.ts
 ```ts
@@ -196,4 +196,33 @@ function createTileBackgroud() {
 }
 
 main()
+```
+
+### Animation
+
+```ts
+import { Game, Animator, gameloop, setAnimation } from 'smallgame'
+
+export async function main (container: HTMLElement) {
+  const GAME_WIDTH  = 400
+  const GAME_HEIGHT = 400
+  const TILE_WIDTH  = 32
+  const TILE_HEIGHT = 32
+  const SAMPLE_RATE = 20
+  const { screen }  = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+
+  const animator = new Animator()
+  await animator.add('run', setAnimation(TILE_WIDTH, TILE_HEIGHT, SAMPLE_RATE, 'Run_(32x32).png'))
+  await animator.add('idle', setAnimation(TILE_WIDTH, TILE_HEIGHT, SAMPLE_RATE, 'Idle_(32x32).png'))
+
+  animator.set('idle')
+
+  gameloop(() => {
+    animator.tick()
+    const image = animator.image.clone()
+    // image.flip('x')
+
+    screen.fill('white')
+    screen.blit(image, image.rect)   
+  })
 ```
