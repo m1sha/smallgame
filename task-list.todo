@@ -1,9 +1,12 @@
 TROUBLES
 
 [ ] BUG Sketch.toSurface() without paramters calls leak of memory
+[ ] BUG Surface resize in tilemap
+
 
 LIST OF FEATURE
 
+[ ] Make parameter for "willReadFrequently"
 [ ] Point and Rect methods
 [ ] Other types of events Pen, Touch, Gamepad
 [ ] Shapes in Sketch (ellipse, bezier)
