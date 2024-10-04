@@ -30,12 +30,12 @@ export class ShapeStyle {
   constructor (style: TShapeStyle) {
     this.fill = style.fill ?? "transparent"
     this.stroke = style.stroke ?? "transparent"
-    this.lineCap = 'butt'
-    this.lineDashOffset = 0
-    this.lineDash = []
-    this.lineJoin = 'bevel'
+    this.lineCap = style.lineCap ?? 'butt'
+    this.lineDashOffset = style.lineDashOffset ?? 0
+    this.lineDash = style.lineDash ?? []
+    this.lineJoin = style.lineJoin ?? 'bevel'
     this.lineWidth = style.lineWidth ?? 1
-    this.miterLimit = 0
+    this.miterLimit = style.miterLimit ?? 0
     this.ddaline = Boolean(style.ddaline) && style.lineWidth === 1
   }
 
