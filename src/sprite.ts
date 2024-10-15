@@ -3,9 +3,16 @@ import { Drawable } from "./drawable"
 import { ObservableRect, Rect } from "./rect"
 
 export abstract class Sprite extends Drawable {
-  image: Surface | null = null
-  rect: Rect | ObservableRect | null = null
+  image: Surface
+  rect: Rect | ObservableRect
   collideRect: Rect | ObservableRect | null = null
+
+  constructor () {
+    super()
+
+    this.image = Surface.default
+    this.rect = this.image.rect
+  }
 
   async create (): Promise<void> {}
   protected update (): void {}

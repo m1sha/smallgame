@@ -209,6 +209,10 @@ export class Surface {
     return surface
   }
 
+  static get default () {
+    return new Surface(1, 1)
+  }
+
   private cloneCanvas (size?: { width: number, height: number }) {
     const { width, height } = Object.assign({}, { 
       width: size ? size.width : this.width,
