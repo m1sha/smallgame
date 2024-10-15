@@ -22,12 +22,14 @@ export interface MutableRect {
   readonly topLeft: TPoint
   readonly topRight: TPoint
   readonly bottomLeft: TPoint
-  readonly center: TPoint
+  get center(): TPoint
+  set center(value: TPoint)
   readonly absCenter: TPoint
   readonly absWidth: number
   readonly diagonal: number
   overlaps (rect: MutableRect): boolean
   touchSide (rect: MutableRect): ('left' | 'right' | 'top' | 'bottom')[]
+  inside (rect: TRect): boolean
   contains (rect: MutableRect): boolean
   containsPoint({x, y}: TPoint): boolean 
   equals(rect: MutableRect | TRect): boolean
@@ -85,7 +87,7 @@ export class Rect implements MutableRect {
     return this.y + this.height
   }
 
-  get center () {
+  get center (): TPoint {
     return { x: this.width / 2, y: this.height / 2 }
   }
 
@@ -121,6 +123,10 @@ export class Rect implements MutableRect {
     if (y < rect.y) result[1] = 'bottom'
     if (y > rect.y) result[1] = 'top'
     return result
+  }
+
+  inside (rect: TRect): boolean {
+    return rect.x <= this.x && rect.y <= this.y && (this.x + this.width) <= (rect.x + rect.width) && (this.y + this.height) <= (rect.y + rect.height)
   }
 
   contains (rect: Rect) {
@@ -317,6 +323,7 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
     if (this.callback) this.callback(this.#sprite)
   }
   get center () { return this.#rect.center }
+  set center (value: TPoint) { this.#rect.center = value }
   get absCenter () { return this.#rect.absCenter }
   get absWidth () { return this.#rect.absWidth }
   get absHeight () { return this.#rect.absHeight }
@@ -327,6 +334,7 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
   get diagonal () { return this.#rect.diagonal }
   overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
   touchSide (rect: Rect) { return this.#rect.touchSide(rect) }
+  inside (rect: TRect): boolean { return this.#rect.inside(rect) }
   contains (rect: Rect) { return this.#rect.contains(rect) }
   containsPoint (point: TPoint) { return this.#rect.containsPoint(point) }
   equals (rect: Rect) { return this.#rect.equals(rect) }

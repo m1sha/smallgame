@@ -58,7 +58,7 @@ export class Draw {
   }
   
   rect (x: number, y: number, w: number, h: number): void {
-    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y + h)))
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + w, y + h )))
     this.#ctx.rect(rect.x, rect.y, rect.width, rect.height)
   }
 
