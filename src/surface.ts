@@ -220,11 +220,17 @@ export class Surface {
       shift.move(Math.abs((size.width - this.width / 2)), Math.abs((size.height - this.height / 2)))
     }
 
-    const imageDate = this.#ctx.getImageData(0, 0, width, height)
+    // const imageDate = this.#ctx.getImageData(0, 0, width, height)
+    // const canvas = document.createElement('canvas')
+    // canvas.width = this.width
+    // canvas.height = this.height
+    // canvas.getContext('2d')!.putImageData(imageDate, shift.x, shift.y)
+    // return canvas
+    
     const canvas = document.createElement('canvas')
     canvas.width = this.width
     canvas.height = this.height
-    canvas.getContext('2d')!.putImageData(imageDate, shift.x, shift.y)
+    canvas.getContext('2d')!.drawImage(this.#ctx.canvas, shift.x, shift.y)
     return canvas
   }
 }
