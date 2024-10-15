@@ -1,5 +1,5 @@
 import { TPoint } from "../point"
-import { setRect, TRect, resetRect } from "../rect"
+import { setRect, TRect, resetRect, Rect } from "../rect"
 import { ViewportBase } from "./viewport-base"
 
 export class CssViewport extends ViewportBase {
@@ -54,5 +54,15 @@ export class CssViewport extends ViewportBase {
   set position (value: TPoint) {
     this.#rect.x = value.x
     this.#rect.y = value.y
+  }
+
+  get center (): TPoint {
+    return this.#rect
+  }
+
+  set center (value: TPoint) {
+    const rect = Rect.from(this.#rect)
+    rect.center = value
+    this.#rect = rect
   }
 }

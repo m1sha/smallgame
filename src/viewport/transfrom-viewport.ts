@@ -1,15 +1,15 @@
 import { TPoint } from "../point"
-import { setRect, TRect } from "../rect"
+import { Rect, TRect } from "../rect"
 import { ViewportBase } from "./viewport-base"
 
 export class TransformViewport extends ViewportBase {
   readonly type = 'transform'
-  #rect: TRect
+  #rect: Rect
   #zoom: number
 
   constructor (canvas: HTMLCanvasElement) {
     super(canvas)
-    this.#rect = setRect(0, 0, canvas.width,  canvas.height)
+    this.#rect = Rect.size(canvas.width,  canvas.height)
     this.#zoom = 1
   }
 
@@ -32,5 +32,13 @@ export class TransformViewport extends ViewportBase {
   set position (value: TPoint) {
     this.#rect.x = value.x
     this.#rect.y = value.y
+  }
+
+  get center (): TPoint {
+    return this.#rect.center
+  }
+
+  set center (value: TPoint) {
+    this.#rect.moveSelf(value, 'center-center')
   }
 }
