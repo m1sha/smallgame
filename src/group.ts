@@ -3,6 +3,7 @@ import { Sprite } from "./sprite"
 import { Surface } from "./surface"
 import { CollisionHashmap } from "./utils/collision-hashmap"
 import { TPoint } from "./point"
+import { TRect } from "./rect"
 
 export type GroupOptions = {
   collisionHashmap?: {
@@ -99,6 +100,15 @@ export class Group {
         return
       }
       this.#collidedlist.delete(sprt)
+    })
+  }
+
+  outsideRect (rect: TRect, callback: (sprite: Sprite) => void): void {
+    this.sprites.forEach(sprite => { 
+      const spriteRect = sprite.rect
+      if (!spriteRect) return
+      if (!spriteRect.inside(rect))
+        callback(sprite)
     })
   }
   
