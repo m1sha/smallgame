@@ -4,6 +4,7 @@ TROUBLES
 [ ] BUG Surface resize in tilemap
 
 
+
 LIST OF FEATURE
 
 [ ] Make parameter for "willReadFrequently"
@@ -19,3 +20,4 @@ LIST OF FEATURE
 [x] Sketch segment line
 [x] MOUSEENTER and MOUSELEAVE events
 [x] BUG Animation speed in different browsers
+[x] BUG Shape style dash line
