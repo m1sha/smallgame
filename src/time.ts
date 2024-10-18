@@ -10,7 +10,7 @@ const InternalTimeSetter = {
 
 const Time = {
   get deltaTime () { return InternalTimeSetter.deltaTime },
-  get time () { return millis() / 1000.0 },
+  get time () { return millis() * 0.001 },
   get fps () { return FPSCounter.get() }
 }
 

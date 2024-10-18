@@ -41,7 +41,7 @@ export const gameloop = (callback: () => void) => {
   const nextFrame = () => {
     requestAnimationFrame(nextFrame)  
      
-    const delta = (millis() - lastTime) / 1000
+    const delta = (millis() - lastTime) * 0.001
     InternalTimeSetter.deltaTime = delta
     FPSCounter.update()
     lastTime = millis()
