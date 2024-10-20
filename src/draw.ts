@@ -25,6 +25,11 @@ export class Draw {
     const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + radius, y + radius)))
     this.#ctx.arc(rect.x, rect.y, rect.width, startAngle, endAngle, counterclockwise)
   }
+
+  circle (x: number, y: number, radius: number) {
+    const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x + radius, y + radius)))
+    this.#ctx.arc(rect.x, rect.y, rect.width, 0, 6.283185307179)
+  }
     
   arcTo (x1: number, y1: number, x2: number, y2: number, radius: number): void {
     this.#ctx.arcTo(x1, y1, x2, y2, radius)
@@ -52,6 +57,13 @@ export class Draw {
     const point = this.#conv(setPoint(x, y))
     this.#ctx.moveTo(point.x, point.y)
   }
+
+  line (p0: TPoint, p1: TPoint) {
+    const pp0 = this.#conv(p0)
+    const pp1 = this.#conv(p1)
+    this.#ctx.moveTo(pp0.x, pp0.y)
+    this.#ctx.lineTo(pp1.x, pp1.y)
+  }
   
   quadraticCurveTo (cpx: number, cpy: number, x: number, y: number): void{
     this.#ctx.quadraticCurveTo(cpx, cpy, x, y)
@@ -73,7 +85,6 @@ export class Draw {
   }
 
   vline (x: number, y: number, h: number): void {
-    debugger
     const rect = Rect.fromTwoPoints(this.#conv(setPoint(x, y)), this.#conv(setPoint(x, y + h)))
     this.#ctx.fillRect(rect.x, rect.y, 1, rect.height)
   }
@@ -166,5 +177,24 @@ export class Draw {
     else
       this.#ctx.drawImage(src, x, y)
   }
-    
+
+  reset = () => { this.#ctx.reset() }
+  save = () => { this.#ctx.save() }
+  restore = () => { this.#ctx.restore() }
+  scale = (x: number, y: number) => { this.#ctx.scale(x, y) }
+  translate = (x: number, y: number) => { this.#ctx.translate(x, y) }
+  rotate = (a: number) => this.#ctx.rotate(a) 
+  getTransform = () =>  this.#ctx.getTransform() 
+  resetTransform = () => this.#ctx.resetTransform() 
+  transform = (a: number, b: number, c: number, d: number, e: number, f: number) => { this.#ctx.transform(a, b, c, d, e, f) }
+  setTransform = (transform?: DOMMatrix2DInit) => this.#ctx.setTransform(transform)
+
+  get shadowBlur() { return this.#ctx.shadowBlur }
+  set shadowBlur(value: number ) { this.#ctx.shadowBlur = value }
+  get shadowColor() { return this.#ctx.shadowColor }
+  set shadowColor(value: string ) { this.#ctx.shadowColor = value }
+  get shadowOffsetX() { return this.#ctx.shadowOffsetX }
+  set shadowOffsetX(value: number ) { this.#ctx.shadowOffsetX = value }
+  get shadowOffsetY() { return this.#ctx.shadowOffsetY }
+  set shadowOffsetY(value: number ) { this.#ctx.shadowOffsetY = value }
 }
