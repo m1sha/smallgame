@@ -27,6 +27,7 @@ export interface MutableRect {
   readonly absCenter: TPoint
   readonly absWidth: number
   readonly diagonal: number
+  get points(): [TPoint, TPoint, TPoint, TPoint]
   overlaps (rect: MutableRect): boolean
   touchSide (rect: MutableRect): ('left' | 'right' | 'top' | 'bottom')[]
   inside (rect: TRect): boolean
@@ -101,6 +102,10 @@ export class Rect implements MutableRect {
   }
 
   get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
+
+  get points (): [TPoint, TPoint, TPoint, TPoint] {
+    return [this.topLeft, this.topRight, this.bottomRight, this.bottomLeft]
+  }
 
   overlaps (rect: Rect) {
     const e1 =  this.containsPoint(rect.topLeft) 
@@ -332,6 +337,7 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
   get bottomLeft () { return this.#rect.bottomLeft }
   get bottomRight () { return this.#rect.bottomRight }
   get diagonal () { return this.#rect.diagonal }
+  get points (): [TPoint, TPoint, TPoint, TPoint] { return this.#rect.points }
   overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
   touchSide (rect: Rect) { return this.#rect.touchSide(rect) }
   inside (rect: TRect): boolean { return this.#rect.inside(rect) }
