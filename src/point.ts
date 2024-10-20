@@ -1,3 +1,5 @@
+import { rad } from "./utils"
+
 export type TPoint = { x: number, y: number }
 
 export class Point {
@@ -47,10 +49,29 @@ export class Point {
     return new Point(this.x + dx, this.y + dy)
   }
 
-  shiftSelf (dx: number, dy: number) {
-    this.x += dx
-    this.y += dy
-    return this
+  shiftSelf (d: number): Point 
+  shiftSelf (dp: TPoint): Point 
+  shiftSelf (dx: number, dy: number): Point 
+  shiftSelf (...args: Array<any>): Point {
+    if (args.length === 1 && typeof args[0] === 'number' ){
+      this.x += args[0]
+      this.y += args[0]
+      return this
+    }
+
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      this.x += args[0]
+      this.y += args[1]
+      return this
+    }
+
+    if (typeof args[0] === 'object' && args[0] && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      this.x += args[0].x
+      this.y += args[0].y
+      return this
+    }
+    
+    throw new Error('unsupported arguments.')
   }
 
   shiftX (dx: number) {
@@ -61,14 +82,49 @@ export class Point {
     return new Point(this.x, this.y + dy)
   }
 
-  scale(dx: number, dy: number) {
-    return new Point(this.x * dx, this.y * dy)
+  scale (d: number): Point 
+  scale (dp: TPoint): Point 
+  scale (dx: number, dy: number): Point
+  scale (...args: Array<any>): Point {
+    if (args.length === 1 && typeof args[0] === 'number' ){
+      return new Point(this.x * args[0], this.y * args[0])
+    }
+
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Point(this.x * args[0], this.y * args[1])
+    }
+
+    if (typeof args[0] === 'object' && args[0] && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      return new Point(this.x * args[0].x, this.y * args[0].y)
+    }
+    
+    throw new Error('unsupported arguments.')
+    
   }
 
-  scaleSelf (dx: number, dy: number) {
-    this.x = this.x * dx
-    this.y = this.y * dy
-    return this
+  scaleSelf (d: number): Point 
+  scaleSelf (dp: TPoint): Point 
+  scaleSelf (dx: number, dy: number): Point
+  scaleSelf (...args: Array<any>): Point {
+    if (args.length === 1 && typeof args[0] === 'number' ){
+      this.x *= args[0]
+      this.y *= args[0]
+      return this
+    }
+
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      this.x *= args[0]
+      this.y *= args[1]
+      return this
+    }
+
+    if (typeof args[0] === 'object' && args[0] && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      this.x *= args[0].x
+      this.y *= args[0].y
+      return this
+    }
+    
+    throw new Error('unsupported arguments.')
   }
 
   scaleX(dx: number) {
@@ -77,6 +133,17 @@ export class Point {
 
   scaleY(dy: number) {
     return new Point(this.x, this.y * dy)
+  }
+
+  rotate (deg: number) {
+    const a = rad(deg)
+    return new Point(this.x + Math.cos(a), this.y + Math.sin(a))
+  }
+
+  rotateSelf (deg: number) {
+    const a = rad(deg)
+    this.shiftSelf(Math.cos(a), Math.sin(a))
+    return this
   }
 
   negative () {
@@ -90,6 +157,8 @@ export class Point {
   }
 
   static get zero () { return new Point(0, 0) }
+  
+  static get one () { return new Point(1, 1) }
 
   static distance (p0: TPoint, p1: TPoint): number {
     const dx = Math.pow(p1.x - p0.x, 2)
