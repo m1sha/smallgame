@@ -2,6 +2,7 @@ import { CssViewport, TransformViewport, Viewport, ViewportType } from './viewpo
 import { Surface, SurfaceCreateOptions } from './surface'
 import { TPoint } from './point'
 import { Rect } from './rect'
+import { ISurface } from './interfaces'
 
 export class Screen extends Surface {
   readonly viewport: Viewport
@@ -33,7 +34,7 @@ export class Screen extends Surface {
   }
 
   
-  blit (surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blit (surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
     if (this.viewport.type === 'css') {
       this.blitx(surface, rect, distRect)  
       return

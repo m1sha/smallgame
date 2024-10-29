@@ -228,3 +228,7 @@ export function sumPoints (p0: TPoint, p1: TPoint): TPoint {
 export function subPoints (p0: TPoint, p1: TPoint): TPoint {
   return { x: p0.x - p1.x, y: p0.y - p1.y }
 }
+
+export function gl_normalize({ x, y }: TPoint, w: number, h: number) {
+  return setPoint (x / (w * 0.5)  -  1.0, 1.0 - y / (h * 0.5))
+}

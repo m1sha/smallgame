@@ -4,6 +4,7 @@ import { Rect } from "./rect"
 //import { Game } from "./game"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
+import { ISurface } from "./interfaces"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -14,7 +15,7 @@ export type SurfaceCreateOptions = {
 
 export class Surface {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
-  #ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+  protected ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   #rect: Rect
   #conv: (point: TPoint) => TPoint
   readonly draw: Draw
@@ -28,9 +29,9 @@ export class Surface {
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth : true
     this.#conv = point => coordconv(coordinateSystem, point, width, height) 
     this.#rect = new Rect(0, 0, width, height)
-    this.#ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
+    this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
     this.imageRendering = useSmooth ? 'auto' : 'pixelated'
-    this.draw = new Draw(this.#ctx, coordinateSystem)
+    this.draw = new Draw(this.ctx, coordinateSystem)
   }
 
   get imageRendering () { 
@@ -40,7 +41,7 @@ export class Surface {
 
   set imageRendering (value: 'auto' | 'pixelated') { 
     ;(this.canvas as HTMLCanvasElement).style.imageRendering = value 
-    this.#ctx.imageSmoothingEnabled = value === 'auto'
+    this.ctx.imageSmoothingEnabled = value === 'auto'
   }
 
   get rect () { return this.#rect }
@@ -51,19 +52,19 @@ export class Surface {
 
 
   clear () {
-    this.#ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
   fill (color: string) {
-    this.#ctx.fillStyle = color
-    this.#ctx.fillRect(0, 0, this.width, this.height)
+    this.ctx.fillStyle = color
+    this.ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit(surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blit(surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
     this.blitx(surface, rect, distRect)
   }
 
-  protected blitx(surface: Surface, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
+  protected blitx(surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
     const { x, y, width, height } = Object.assign(rect, { 
       width: (rect as Rect).width ?? surface.width, 
       height: (rect as Rect).height ?? surface.height 
@@ -88,11 +89,15 @@ export class Surface {
       }
 
       const outDistrect = Rect.fromTwoPoints(p2, p3)
-      this.#ctx.drawImage(surface.#ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
+      const ctx = (surface as any).ctx
+      if (!ctx) throw new Error('Context is not found.')
+      this.ctx.drawImage(ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
       return  
     }
 
-    this.#ctx.drawImage(surface.#ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height)
+    const ctx = (surface as any).ctx
+    if (!ctx) throw new Error('Context is not found.')
+    this.ctx.drawImage(ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height)
   }
 
   zoom (index: number) {
@@ -110,10 +115,10 @@ export class Surface {
     const canvas = this.cloneCanvas()
     this.clear()
     
-    this.#ctx.translate(w, h)
-    this.#ctx.scale(x, y)
-    this.#ctx.drawImage(canvas, 0, 0)
-    this.#ctx.resetTransform()
+    this.ctx.translate(w, h)
+    this.ctx.scale(x, y)
+    this.ctx.drawImage(canvas, 0, 0)
+    this.ctx.resetTransform()
   }
 
   rotate (a: number, pivot?: TPoint) {
@@ -125,19 +130,19 @@ export class Surface {
       ({ x, y } = pivot)
     }
     
-    this.#ctx.translate(x, y)
-    this.#ctx.rotate(a * Math.PI / 180)
-    this.#ctx.translate(-x, -y)
-    this.#ctx.drawImage(canvas, 0, 0)
-    this.#ctx.resetTransform()
+    this.ctx.translate(x, y)
+    this.ctx.rotate(a * Math.PI / 180)
+    this.ctx.translate(-x, -y)
+    this.ctx.drawImage(canvas, 0, 0)
+    this.ctx.resetTransform()
   }
 
   resize (width: number, height: number) {
     const canvas = this.cloneCanvas()
     this.canvas.width = width
     this.canvas.height = height
-    if (this.imageRendering === 'pixelated') this.#ctx.imageSmoothingEnabled = false
-    this.#ctx.drawImage(canvas, 0, 0, width, height)
+    if (this.imageRendering === 'pixelated') this.ctx.imageSmoothingEnabled = false
+    this.ctx.drawImage(canvas, 0, 0, width, height)
     this.#rect.resizeSelf(width, height)
   }
 
@@ -148,9 +153,9 @@ export class Surface {
     const shiftY = shiftToCenter ? (height - canvas.height) / 2: 0
     this.canvas.width = width
     this.canvas.height = height
-    this.#ctx.fillStyle = '#119922'
-    this.#ctx.fillRect(0,0,width, height)
-    this.#ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
+    this.ctx.fillStyle = '#119922'
+    this.ctx.fillRect(0,0,width, height)
+    this.ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
     this.#rect.resizeSelf(width, height)
   }
 
@@ -175,7 +180,7 @@ export class Surface {
   }
 
   createMask () {
-    const imageDate = this.#ctx.getImageData(0, 0, this.width, this.height)
+    const imageDate = this.ctx.getImageData(0, 0, this.width, this.height)
     return PixelMask.fromImageData(imageDate)
   }
 
@@ -184,7 +189,7 @@ export class Surface {
     const canvas = this.cloneCanvas()
     surface.canvas = canvas
     surface.imageRendering = this.imageRendering
-    surface.#ctx = canvas.getContext('2d')!
+    surface.ctx = canvas.getContext('2d')!
     return surface
   }
 
@@ -193,7 +198,7 @@ export class Surface {
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth: true
     const surface = new Surface(rect.width, rect.height, { useAlpha })
     surface.imageRendering = useSmooth ? 'auto' : 'pixelated'
-    surface.#ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
+    surface.ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     return surface
   }
 
@@ -203,7 +208,7 @@ export class Surface {
 
     for (let i = 0; i < images.length; i++) {
       const image = images[i]
-      surface.#ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height, rect.x + rect.width * i, rect.y, rect.width, rect.height)
+      surface.ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height, rect.x + rect.width * i, rect.y, rect.width, rect.height)
     }
     
     return surface
@@ -234,7 +239,7 @@ export class Surface {
     const canvas = document.createElement('canvas')
     canvas.width = this.width
     canvas.height = this.height
-    canvas.getContext('2d')!.drawImage(this.#ctx.canvas, shift.x, shift.y)
+    canvas.getContext('2d')!.drawImage(this.ctx.canvas, shift.x, shift.y)
     return canvas
   }
 }
