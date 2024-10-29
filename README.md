@@ -86,22 +86,6 @@ async function main () {
 main()
 ```
 
-### Sketchs (Vector graphics)
-
-```ts
-import { Game, Sketch } from 'smallgame'
-
-const GAME_WIDTH  = 400
-const GAME_HEIGHT = 400
-const container  = document.getElementById('container')
-const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
-const heroSketch = Sketch()
-heroSketch.roundedrect({ fill: 'tomato' }, new Rect(10, 10, 200, 200), 16)
-  
-const hero = heroSketch.toSurface()
-screen.blit(hero, hero.rect)
-```
-
 
 ### Sprites
 
@@ -225,4 +209,56 @@ export async function main (container: HTMLElement) {
     screen.fill('white')
     screen.blit(image, image.rect)   
   })
+```
+
+### Sketchs (Vector graphics)
+
+```ts
+import { Game, Sketch } from 'smallgame'
+
+const GAME_WIDTH  = 400
+const GAME_HEIGHT = 400
+const container  = document.getElementById('container')
+const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
+const heroSketch = Sketch()
+heroSketch.roundedrect({ fill: 'tomato' }, new Rect(10, 10, 200, 200), 16)
+  
+const hero = heroSketch.toSurface()
+screen.blit(hero, hero.rect)
+```
+
+### WebGL Surfaces
+
+
+
+```ts
+import { Game, GlSurface } from 'smallgame'
+
+const vertex = `
+void main()
+{
+  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+  gl_PointSize = 200.0;
+}
+`
+const fragmnet = `
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(0.4, 0.0, 0.5, 1.0);  
+}
+`
+
+const GAME_WIDTH  = 400
+const GAME_HEIGHT = 400
+const container  = document.getElementById('container') 
+const glSurface = new GlSurface(w, h)
+const program = glSurface.createDefaultProgram(vertex, fragmnet)
+
+program.clear()
+program.drawArrays()
+  
+const { screen } = Game.create(w, h, container)
+screen.fill('white')
+screen.blit(glSurface, glSurface.rect)
 ```
