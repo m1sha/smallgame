@@ -36,10 +36,12 @@ export class Game {
 }
 
 
+let gameloopRequestAnimationFrameId = 0
+
 export const gameloop = (callback: () => void) => {
   let lastTime = millis()  
   const nextFrame = () => {
-    requestAnimationFrame(nextFrame)  
+    gameloopRequestAnimationFrameId = requestAnimationFrame(nextFrame)  
      
     const delta = (millis() - lastTime) * 0.001
     InternalTimeSetter.deltaTime = delta
@@ -48,5 +50,7 @@ export const gameloop = (callback: () => void) => {
     
     callback()
   }
-  requestAnimationFrame(nextFrame)  
+  gameloopRequestAnimationFrameId = requestAnimationFrame(nextFrame)
 }
+
+export const killgameloop = () => cancelAnimationFrame(gameloopRequestAnimationFrameId)
