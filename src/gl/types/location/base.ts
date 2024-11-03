@@ -4,6 +4,9 @@ export abstract class GlAttributeLocation {
   constructor (gl: WebGL2RenderingContext, program: WebGLProgram, name: string) {
     this.gl = gl
     this.origin = this.gl.getAttribLocation(program, name)!
-    if (this.origin < 0) throw new Error(`Can't get the storage location ${name}`)
+  }
+
+  get valid () {
+    return this.origin > -1
   }
 }

@@ -7,6 +7,9 @@ export abstract class GlUniformLocation {
     this.gl = gl
     this.program = program
     this.origin = this.gl.getUniformLocation(program, name)!
-    if (!this.origin) throw new Error(`Can't find the uniform location ${name}`)
+  }
+
+  get valid () {
+    return Boolean(this.origin)
   }
 }
