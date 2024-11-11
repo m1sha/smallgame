@@ -197,4 +197,7 @@ export class Draw {
   set shadowOffsetX(value: number ) { this.#ctx.shadowOffsetX = value }
   get shadowOffsetY() { return this.#ctx.shadowOffsetY }
   set shadowOffsetY(value: number ) { this.#ctx.shadowOffsetY = value }
+
+  fillText (text: string, x: number, y: number, maxWidth?: number) { this.#ctx.fillText(text, x, y, maxWidth) }
+  strokeText (text: string, x: number, y: number, maxWidth?: number) { this.#ctx.strokeText(text, x, y, maxWidth) }
 }
