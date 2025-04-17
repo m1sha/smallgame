@@ -103,11 +103,7 @@ export class GlProgram {
 
   createTexture (samplerName: string, surface: Surface) {
     const sampler = this.uniform(samplerName, 'int')
-    this.#textures.add(sampler, surface)
-  }
-
-  removeTexture (tex: any) {
-    this.#gl.deleteTexture(tex)
+    return this.#textures.add(sampler, surface)
   }
 
   private getShape (type: GlShape): number {
