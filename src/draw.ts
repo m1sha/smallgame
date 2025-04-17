@@ -200,4 +200,6 @@ export class Draw {
 
   fillText (text: string, x: number, y: number, maxWidth?: number) { this.#ctx.fillText(text, x, y, maxWidth) }
   strokeText (text: string, x: number, y: number, maxWidth?: number) { this.#ctx.strokeText(text, x, y, maxWidth) }
+  get font () { return this.#ctx.font }
+  set font (value: string) { this.#ctx.font = value }
 }
