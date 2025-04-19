@@ -4,6 +4,7 @@ import { IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, IGlAttributeTy
 import { getVertexAttribPointerTemplate } from "./utils"
 import { Surface } from "../surface"
 import { GlTextureList } from "./gl-texture"
+import { GlSurface } from "./gl-surface"
 
 type GlShape = 'points' | 'lines' | 'line-strip' | 'line-loop' | 'triangles' | 'triangle-strip' | 'triangle-fan'
 
@@ -101,7 +102,7 @@ export class GlProgram {
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW)
   }
 
-  createTexture (samplerName: string, surface: Surface) {
+  createTexture (samplerName: string, surface: Surface | GlSurface) {
     const sampler = this.uniform(samplerName, 'int')
     return this.#textures.add(sampler, surface)
   }

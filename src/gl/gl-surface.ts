@@ -53,4 +53,8 @@ export class GlSurface implements ISurface {
   deleteProgram (program: GlProgram) {
     removeItem(this.programs, p => p === program)
   }
+
+  get origin () {
+    return this.canvas
+  }
 }
