@@ -5,6 +5,7 @@ import { Rect } from "./rect"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
 import { ISurface } from "./interfaces"
+import { Pixels } from "./utils/pixels"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -157,6 +158,14 @@ export class Surface {
     this.ctx.fillRect(0,0,width, height)
     this.ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
     this.#rect.resizeSelf(width, height)
+  }
+
+  get pixels (): Pixels {
+    return new Pixels(this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height))
+  }
+
+  set pixels (value: Pixels) {
+    this.ctx.putImageData(value.imageData, 0, 0)
   }
 
   createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
