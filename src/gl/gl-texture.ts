@@ -12,8 +12,9 @@ export class GlTexture {
     this.#gl = gl
     this.#slot = slot
     this.#onRemove = onRemove
-    this.#texture = gl.createTexture()
-    if (!this.#texture) throw new Error(`Can't create a texture.`)
+    const tex = gl.createTexture()
+    if (!tex) throw new Error(`Can't create a texture.`)
+    this.#texture = tex
   }
 
   activate (surface: Surface | GlSurface) {
