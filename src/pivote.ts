@@ -1,0 +1,10 @@
+export type Pivote = 
+  | 'top-left' 
+  | 'top-right' 
+  | 'top-center'
+  | 'bottom-left' 
+  | 'bottom-right' 
+  | 'bottom-center'
+  | 'left-center'
+  | 'right-center'
+  | 'center-center'
