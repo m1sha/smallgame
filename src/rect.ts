@@ -1,16 +1,6 @@
 import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, TPoint, zeroPoint } from "./point"
 import { Sprite } from "./sprite"
-
-export type Pivote = 
-  | 'top-left' 
-  | 'top-right' 
-  | 'top-center'
-  | 'bottom-left' 
-  | 'bottom-right' 
-  | 'bottom-center'
-  | 'left-center'
-  | 'right-center'
-  | 'center-center'
+import { Pivote } from './pivote'
 
 export type TRect = { x: number, y: number, width: number, height: number }
 
@@ -65,19 +55,39 @@ export class Rect implements MutableRect {
   }
 
   get topLeft () { 
-    return { x: this.x, y: this.y}
+    return { x: this.x, y: this.y }
+  }
+
+  set topLeft (value: TPoint) {
+    this.x = this.x
+    this.y = this.y
   }
 
   get topRight () { 
-    return { x: this.absWidth, y: this.y}
+    return { x: this.absWidth, y: this.y }
+  }
+
+  set topRight (value: TPoint) {
+    this.width = value.x - this.x
+    this.y = this.y
   }
 
   get bottomLeft () { 
-    return { x: this.x, y: this.absHeight}
+    return { x: this.x, y: this.absHeight }
+  }
+
+  set bottomLeft (value: TPoint) {
+    this.x = this.x
+    this.height = value.y - this.y
   }
 
   get bottomRight () { 
     return { x: this.absWidth, y: this.absHeight }
+  }
+
+  set bottomRight (value: TPoint) {
+    this.width = value.x - this.x
+    this.height = value.y - this.y
   }
 
   get absWidth () {
@@ -238,19 +248,15 @@ export class Rect implements MutableRect {
   }
 
   union (rect: TRect) {
-    return new Rect(
-      Math.min(this.x, rect.x), 
-      Math.min(this.y, rect.y), 
-      Math.max(this.width, rect.width),
-      Math.max(this.height, rect.height)
+    return Rect.fromTwoPoints(
+      new Point(Math.min(this.x, rect.x), Math.min(this.y, rect.y) ), 
+      new Point(Math.max(this.absWidth, rect.width + rect.x), Math.max(this.absHeight, rect.height + rect.y))
     )
   }
 
   unionSelf (rect: TRect) {
-    this.x = Math.min(this.x, rect.x)
-    this.y = Math.min(this.y, rect.y) 
-    this.width = Math.max(this.width, rect.width)
-    this.height = Math.max(this.height, rect.height)
+    this.topLeft = new Point(Math.min(this.x, rect.x), Math.min(this.y, rect.y) )
+    this.bottomRight = new Point(Math.max(this.absWidth, rect.width + rect.x), Math.max(this.absHeight, rect.height + rect.y))
     return this
   }
 
@@ -333,9 +339,13 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
   get absWidth () { return this.#rect.absWidth }
   get absHeight () { return this.#rect.absHeight }
   get topLeft () { return this.#rect.topLeft }
+  set topLeft (value: TPoint) { this.#rect.topLeft = value }
   get topRight () { return this.#rect.topRight }
+  set topRight (value: TPoint) { this.#rect.topRight = value }
   get bottomLeft () { return this.#rect.bottomLeft }
+  set bottomLeft (value: TPoint) { this.#rect.bottomLeft = value }
   get bottomRight () { return this.#rect.bottomRight }
+  set bottomRight (value: TPoint) { this.#rect.bottomRight = value }
   get diagonal () { return this.#rect.diagonal }
   get points (): [TPoint, TPoint, TPoint, TPoint] { return this.#rect.points }
   overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
