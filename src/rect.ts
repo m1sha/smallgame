@@ -282,6 +282,10 @@ export class Rect implements MutableRect {
     return new Rect(p0.x, p0.y, p.x, p.y)
   }
 
+  static fromCenter (center: TPoint, width: number, height: number) {
+    return new Rect(center.x - width * 0.5, center.y - height * 0.5, width, height)
+  }
+
   private calcPivote(pivote?: Pivote) {
     if (!pivote) return [0, 0]
     switch (pivote) {
