@@ -48,6 +48,19 @@ export class Sketch extends Drawable {
     return shape
   }
 
+  rects (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect, cols: number = 1, rows: number = 1): Rectangle[]  {
+    const result: Rectangle[] = []
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) { 
+        const r = rect instanceof Rect ? rect : Rect.from(rect)
+        const shape: Shape = { type: 'rectangle', ...r.move(j * r.width + r.x, i * r.height + r.y), style: this.initStyle(style) }
+        this._shapes.push(shape)
+        result.push(shape)
+      }
+    }
+    return result
+  }
+
   polyrect (style: ShapeStyle | TShapeStyle | string, { topLeft, topRight, bottomLeft, bottomRight }: PolyRect): PolyRectangle {
     const shape: Shape = { type: 'polyrectangle', topLeft, topRight, bottomLeft, bottomRight, style: this.initStyle(style) }
     this._shapes.push(shape)
