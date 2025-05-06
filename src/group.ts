@@ -16,8 +16,8 @@ export type GroupOptions = {
 }
 
 
-export class Group {
-  #sprites: Sprite[] = []
+export class Group<T extends Sprite>{
+  #sprites: T[] = []
   #hashmap: CollisionHashmap<Sprite> | null = null
   #collidedlist: Map<Sprite, Sprite> = new Map()
   readonly useCollisionHashmap: boolean = false
@@ -33,11 +33,11 @@ export class Group {
     this.useSpriteCollideRect = Boolean(options && options.useSpriteCollideRect)
   }
 
-  get sprites (): ReadonlyArray<Sprite> {
+  get sprites (): ReadonlyArray<T> {
     return this.#sprites
   }
 
-  add (sprite: Sprite): void {
+  add (sprite: T): void {
     if (sprite.rect && (sprite.rect as any).callback) {
       (sprite.rect as any).callback = (sprt: Sprite) => { if (this.#hashmap) this.#hashmap.update(sprt) }
     }
@@ -59,7 +59,7 @@ export class Group {
     removeItem(this.#sprites, p => p === sprite)
   }
 
-  collidePoint (point: TPoint, callback: (sprite: Sprite) => void): void {
+  collidePoint (point: TPoint, callback: (sprite: T) => void): void {
     this.sprites.forEach( sprt => {
       const rect = this.useSpriteCollideRect ? sprt.collideRect : sprt.rect
       if (rect && rect.containsPoint(point)) 
@@ -77,7 +77,7 @@ export class Group {
     this.collideSprites(sprite, this.#sprites, spr => callback(spr))
   }
 
-  collideGroup (group: Group, callback: (sprite1: Sprite, sprite2: Sprite) => void): void {
+  collideGroup (group: Group<T>, callback: (sprite1: Sprite, sprite2: Sprite) => void): void {
     if (this.#hashmap && this.useCollisionHashmap) {
       for (const sprite2 of group.#sprites) {
         const sprites = this.#hashmap.getCompanions(sprite2)
@@ -103,7 +103,7 @@ export class Group {
     })
   }
 
-  outsideRect (rect: TRect, callback: (sprite: Sprite) => void): void {
+  outsideRect (rect: TRect, callback: (sprite: T) => void): void {
     this.sprites.forEach(sprite => { 
       const spriteRect = sprite.rect
       if (!spriteRect) return
