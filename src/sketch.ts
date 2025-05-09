@@ -48,9 +48,10 @@ export class Sketch extends Drawable {
     return shape
   }
 
-  rects (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect, cols: number = 1, rows: number = 1): Rectangle[]  {
+  rects (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect, cols: number = 1, rows: number = 1, skipRows: number = 0 ): Rectangle[]  {
     const result: Rectangle[] = []
     for (let i = 0; i < rows; i++) {
+      if (i < skipRows) continue
       for (let j = 0; j < cols; j++) { 
         const r = rect instanceof Rect ? rect : Rect.from(rect)
         const shape: Shape = { type: 'rectangle', ...r.move(j * r.width + r.x, i * r.height + r.y), style: this.initStyle(style) }
