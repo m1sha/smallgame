@@ -32,4 +32,30 @@ export class Clock {
   }
 }
 
+export class Delay {
+  private lastTime: number
+  #deltaTime: number = 0
+  #now: boolean = false
+
+  constructor (public timeout: number) {
+    this.lastTime = millis()
+  }
+
+  private tick (): void {
+    this.#deltaTime = millis() - this.lastTime
+    this.#now = false
+    if (this.#deltaTime > this.timeout) {
+      this.reset()
+      this.#now = true
+    }
+  }
+
+  get ready() {
+    this.tick()
+    return this.#now
+  }
+
+  reset (): void { this.lastTime = millis() }
+}
+
 export { millis }
