@@ -33,6 +33,10 @@ export class Group<T extends Sprite>{
     this.useSpriteCollideRect = Boolean(options && options.useSpriteCollideRect)
   }
 
+  protected update (): void {
+
+  }
+
   get sprites (): ReadonlyArray<T> {
     return this.#sprites
   }
@@ -46,6 +50,7 @@ export class Group<T extends Sprite>{
   }
 
   draw (surface: Surface): void {
+    this.update()
     for (const sprite of this.#sprites) {
       sprite.draw(surface)
     }
