@@ -8,9 +8,12 @@ export function setAnimation (tileWidth: number, titleHight: number, rate: numbe
   return { tileWidth, titleHight, rate, url}
 }
 
+export type EndAnimationLoopCallback = (name: string) => void
+
 export class Animator implements IAnimation {
   #items: AnimationItem[] = []
   #current: AnimationItem | null = null
+  onEndAnimationLoop: EndAnimationLoopCallback | null = null
 
   async add (name: string, { tileWidth, titleHight, url, rate }: AddAnimationOptions): Promise<void> {
     const map = await loadTileMap(tileWidth, titleHight, url)
@@ -20,6 +23,13 @@ export class Animator implements IAnimation {
 
   set (name: string): void {
     this.#current = this.#items.find(p => p.name === name) ?? null
+    
+    if (this.#current) this.#current.animation.onEndAnimationLoop = () => {
+      if (this.onEndAnimationLoop && this.#current) {
+        this.onEndAnimationLoop(this.#current.name)
+      }
+    }
+
     this.play()
   }
 

@@ -2,6 +2,8 @@ import { Clock } from "../utils"
 import { TileMap } from "../tile-map"
 import { Surface } from "../surface"
 
+export type EndAnimationLoopCallback = () => void
+
 export interface IAnimation {
   get image (): Surface
   play (): void
@@ -15,6 +17,7 @@ export class Animation implements IAnimation {
   #frame: number
   readonly map: TileMap
   readonly rate: number
+  onEndAnimationLoop: EndAnimationLoopCallback | null = null
 
   constructor (map: TileMap, rate: number) {
     this.map = map
@@ -46,6 +49,9 @@ export class Animation implements IAnimation {
 
   private next () {
     this.#frame++
-    if (this.#frame >= this.map.count) this.#frame = 0
+    if (this.#frame >= this.map.count) {
+      this.#frame = 0
+      if (this.onEndAnimationLoop) this.onEndAnimationLoop()
+    }
   }
 }
