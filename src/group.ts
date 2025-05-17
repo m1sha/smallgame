@@ -64,6 +64,10 @@ export class Group<T extends Sprite>{
     removeItem(this.#sprites, p => p === sprite)
   }
 
+  find (predicate: (sprite: T) => boolean) {
+    return this.sprites.find(predicate)
+  }
+
   collidePoint (point: TPoint, callback: (sprite: T) => void): void {
     this.sprites.forEach( sprt => {
       const rect = this.useSpriteCollideRect ? sprt.collideRect : sprt.rect
