@@ -76,27 +76,27 @@ export class Group<T extends Sprite>{
     })
   }
 
-  collideSprite (sprite: Sprite, callback: (sprite: Sprite) => void): void {
+  collideSprite<R extends Sprite> (sprite: R, callback: (sprite: T) => void): void {
     if (this.#hashmap && this.useCollisionHashmap) {
       const sprites = this.#hashmap.getCompanions(sprite)
-      this.collideSprites(sprite, sprites, spr => callback(spr))  
+      this.collideSprites(sprite, sprites, spr => callback(spr as T))  
       return
     }
 
-    this.collideSprites(sprite, this.#sprites, spr => callback(spr))
+    this.collideSprites(sprite, this.#sprites, spr => callback(spr as T))
   }
 
-  collideGroup (group: Group<T>, callback: (sprite1: Sprite, sprite2: Sprite) => void): void {
+  collideGroup<R extends Sprite> (group: Group<R>, callback: (sprite1: T, sprite2: R) => void): void {
     if (this.#hashmap && this.useCollisionHashmap) {
       for (const sprite2 of group.#sprites) {
         const sprites = this.#hashmap.getCompanions(sprite2)
-        this.collideSprites(sprite2, sprites, spr => callback(spr, sprite2)) 
+        this.collideSprites(sprite2, sprites, spr => callback(spr as T, sprite2)) 
       }
       return
     }
 
     for (const sprite2 of group.#sprites) {
-      this.collideSprites(sprite2, this.#sprites, spr => callback(spr, sprite2)) 
+      this.collideSprites(sprite2, this.#sprites, spr => callback(spr as T, sprite2)) 
     }
   }
 
