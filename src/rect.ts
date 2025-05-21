@@ -353,7 +353,7 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
   get diagonal () { return this.#rect.diagonal }
   get points (): [TPoint, TPoint, TPoint, TPoint] { return this.#rect.points }
   overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
-  touchSide (rect: Rect) { return this.#rect.touchSide(rect) }
+  touchSide (rect: TRect) { return this.#rect.touchSide(rect) }
   inside (rect: TRect): boolean { return this.#rect.inside(rect) }
   contains (rect: Rect) { return this.#rect.contains(rect) }
   containsPoint (point: TPoint) { return this.#rect.containsPoint(point) }
