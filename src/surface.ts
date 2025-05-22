@@ -181,6 +181,11 @@ export class Surface {
     return this.canvas.toDataURL(type, quality)
   }
 
+  toPattern (repetition: "repeat" | "repeat-x" | "repeat-y" | "no-repeat"): CanvasPattern {
+    if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an pattern from the OffscreenCanvas.')
+    return this.draw.createPattern(this.canvas, repetition)
+  }
+
   save (type?: string, quality?: any): Promise<Blob | null> {
     return new Promise((resolve) => {
       if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')

@@ -57,4 +57,11 @@ export class GlSurface implements ISurface {
   get origin () {
     return this.canvas
   }
+
+  toPattern (repetition: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat') {
+    const canvas = document.createElement('canvas')
+    const pattern = canvas.getContext('2d')?.createPattern(this.canvas, repetition)
+    if (!pattern) throw new Error('Can not create a pattern.')
+    return pattern
+  }
 }

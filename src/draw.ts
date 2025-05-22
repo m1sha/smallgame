@@ -202,4 +202,10 @@ export class Draw {
   strokeText (text: string, x: number, y: number, maxWidth?: number) { this.#ctx.strokeText(text, x, y, maxWidth) }
   get font () { return this.#ctx.font }
   set font (value: string) { this.#ctx.font = value }
+
+  createPattern (canvas: CanvasImageSource, repetition: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat' ): CanvasPattern { 
+    const result = this.#ctx.createPattern(canvas, repetition)
+    if (!result) throw new Error('Can not create a canvas pattern.')
+    return result
+  }
 }

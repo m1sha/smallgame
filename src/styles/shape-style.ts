@@ -1,10 +1,12 @@
 /* global CanvasLineCap, CanvasLineJoin */
 
+import { Surface } from "../surface"
+import { TColorSource } from "./color-source"
 import { PaintOrder } from "./paint-order"
 
 export type TShapeStyle = {
-  fill?: string
-  stroke?: string
+  fill?: TColorSource
+  stroke?: TColorSource
   lineCap?: CanvasLineCap
   lineDashOffset?: number
   lineDash?: number[]
@@ -16,8 +18,8 @@ export type TShapeStyle = {
 }
 
 export class ShapeStyle {
-  fill: string
-  stroke: string
+  fill: TColorSource
+  stroke: TColorSource
   lineCap: CanvasLineCap
   lineDashOffset: number
   lineDash: number[]
@@ -51,12 +53,24 @@ export class ShapeStyle {
 }
 
 export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
-  ctx.strokeStyle = style.stroke
+  if (style.stroke instanceof Surface) {
+    ctx.strokeStyle = style.stroke.draw.origin
+  } else {
+    ctx.strokeStyle = style.stroke
+  }
+  
   ctx.lineWidth = style.lineWidth || 1
   ctx.lineJoin = style.lineJoin || 'bevel'
   if (style.lineDash) ctx.setLineDash(style.lineDash)
   ctx.lineDashOffset = style.lineDashOffset || 0
   ctx.lineCap = style.lineCap || 'butt'
-  
+}
+
+export function applyFill (ctx: CanvasRenderingContext2D, color: TColorSource) {
+if (color instanceof Surface) {
+    ctx.fillStyle = color.draw.origin
+  } else {
+    ctx.fillStyle = color
+  }
 }
 

@@ -1,4 +1,4 @@
-import { ShapeStyle, TShapeStyle, applyStroke } from './styles/shape-style'
+import { ShapeStyle, TShapeStyle, applyStroke, applyFill } from './styles/shape-style'
 import { Drawable } from './drawable'
 import { Surface } from './surface'
 import { PolyRect, Rect, TRect } from './rect'
@@ -157,7 +157,7 @@ export class Sketch extends Drawable {
       
       suface.draw.beginPath()
       if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
-      if (shape.style.fill) suface.draw.fillStyle = shape.style.fill
+      if (shape.style.fill) applyFill(suface.draw as any, shape.style.fill)
       switch (shape.type) {
         case 'rectangle': {
           suface.draw.rect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy)
@@ -231,7 +231,7 @@ export class Sketch extends Drawable {
               suface.draw.lineTo(x, y)
             }
             suface.draw.closePath()
-            suface.draw.fillStyle = shape.style.stroke
+            applyFill(suface.draw as any, shape.style.stroke)
             suface.draw.fill()
             suface.draw.beginPath()
           }
@@ -294,6 +294,10 @@ export class Sketch extends Drawable {
     const suface = new Surface(w, h, { coordinateSystem })
     this.draw(suface)
     return suface
+  }
+
+  toPattern (repetition: "repeat" | "repeat-x" | "repeat-y" | "no-repeat", width?: number, height?: number, coordinateSystem?: CoordinateSystem): CanvasPattern  {
+    return this.toSurface(width, height, coordinateSystem).toPattern(repetition)
   }
 
   private pushToBlitQueue(shape: Shape, suface: Surface) {
