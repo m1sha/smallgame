@@ -2,6 +2,7 @@ import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, TPoint, zero
 import { Sprite } from "./sprite"
 import { Pivote } from './pivote'
 
+export type TSize = { width: number, height: number }
 export type TRect = { x: number, y: number, width: number, height: number }
 
 export interface MutableRect {
@@ -36,6 +37,8 @@ export interface MutableRect {
   moveSelf (...args: Array<any>): MutableRect
   resize (width: number, height: number): MutableRect
   resizeSelf (width: number, height: number): MutableRect
+  scalesize (dw: number, dh: number): MutableRect
+  scalesizeSelf (dw: number, dh: number): MutableRect
   union (rect: MutableRect): MutableRect
   unionSelf (rect: MutableRect): MutableRect
   rotate (a: number, pivot?: number | TPoint): PolyRect
@@ -247,6 +250,16 @@ export class Rect implements MutableRect {
     return this
   }
 
+  scalesize (dw: number, dh: number) {
+    return new Rect(this.x, this.y, this.width * dw, this.height * dh)
+  }
+
+  scalesizeSelf (dw: number, dh: number) {
+    this.width *= dw
+    this.height *= dh
+    return this
+  }
+
   union (rect: TRect) {
     return Rect.fromTwoPoints(
       new Point(Math.min(this.x, rect.x), Math.min(this.y, rect.y) ), 
@@ -379,6 +392,12 @@ export class ObservableRect implements MutableRect /* implicitly implements Obse
   }
   resizeSelf (width: number, height: number) {
     return this.#rect.resizeSelf(width, height)
+  }
+  scalesize (dw: number, dh: number) {
+    return this.#rect.scalesize(dw, dh)
+  }
+  scalesizeSelf (dw: number, dh: number) {
+    return this.#rect.scalesizeSelf(dw, dh)
   }
   union (rect: TRect) {
     return this.#rect.union(rect)
