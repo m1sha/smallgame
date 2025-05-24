@@ -1,18 +1,18 @@
 import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
-import { Game } from "../game"
 import { Point } from "../point"
-import { Screen } from "../screen"
+import { IEventProvider } from "./event-provider"
+import { Surface } from "surface"
 
 export class EventController {
-  private readonly game: Game
+  private readonly eventProvider: IEventProvider
 
-  constructor (game: Game) {
-    this.game = game
+  constructor (game: IEventProvider) {
+    this.eventProvider = game
   }
 
-  init (screen: Screen) {
-    const { event, key } = this.game
+  init (screen: Surface) {
+    const { event, key } = this.eventProvider
     let keypressed = false
     let mousemown = false
     const queue = unsafecast<EventQueue>(key)
@@ -39,7 +39,7 @@ export class EventController {
       prevMousePos.moveSelf(0, 0)
     })
 
-    const canvas = screen.originCanvas
+    const canvas = screen.draw.origin.canvas
 
     canvas.addEventListener('pointerdown', e => {
       leave = false

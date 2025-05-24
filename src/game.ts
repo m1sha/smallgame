@@ -1,12 +1,11 @@
 import { Screen } from "./screen"
-import { EventController } from "./events/event-controller"
-import { GameEvents } from "./events/game-event"
+import { EventController, IEventProvider, GameEvents } from "./events"
 import { Keys } from "./keys/keys"
 import { InternalTimeSetter } from "./time"
 import { ViewportType } from "./viewport"
 import { FPSCounter, millis } from "./utils"
 
-export class Game {
+export class Game implements IEventProvider {
   readonly event: GameEvents
   readonly key: Keys
   private readonly controller: EventController 
