@@ -20,8 +20,9 @@ export class Game implements IEventProvider {
   private init (width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform'): Screen {
     if (this.#screen) return this.#screen
     this.#screen = new Screen(viewportType, width, height)
-    containter.append(this.#screen.viewport.htmlContainer as any)
-    this.controller.init(this.#screen)
+    const htmlContainer = this.#screen.viewport.htmlContainer as any
+    containter.append(htmlContainer)
+    this.controller.init(htmlContainer)
     return this.#screen
   }
 

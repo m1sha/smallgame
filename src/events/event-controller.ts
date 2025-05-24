@@ -2,16 +2,16 @@ import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
 import { Point } from "../point"
 import { IEventProvider } from "./event-provider"
-import { Surface } from "surface"
 
 export class EventController {
   private readonly eventProvider: IEventProvider
+  callback: (() => void) | null = null
 
-  constructor (game: IEventProvider) {
-    this.eventProvider = game
+  constructor (provider: IEventProvider) {
+    this.eventProvider = provider
   }
 
-  init (screen: Surface) {
+  init (htmlContainter: HTMLElement) {
     const { event, key } = this.eventProvider
     let keypressed = false
     let mousemown = false
@@ -28,6 +28,7 @@ export class EventController {
       keypressed = true
       lastKey = e.key
       event.push('KEYDOWN', e)
+      if (this.callback) this.callback()
     })
 
     document.addEventListener('keyup', e => {
@@ -37,27 +38,28 @@ export class EventController {
       keypressed = false
       event.push('KEYUP', e)
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
 
-    const canvas = screen.draw.origin.canvas
-
-    canvas.addEventListener('pointerdown', e => {
+    htmlContainter.addEventListener('pointerdown', e => {
       leave = false
 
       if (mousemown) return
       mousemown = true
       event.push('MOUSEDOWN', e)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointerup', e => {
+    htmlContainter.addEventListener('pointerup', e => {
       leave = false
 
       if (!mousemown) return
       mousemown = false
       event.push('MOUSEUP', e)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointermove', e => {
+    htmlContainter.addEventListener('pointermove', e => {
       leave = false
       const ev = e as any
       ev.prevMousePos = prevMousePos
@@ -74,47 +76,54 @@ export class EventController {
           for (const ev of events)
             event.push('MOUSEMOVE', ev)
           
+          if (this.callback) this.callback()
           return
         }
       }
 
       event.push('MOUSEMOVE', e)
       prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointerleave', e => {
+    htmlContainter.addEventListener('pointerleave', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointercancel', e => {
+    htmlContainter.addEventListener('pointercancel', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointerout', e => {
+    htmlContainter.addEventListener('pointerout', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
       leave = true
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
 
-    canvas.addEventListener('pointerover', e => {
+    htmlContainter.addEventListener('pointerover', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
       leave = false
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
     
-    canvas.addEventListener('pointerenter', e => {
+    htmlContainter.addEventListener('pointerenter', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
       leave = false
       prevMousePos.moveSelf(0, 0)
+      if (this.callback) this.callback()
     })
   }
 }
