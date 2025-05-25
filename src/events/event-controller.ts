@@ -76,54 +76,54 @@ export class EventController {
           for (const ev of events)
             event.push('MOUSEMOVE', ev)
           
-          if (this.callback) this.callback()
+          //if (this.callback) this.callback()
           return
         }
       }
 
       event.push('MOUSEMOVE', e)
-      prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
       if (this.callback) this.callback()
+      prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
     })
 
     htmlContainter.addEventListener('pointerleave', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
+      if (this.callback) this.callback()
       leave = true
       prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
     })
 
     htmlContainter.addEventListener('pointercancel', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
+      if (this.callback) this.callback()
       leave = true
       prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
     })
 
     htmlContainter.addEventListener('pointerout', e => {
       if (leave) return
       event.push('MOUSELEAVE', e)
+      if (this.callback) this.callback()
       leave = true
       prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
     })
 
     htmlContainter.addEventListener('pointerover', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
+      if (this.callback) this.callback()
       leave = false
       prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
     })
     
     htmlContainter.addEventListener('pointerenter', e => {
       if (!leave) return
       event.push('MOUSEENTER', e)
+      if (this.callback) this.callback()
       leave = false
       prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
     })
   }
 }
