@@ -4,6 +4,8 @@ import { Surface } from "../surface"
 import { TColorSource } from "./color-source"
 import { PaintOrder } from "./paint-order"
 
+export type ShapeStyleTypes = TShapeStyle | ShapeStyle | string
+
 export type TShapeStyle = {
   fill?: TColorSource
   stroke?: TColorSource
@@ -67,10 +69,34 @@ export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
 }
 
 export function applyFill (ctx: CanvasRenderingContext2D, color: TColorSource) {
-if (color instanceof Surface) {
-    ctx.fillStyle = color.draw.origin
-  } else {
-    ctx.fillStyle = color
+  ctx.fillStyle = color
+}
+
+export class ShapeStyleResolver {
+  constructor (private style: ShapeStyleTypes | ShapeStyleTypes[] | ShapeStyleTypes[][]) {
+  }
+
+  get (col: number, row: number): ShapeStyleTypes {
+    if (Array.isArray(this.style)) {
+      const styles = this.style
+      
+      if (Array.isArray(styles[0])) {
+        const stylesList = styles as ShapeStyleTypes[][]
+        const j = col >= styles.length ? 0 | col % this.style.length  : col
+        const styleList = styles[j] as ShapeStyleTypes[]
+        const i = row >= styleList.length ? 0 | row % styleList.length : row
+        return  stylesList[j][i]
+      }
+      
+      const j = col >= this.style.length ? col % this.style.length : col  
+      return this.style[j] as ShapeStyleTypes
+    }
+
+    if (!Array.isArray(this.style)) {
+      return this.style
+    }
+
+    throw new Error('Unsupported arguments.')
   }
 }
 

@@ -1,12 +1,13 @@
-import { ShapeStyle, TShapeStyle, applyStroke, applyFill } from './styles/shape-style'
-import { Drawable } from './drawable'
-import { Surface } from './surface'
-import { PolyRect, Rect, TRect } from './rect'
-import { Point, setPoint, TPoint } from './point'
-import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots, Arrows } from './shapes'
-import { Boundedrect } from './shapes/boundedrect'
-import { type TSegment } from './segment'
-import { CoordinateSystem } from './coords'
+import { ShapeStyle, TShapeStyle, applyStroke, applyFill, ShapeStyleTypes, ShapeStyleResolver } from '../styles/shape-style'
+import { Drawable } from '../drawable'
+import { Surface } from '../surface'
+import { PolyRect, Rect, TRect } from '../rect'
+import { Point, setPoint, TPoint } from '../point'
+import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots, Arrows } from '../shapes'
+import { Boundedrect } from '../shapes/boundedrect'
+import { type TSegment } from '../segment'
+import { CoordinateSystem } from '../coords'
+import { RectDrawOptions, TRectDrawOptions } from './options'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -15,7 +16,6 @@ export class Sketch extends Drawable {
   y: number = 0
   sx: number = 1
   sy: number = 1
-  
 
   defineStyle (name: string, style: TShapeStyle): ShapeStyle {
     return this._styleList[name] = ShapeStyle.from(style)
@@ -48,13 +48,16 @@ export class Sketch extends Drawable {
     return shape
   }
 
-  rects (style: ShapeStyle | TShapeStyle | string, rect: Rect | TRect, cols: number = 1, rows: number = 1, skipRows: number = 0 ): Rectangle[]  {
+  rects (style: ShapeStyleTypes | ShapeStyleTypes[] | ShapeStyleTypes[][], rect: Rect | TRect, cols: number = 1, rows: number = 1, options?: TRectDrawOptions): Rectangle[]  {
     const result: Rectangle[] = []
+    const { skipRows, gap } = new RectDrawOptions(options)
+    const resolver = new ShapeStyleResolver(style)
     for (let i = 0; i < rows; i++) {
       if (i < skipRows) continue
       for (let j = 0; j < cols; j++) { 
         const r = rect instanceof Rect ? rect : Rect.from(rect)
-        const shape: Shape = { type: 'rectangle', ...r.move(j * r.width + r.x, i * r.height + r.y), style: this.initStyle(style) }
+        const shapeStyle = resolver.get(j, i)
+        const shape: Shape = { type: 'rectangle', ...r.move(j * r.width + r.x + gap * j, i * r.height + r.y + gap * i), style: this.initStyle(shapeStyle) }
         this._shapes.push(shape)
         result.push(shape)
       }
