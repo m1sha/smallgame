@@ -21,8 +21,8 @@ export class Surface {
   #conv: (point: TPoint) => TPoint
   readonly draw: Draw
   
-  constructor(width: number, height: number, options?: SurfaceCreateOptions) {
-    this.canvas = options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+  constructor(width: number, height: number, options?: SurfaceCreateOptions, canvas?: HTMLCanvasElement) {
+    this.canvas = canvas ? canvas : options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
     this.canvas.width = width
     this.canvas.height = height
     const coordinateSystem = options && options.coordinateSystem ? options.coordinateSystem : 'screen'
@@ -154,8 +154,7 @@ export class Surface {
     const shiftY = shiftToCenter ? (height - canvas.height) / 2: 0
     this.canvas.width = width
     this.canvas.height = height
-    this.ctx.fillStyle = '#119922'
-    this.ctx.fillRect(0,0,width, height)
+    
     this.ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
     this.#rect.resizeSelf(width, height)
   }
@@ -214,6 +213,10 @@ export class Surface {
     surface.imageRendering = useSmooth ? 'auto' : 'pixelated'
     surface.ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     return surface
+  }
+
+  static fromCanvas (canvas: HTMLCanvasElement, options?: SurfaceCreateOptions) {
+    return new Surface(canvas.width, canvas.height, options, canvas)
   }
 
   static fromImages(images: HTMLImageElement[], rect: Rect, rows: number = 1, cols: number = -1, useAlpha: boolean = true, useSmooth: boolean = true) {
