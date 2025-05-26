@@ -1,11 +1,11 @@
 import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, TPoint, zeroPoint } from "./point"
 import { Sprite } from "./sprite"
 import { Pivote } from './pivote'
+import { type TSize } from "./size"
 
-export type TSize = { width: number, height: number }
 export type TRect = { x: number, y: number, width: number, height: number }
 
-export interface MutableRect {
+export interface MutableRect extends TSize {
   x: number
   y: number
   width: number 
