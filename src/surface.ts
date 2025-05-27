@@ -167,6 +167,13 @@ export class Surface {
     this.ctx.putImageData(value.imageData, 0, 0)
   }
 
+  mix (method: GlobalCompositeOperation, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+    const old = this.ctx.globalCompositeOperation
+    this.ctx.globalCompositeOperation = method
+    this.blit(surface, rect, distRect)
+    this.ctx.globalCompositeOperation = old
+  }
+
   createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
       const img = document.createElement("img")
