@@ -282,8 +282,16 @@ export class Rect implements MutableRect {
     return new Rect(0, 0, 0, 0)
   }
 
-  static size (width: number, height: number) {
-    return new Rect(0, 0, width, height)
+  static size (width: number, height: number): Rect
+  static size (size: TSize): Rect
+  static size (...args: Array<any>): Rect {
+    if (args.length === 1 && args[0] && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      return new Rect(0, 0, args[0].width, args[0].height)
+    }
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Rect(0, 0, args[0], args[1])
+    }
+    throw new Error('Unsupport arguments.')
   }
 
   static from ({ x, y, width, height }: TRect) {
