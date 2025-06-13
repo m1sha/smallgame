@@ -107,6 +107,8 @@ export class TileMap {
       this.titleHight || 0
     )
 
+    this.surface.rect.moveSelf(this.framePosition)
+
     return this.surface
   }
 
