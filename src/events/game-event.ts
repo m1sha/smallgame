@@ -2,10 +2,11 @@ import { setPoint, TPoint } from "../point"
 import { Keys } from "../keys/keys"
 import { unsafecast } from "../utils"
 
-export type MouseEventTypeNames = | 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE' | 'MOUSELEAVE' | 'MOUSEENTER'
+export type MouseEventTypeNames = | 'MOUSEDOWN' | 'MOUSEUP' | 'MOUSEMOVE' | 'MOUSELEAVE' | 'MOUSEENTER' 
+export type MouseWheelEventType = | 'WHEEL'
 export type KeyBoardTypeNames = 'KEYDOWN' | 'KEYUP' 
 
-export type GameEventType = KeyBoardTypeNames | MouseEventTypeNames | 'USEREVENT'
+export type GameEventType = KeyBoardTypeNames | MouseEventTypeNames | MouseWheelEventType | 'USEREVENT'
 
 class InputGameEvent<T> {
   readonly altKey: boolean
@@ -59,7 +60,34 @@ export class MouseGameEvent extends InputGameEvent<MouseEvent> {
   }
 }
 
-export type GameEvent = KeyboardGameEvent | MouseGameEvent
+export class MouseWheelGameEvent extends InputGameEvent<WheelEvent> { 
+  readonly type: MouseWheelEventType
+  readonly pos: TPoint
+  readonly shift: TPoint
+  readonly button: number = -1
+  readonly deltaMode: number
+  readonly deltaX: number
+  readonly deltaY: number
+  readonly deltaZ: number
+
+  constructor (type: MouseWheelEventType, e: WheelEvent) {
+    super(e)
+    this.type = type
+    this.pos = setPoint(e.offsetX,  e.offsetY)
+    this.button = e.buttons
+    const prevMousePos = unsafecast<any>(e).prevMousePos as TPoint
+    this.shift = !prevMousePos 
+      ? setPoint(0, 0) 
+      : setPoint(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
+
+    this.deltaMode = e.deltaMode
+    this.deltaX = e.deltaX
+    this.deltaY = e.deltaY
+    this.deltaZ = e.deltaZ
+  }
+}
+
+export type GameEvent = KeyboardGameEvent | MouseGameEvent | MouseWheelGameEvent
 
 export class GameEvents {
   private items: GameEvent[] = []
@@ -85,6 +113,9 @@ export class GameEvents {
       case 'MOUSELEAVE':
       case 'MOUSEENTER':
         this.items.push(new MouseGameEvent(type, e as MouseEvent))
+        break
+      case 'WHEEL':
+        this.items.push(new MouseWheelGameEvent(type, e as WheelEvent))
         break
     }
   }

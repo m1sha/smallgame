@@ -125,5 +125,10 @@ export class EventController {
       leave = false
       prevMousePos.moveSelf(0, 0)
     })
+
+    htmlContainter.addEventListener('wheel', e => {
+      event.push('WHEEL', e)
+      if (this.callback) this.callback()
+    })
   }
 }
