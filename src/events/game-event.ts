@@ -38,8 +38,8 @@ export class KeyboardGameEvent extends InputGameEvent<KeyboardEvent> {
 export class MouseButton {
   static readonly NONE = 0
   static readonly LEFT = 1
-  static readonly MIDDLE = 2
-  static readonly RIGHT = 3
+  static readonly MIDDLE = 3
+  static readonly RIGHT = 2
 }
 
 export class MouseGameEvent extends InputGameEvent<MouseEvent> {
