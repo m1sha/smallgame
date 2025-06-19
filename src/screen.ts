@@ -1,8 +1,8 @@
-import { CssViewport, TransformViewport, Viewport, ViewportType } from './viewport'
-import { Surface, SurfaceCreateOptions } from './surface'
-import { TPoint } from './point'
+import { CssViewport, TransformViewport, type Viewport, type ViewportType } from './viewport'
+import { Surface, type SurfaceCreateOptions } from './surface'
+import { type TPoint } from './point'
 import { Rect } from './rect'
-import { ISurface } from './interfaces'
+import { type ISurface } from './interfaces'
 
 export class Screen extends Surface {
   readonly viewport: Viewport

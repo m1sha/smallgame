@@ -1,4 +1,4 @@
-import { setPoint, TPoint } from "./point"
+import { setPoint, type TPoint } from "./point"
 
 export type TSegment = {
   readonly p0: TPoint

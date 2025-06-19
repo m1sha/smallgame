@@ -2,8 +2,8 @@ import { removeItem } from "./utils/array"
 import { Sprite } from "./sprite"
 import { Surface } from "./surface"
 import { CollisionHashmap } from "./utils/collision-hashmap"
-import { TPoint } from "./point"
-import { TRect } from "./rect"
+import { type TPoint } from "./point"
+import { type TRect } from "./rect"
 
 export type GroupOptions = {
   collisionHashmap?: {

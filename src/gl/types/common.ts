@@ -90,7 +90,7 @@ export function vertexOf (typeName: KnowledgeTypes) {
   }
 }
 
-export function sizeOf (typeName: string) {
+export function sizeOf (_/*typeName*/: string) {
   return 4
 }
 

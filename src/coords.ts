@@ -1,4 +1,4 @@
-import { setPoint, TPoint } from "./point"
+import { setPoint, type TPoint } from "./point"
 
 export type CoordinateSystem = 'screen' | 'math' | 'cartesian'
 

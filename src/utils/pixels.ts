@@ -26,7 +26,7 @@ export class Pixels {
     this.imageData.data[index + 3] = color[3]
   }
 
-  getValue (x: number, y: number, color: ColorChannel): number {
+  getValue (x: number, y: number, _: ColorChannel): number {
     const index = this.getIndex(x, y)
     return this.imageData.data[index]
   }

@@ -1,4 +1,4 @@
-import { MutableRect, Rect } from "../rect"
+import { type MutableRect, Rect } from "../rect"
 import { removeItem } from "./array"
 
 export class CollisionHashmap<T extends { rect: MutableRect | null }> {

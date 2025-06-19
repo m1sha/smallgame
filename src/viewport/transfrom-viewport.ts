@@ -1,5 +1,5 @@
-import { TPoint } from "../point"
-import { Rect, TRect } from "../rect"
+import { type TPoint } from "../point"
+import { Rect, type TRect } from "../rect"
 import { ViewportBase } from "./viewport-base"
 
 export class TransformViewport extends ViewportBase {

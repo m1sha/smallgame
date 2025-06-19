@@ -1,4 +1,4 @@
-import { Hex, HexagonOrientation } from "./hex"
+import { Hex, type HexagonOrientation } from "./hex"
 
 
 
@@ -6,7 +6,7 @@ export class HexGrid {
   #cellSize: number
   #orientation: HexagonOrientation
 
-  constructor (rows: number, cols: number, cellSize: number, orientation: HexagonOrientation) {
+  constructor (_/*rows*/: number, __/*cols*/: number, cellSize: number, orientation: HexagonOrientation) {
     this.#cellSize = cellSize
     this.#orientation = orientation
   }

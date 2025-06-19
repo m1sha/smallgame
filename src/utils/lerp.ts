@@ -1,4 +1,4 @@
-import { TPoint } from "../point"
+import { type TPoint } from "../point"
 
 const lerpScalar = (g: number, c: number, dt: number): number => {
   const d = g - c

@@ -1,13 +1,13 @@
-import { ShapeStyle, TShapeStyle, applyStroke, applyFill, ShapeStyleTypes, ShapeStyleResolver } from '../styles/shape-style'
+import { ShapeStyle, type TShapeStyle, applyStroke, applyFill, type ShapeStyleTypes, ShapeStyleResolver } from '../styles/shape-style'
 import { Drawable } from '../drawable'
 import { Surface } from '../surface'
-import { PolyRect, Rect, TRect } from '../rect'
-import { Point, setPoint, TPoint } from '../point'
-import { Shape, Rectangle, PolyRectangle, Circle, Line, RoundedRectangle, VLine, HLine, Polygon, Polydots, Arrows } from '../shapes'
+import { PolyRect, Rect, type TRect } from '../rect'
+import { Point, setPoint, type TPoint } from '../point'
+import { type Shape, type Rectangle, type PolyRectangle, type Circle, type Line, type RoundedRectangle, type VLine, type HLine, type Polygon, type Polydots, Arrows } from '../shapes'
 import { Boundedrect } from '../shapes/boundedrect'
 import { type TSegment } from '../segment'
-import { CoordinateSystem } from '../coords'
-import { RectDrawOptions, TRectDrawOptions } from './options'
+import { type CoordinateSystem } from '../coords'
+import { RectDrawOptions, type TRectDrawOptions } from './options'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []

@@ -1,5 +1,5 @@
 import { ShapeStyle } from "../styles/shape-style"
-import { TPoint } from "../point"
+import { type TPoint } from "../point"
 
 export type PolyRectangle = {
   style: ShapeStyle

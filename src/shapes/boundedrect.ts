@@ -1,10 +1,10 @@
-import { Rect, setRect, TRect } from "../rect";
-import { Shape } from "./shape"
-import { Rectangle } from "./rectangle";
-import { RoundedRectangle } from "./roundedrect";
-import { Circle } from "./circle";
-import { Line } from "./line";
-import { setPoint } from "../point";
+import { Rect, setRect, type TRect } from "../rect"
+import { type Shape } from "./shape"
+import { type Rectangle } from "./rectangle"
+import { type RoundedRectangle } from "./roundedrect"
+import { type Circle } from "./circle"
+import { type Line } from "./line"
+import { setPoint } from "../point"
 
 export class Boundedrect {
   static getShapesBounds (shapes: Shape[]): Rect { 

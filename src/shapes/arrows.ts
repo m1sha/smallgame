@@ -1,5 +1,5 @@
 import { ShapeStyle } from "../styles/shape-style"
-import { TSegment } from "../segment"
+import { type TSegment } from "../segment"
 
 export class Arrows {
   style: ShapeStyle

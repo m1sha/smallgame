@@ -1,5 +1,5 @@
-import { TPoint } from "../point"
-import { TRect } from "../rect"
+import { type TPoint } from "../point"
+import { type TRect } from "../rect"
 
 export abstract class ViewportBase {
   protected canvas: HTMLCanvasElement

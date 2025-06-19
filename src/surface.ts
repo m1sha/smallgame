@@ -1,10 +1,10 @@
-import { mulPoints, Point, setPoint, sumPoints, TPoint } from "./point"
+import { mulPoints, Point, setPoint, sumPoints, type TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
 import { Rect } from "./rect"
 //import { Game } from "./game"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
-import { ISurface } from "./interfaces"
+import { type ISurface } from "./interfaces"
 import { Pixels } from "./utils/pixels"
 
 export type SurfaceCreateOptions = {
@@ -243,10 +243,10 @@ export class Surface {
   }
 
   private cloneCanvas (size?: { width: number, height: number }) {
-    const { width, height } = Object.assign({}, { 
-      width: size ? size.width : this.width,
-      height : size ? size.height : this.height,
-    })
+    // const { width, height } = Object.assign({}, { 
+    //   width: size ? size.width : this.width,
+    //   height : size ? size.height : this.height,
+    // })
 
     const shift = Point.zero
     if (size) {

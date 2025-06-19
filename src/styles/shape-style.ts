@@ -1,8 +1,8 @@
 /* global CanvasLineCap, CanvasLineJoin */
 
 import { Surface } from "../surface"
-import { TColorSource } from "./color-source"
-import { PaintOrder } from "./paint-order"
+import { type  TColorSource } from "./color-source"
+import { type  PaintOrder } from "./paint-order"
 
 export type ShapeStyleTypes = TShapeStyle | ShapeStyle | string
 

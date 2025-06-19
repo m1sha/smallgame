@@ -1,8 +1,8 @@
 import { Surface } from "./surface"
 import { Drawable } from "./drawable"
-import { TPoint } from "./point"
-import { TTextStyle, TextStyle } from "./styles/text-style"
-import { Pivote } from "pivote"
+import { type TPoint } from "./point"
+import { type TTextStyle, TextStyle } from "./styles/text-style"
+import { type Pivote } from "./pivote"
 
 export type TextPosition = TPoint & { pivote?: Pivote }
 
@@ -106,7 +106,7 @@ export class TextMeasurer {
     return this.measureTextInt(ctx, text, style).width
   }
 
-  private static getHeight (text: string, style: TextStyle, metrics: TextMetrics) {
+  private static getHeight (_: string, style: TextStyle, metrics: TextMetrics) {
     if (metrics.actualBoundingBoxAscent && metrics.actualBoundingBoxDescent) {
       return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent 
     }

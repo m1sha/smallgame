@@ -1,5 +1,5 @@
 import { Point } from "./point"
-import { Rect } from "./rect";
+import { Rect } from "./rect"
 import { Surface } from "./surface"
 
 export type TileMapInitOptions = {

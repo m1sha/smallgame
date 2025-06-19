@@ -1,5 +1,5 @@
-import { setPoint, TPoint } from "./point"
-import { CoordinateSystem, coordconv } from "./coords"
+import { setPoint, type TPoint } from "./point"
+import { type CoordinateSystem, coordconv } from "./coords"
 import { ddaline } from "./utils/dda-line"
 import { Rect } from "./rect"
 

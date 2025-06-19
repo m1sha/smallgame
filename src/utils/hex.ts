@@ -1,5 +1,5 @@
 import { Rect } from "../rect"
-import { setPoint, TPoint } from "../point"
+import { setPoint, type TPoint } from "../point"
 
 export type HexagonOrientation = 'flat' | 'pointy'
 

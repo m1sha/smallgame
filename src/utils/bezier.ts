@@ -1,4 +1,4 @@
-import { Point, TPoint } from "../point"
+import { Point } from "../point"
 
 export function quadratic (p0: Point, p1: Point, p2: Point, t: number): Point {
   const nt = (1 - t)

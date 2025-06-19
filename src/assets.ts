@@ -1,4 +1,4 @@
-import { TileMap, TileMapInitOptions } from "./tile-map"
+import { TileMap, type TileMapInitOptions } from "./tile-map"
 import { Rect } from "./rect"
 import { Surface } from "./surface"
 

@@ -1,6 +1,6 @@
-import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, TPoint, zeroPoint } from "./point"
+import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, type TPoint, zeroPoint } from "./point"
 import { Sprite } from "./sprite"
-import { Pivote } from './pivote'
+import { type Pivote } from './pivote'
 import { type TSize } from "./size"
 
 export type TRect = { x: number, y: number, width: number, height: number }
@@ -62,8 +62,8 @@ export class Rect implements MutableRect {
   }
 
   set topLeft (value: TPoint) {
-    this.x = this.x
-    this.y = this.y
+    this.x = value.x
+    this.y = value.y
   }
 
   get topRight () { 

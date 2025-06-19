@@ -1,4 +1,4 @@
-import { TPoint } from "../point"
+import { type TPoint } from "../point"
 import { ShapeStyle } from "../styles/shape-style"
 
 export type SegmentLine = {

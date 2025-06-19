@@ -1,4 +1,4 @@
-import { TPoint } from "./point"
+import { type TPoint } from "./point"
 
 export type TVector = TPoint
 
@@ -27,7 +27,7 @@ export class Vector {
     return Vector.scale(this, vec)
   }
 
-  scaleSelf (vec: TVector) {
+  scaleSelf (_: TVector) {
     return this
   }
 

@@ -2,7 +2,7 @@ import { Screen } from "./screen"
 import { EventController, GameEvents } from "./events"
 import { Keys } from "./keys/keys"
 import { InternalTimeSetter } from "./time"
-import { ViewportType } from "./viewport"
+import { type ViewportType } from "./viewport"
 import { FPSCounter, millis } from "./utils"
 
 export class Game {

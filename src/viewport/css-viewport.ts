@@ -1,5 +1,5 @@
-import { TPoint } from "../point"
-import { setRect, TRect, resetRect, Rect } from "../rect"
+import { type TPoint } from "../point"
+import { setRect, type TRect, resetRect, Rect } from "../rect"
 import { ViewportBase } from "./viewport-base"
 
 export class CssViewport extends ViewportBase {

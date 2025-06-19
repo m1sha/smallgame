@@ -1,4 +1,4 @@
-import { PaintOrder } from "./paint-order"
+import { type PaintOrder } from "./paint-order"
 
 export type FontWeight = 'normal' | 'bold' | 'lighter' | 'bolder' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 export type FontVariant = 'normal' | 'small-caps'
