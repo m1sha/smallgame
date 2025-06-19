@@ -1,21 +1,21 @@
 import { Screen } from "./screen"
-import { EventController, IEventProvider, GameEvents } from "./events"
+import { EventController, GameEvents } from "./events"
 import { Keys } from "./keys/keys"
 import { InternalTimeSetter } from "./time"
 import { ViewportType } from "./viewport"
 import { FPSCounter, millis } from "./utils"
 
-export class Game implements IEventProvider {
-  readonly event: GameEvents
-  readonly key: Keys
+export class Game {
   private readonly controller: EventController 
   #screen: Screen | null = null
   
   constructor () {
-    this.event = new GameEvents()
-    this.key = new Keys
-    this.controller = new EventController(this)
+    this.controller = new EventController()
   }
+
+  get event (): GameEvents { return this.controller.event }
+  get key (): Keys { return this.controller.key }
+  get screen (): Screen { return this.screen }
 
   private init (width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform'): Screen {
     if (this.#screen) return this.#screen
@@ -26,7 +26,7 @@ export class Game implements IEventProvider {
     return this.#screen
   }
 
-  static create(width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform', willReadFrequently = true) {
+  static create (width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform', willReadFrequently = true) {
     Game.willReadFrequently = willReadFrequently
     const game = new Game()
     return { game, screen: game.init(width, height, containter, viewportType) }

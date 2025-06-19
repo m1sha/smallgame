@@ -1,22 +1,26 @@
 import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
 import { Point } from "../point"
-import { IEventProvider } from "./event-provider"
 import { EventControllerOptions, TEventControllerOptions } from "./event-controller-options"
+import { GameEvents } from "./game-event"
+import { Keys } from "../keys/keys"
 
 export class EventController {
-  private readonly eventProvider: IEventProvider
   private readonly options: EventControllerOptions
+  readonly event: GameEvents
+  readonly key: Keys
   
   callback: (() => void) | null = null
 
-  constructor (provider: IEventProvider, options?: TEventControllerOptions) {
-    this.eventProvider = provider
+  constructor (options?: TEventControllerOptions) {
+    this.event = new GameEvents()
+    this.key = new Keys
     this.options = new EventControllerOptions(options)
   }
 
   init (htmlContainter: HTMLElement) {
-    const { event, key } = this.eventProvider
+    const event = this.event
+    const key = this.key
     let keypressed = false
     let mousemown = false
     const queue = unsafecast<EventQueue>(key)
