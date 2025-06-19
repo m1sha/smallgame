@@ -2,13 +2,17 @@ import { unsafecast } from "../utils"
 import { EventQueue } from "./event-queue"
 import { Point } from "../point"
 import { IEventProvider } from "./event-provider"
+import { EventControllerOptions, TEventControllerOptions } from "./event-controller-options"
 
 export class EventController {
   private readonly eventProvider: IEventProvider
+  private readonly options: EventControllerOptions
+  
   callback: (() => void) | null = null
 
-  constructor (provider: IEventProvider) {
+  constructor (provider: IEventProvider, options?: TEventControllerOptions) {
     this.eventProvider = provider
+    this.options = new EventControllerOptions(options)
   }
 
   init (htmlContainter: HTMLElement) {
@@ -21,6 +25,8 @@ export class EventController {
     let lastKey = ''
 
     document.addEventListener('keydown', e => {
+      if (!this.options.canPressKey(htmlContainter)) return
+      
       queue.push(e)
 
       if (keypressed && lastKey === e.key) return
@@ -32,6 +38,8 @@ export class EventController {
     })
 
     document.addEventListener('keyup', e => {
+      if (!this.options.canPressKey(htmlContainter)) return
+
       queue.pop(e)
 
       if (!keypressed) return
@@ -112,6 +120,7 @@ export class EventController {
 
     htmlContainter.addEventListener('pointerover', e => {
       if (!leave) return
+      this.options.setTarget(htmlContainter, 'mouseenter')
       event.push('MOUSEENTER', e)
       if (this.callback) this.callback()
       leave = false
@@ -120,6 +129,7 @@ export class EventController {
     
     htmlContainter.addEventListener('pointerenter', e => {
       if (!leave) return
+      this.options.setTarget(htmlContainter, 'mouseenter')
       event.push('MOUSEENTER', e)
       if (this.callback) this.callback()
       leave = false
