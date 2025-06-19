@@ -26,10 +26,18 @@ export class Game {
     return this.#screen
   }
 
+  kill () {
+    this.controller.claerListeners()
+  }
+
   static create (width: number, height: number, containter: HTMLElement, viewportType: ViewportType = 'transform', willReadFrequently = true) {
     Game.willReadFrequently = willReadFrequently
     const game = new Game()
-    return { game, screen: game.init(width, height, containter, viewportType) }
+    return { 
+      game, 
+      screen: game.init(width, height, containter, viewportType), 
+      kill: game.kill.bind(game) 
+    }
   }
 
   static willReadFrequently = true

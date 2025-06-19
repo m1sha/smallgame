@@ -6,143 +6,159 @@ import { GameEvents } from "./game-event"
 import { Keys } from "../keys/keys"
 
 export class EventController {
+  private htmlContainter: HTMLElement | null
+  private listeners: { name: string, callback: (e: any) => void}[]
   private readonly options: EventControllerOptions
+  private readonly queue: EventQueue
+  private readonly prevMousePos = Point.zero
+  private keypressed = false
+  private mousemown = false
+  private leave = true
+  private lastKey = ''
   readonly event: GameEvents
   readonly key: Keys
   
   callback: (() => void) | null = null
 
   constructor (options?: TEventControllerOptions) {
+    this.htmlContainter = null
+    this.listeners = []
     this.event = new GameEvents()
     this.key = new Keys
     this.options = new EventControllerOptions(options)
+    this.queue = unsafecast<EventQueue>(this.key)
   }
 
   init (htmlContainter: HTMLElement) {
-    const event = this.event
-    const key = this.key
-    let keypressed = false
-    let mousemown = false
-    const queue = unsafecast<EventQueue>(key)
-    let leave = true
-    const prevMousePos = Point.zero
-    let lastKey = ''
+    this.htmlContainter = htmlContainter
+    this.listeners.push({ name: 'keydown', callback: this.keydown.bind(this) })
+    this.listeners.push({ name: 'keyup', callback: this.keyup.bind(this) })
+    this.listeners.push({ name: 'pointerdown', callback: this.pointerdown.bind(this) })
+    this.listeners.push({ name: 'pointerup', callback: this.pointerup.bind(this) })
+    this.listeners.push({ name: 'pointermove', callback: this.pointermove.bind(this) })
+    this.listeners.push({ name: 'pointerleave', callback: this.pointerleave.bind(this) })
+    this.listeners.push({ name: 'pointercancel', callback: this.pointerleave.bind(this) })
+    this.listeners.push({ name: 'pointerout', callback: this.pointerleave.bind(this) })
+    this.listeners.push({ name: 'pointerover', callback: this.pointerenter.bind(this) })
+    this.listeners.push({ name: 'pointerenter', callback: this.pointerenter.bind(this) })
+    this.listeners.push({ name: 'wheel', callback: this.wheel.bind(this) })
+    this.activateListeners(htmlContainter)
+  }
 
-    document.addEventListener('keydown', e => {
-      if (!this.options.canPressKey(htmlContainter)) return
-      
-      queue.push(e)
-
-      if (keypressed && lastKey === e.key) return
-      
-      keypressed = true
-      lastKey = e.key
-      event.push('KEYDOWN', e)
-      if (this.callback) this.callback()
-    })
-
-    document.addEventListener('keyup', e => {
-      if (!this.options.canPressKey(htmlContainter)) return
-
-      queue.pop(e)
-
-      if (!keypressed) return
-      keypressed = false
-      event.push('KEYUP', e)
-      prevMousePos.moveSelf(0, 0)
-      if (this.callback) this.callback()
-    })
-
-    htmlContainter.addEventListener('pointerdown', e => {
-      leave = false
-
-      if (mousemown) return
-      mousemown = true
-      event.push('MOUSEDOWN', e)
-      if (this.callback) this.callback()
-    })
-
-    htmlContainter.addEventListener('pointerup', e => {
-      leave = false
-
-      if (!mousemown) return
-      mousemown = false
-      event.push('MOUSEUP', e)
-      if (this.callback) this.callback()
-    })
-
-    htmlContainter.addEventListener('pointermove', e => {
-      leave = false
-      const ev = e as any
-      ev.prevMousePos = prevMousePos
-
-      if (event.has('MOUSEMOVE')) {
+  claerListeners () {
+    if (!this.htmlContainter) return
+    
+    const htmlContainter = this.htmlContainter
+    this.listeners.forEach(listener => {
+      if (['keydown', 'keyup'].includes(listener.name)) {
+        document.removeEventListener(listener.name, listener.callback)
         return
       }
 
-      if (e instanceof PointerEvent) {
-        if (e.pointerType === 'pen')
-        if (e.getCoalescedEvents) {
-          const events = e.getCoalescedEvents()
-          console.dir(events)
-          for (const ev of events)
-            event.push('MOUSEMOVE', ev)
-          
-          //if (this.callback) this.callback()
-          return
-        }
+      htmlContainter.removeEventListener(listener.name, listener.callback)
+    })
+    this.listeners = []
+  }
+
+  private activateListeners (htmlContainter: HTMLElement) { 
+    this.listeners.forEach(listener => {
+      if (['keydown', 'keyup'].includes(listener.name)) {
+        document.addEventListener(listener.name, listener.callback)
+        return
       }
+      htmlContainter.addEventListener(listener.name, listener.callback)
+    })
+  }
 
-      event.push('MOUSEMOVE', e)
-      if (this.callback) this.callback()
-      prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
-    })
+  private keydown (e: KeyboardEvent) {
+    if (!this.options.canPressKey(this.htmlContainter!)) return
+      
+    this.queue.push(e)
 
-    htmlContainter.addEventListener('pointerleave', e => {
-      if (leave) return
-      event.push('MOUSELEAVE', e)
-      if (this.callback) this.callback()
-      leave = true
-      prevMousePos.moveSelf(0, 0)
-    })
+    if (this.keypressed && this.lastKey === e.key) return
+      
+    this.keypressed = true
+    this.lastKey = e.key
+    this.event.push('KEYDOWN', e)
+    if (this.callback) this.callback()
+  }
 
-    htmlContainter.addEventListener('pointercancel', e => {
-      if (leave) return
-      event.push('MOUSELEAVE', e)
-      if (this.callback) this.callback()
-      leave = true
-      prevMousePos.moveSelf(0, 0)
-    })
+  private keyup (e: KeyboardEvent) {
+    if (!this.options.canPressKey(this.htmlContainter!)) return
 
-    htmlContainter.addEventListener('pointerout', e => {
-      if (leave) return
-      event.push('MOUSELEAVE', e)
-      if (this.callback) this.callback()
-      leave = true
-      prevMousePos.moveSelf(0, 0)
-    })
+    this.queue.pop(e)
 
-    htmlContainter.addEventListener('pointerover', e => {
-      if (!leave) return
-      this.options.setTarget(htmlContainter, 'mouseenter')
-      event.push('MOUSEENTER', e)
-      if (this.callback) this.callback()
-      leave = false
-      prevMousePos.moveSelf(0, 0)
-    })
-    
-    htmlContainter.addEventListener('pointerenter', e => {
-      if (!leave) return
-      this.options.setTarget(htmlContainter, 'mouseenter')
-      event.push('MOUSEENTER', e)
-      if (this.callback) this.callback()
-      leave = false
-      prevMousePos.moveSelf(0, 0)
-    })
+    if (!this.keypressed) return
+    this.keypressed = false
+    this.event.push('KEYUP', e)
+    this.prevMousePos.moveSelf(0, 0)
+    if (this.callback) this.callback()
+  }
 
-    htmlContainter.addEventListener('wheel', e => {
-      event.push('WHEEL', e)
-      if (this.callback) this.callback()
-    })
+  private pointerdown (e: PointerEvent) {
+    this.leave = false
+
+    if (this.mousemown) return
+    this.mousemown = true
+    this.event.push('MOUSEDOWN', e)
+    if (this.callback) this.callback()
+  }
+
+  private pointerup (e: PointerEvent) {
+    this.leave = false
+
+    if (!this.mousemown) return
+    this.mousemown = false
+    this.event.push('MOUSEUP', e)
+    if (this.callback) this.callback()
+  }
+
+  private pointermove (e: PointerEvent) {
+    this.leave = false
+    const ev = e as any
+    ev.prevMousePos = this.prevMousePos
+
+    if (this.event.has('MOUSEMOVE')) {
+      return
+    }
+
+    if (e instanceof PointerEvent) {
+      if (e.pointerType === 'pen')
+      if (e.getCoalescedEvents) {
+        const events = e.getCoalescedEvents()
+        console.dir(events)
+        for (const ev of events)
+          this.event.push('MOUSEMOVE', ev)
+        
+        //if (this.callback) this.callback()
+        return
+      }
+    }
+
+    this.event.push('MOUSEMOVE', e)
+    if (this.callback) this.callback()
+    this.prevMousePos.moveSelf(ev.offsetX, ev.offsetY)
+  }
+
+  private pointerleave (e: PointerEvent) {
+    if (this.leave) return
+    this.event.push('MOUSELEAVE', e)
+    if (this.callback) this.callback()
+    this.leave = true
+    this.prevMousePos.moveSelf(0, 0)
+  }
+ 
+  private pointerenter (e: PointerEvent) {
+    if (!this.leave) return
+    this.options.setTarget(this.htmlContainter!, 'mouseenter')
+    this.event.push('MOUSEENTER', e)
+    if (this.callback) this.callback()
+    this.leave = false
+    this.prevMousePos.moveSelf(0, 0)
+  }
+
+  private wheel (e: WheelEvent) {
+    this.event.push('WHEEL', e)
+    if (this.callback) this.callback()
   }
 }
