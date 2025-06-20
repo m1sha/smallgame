@@ -1,7 +1,7 @@
 import { loadTileMap } from "../assets"
 import { Surface } from "../surface"
-import { Animation, IAnimation } from "./animation"
-import { AnimationTransition } from "./transition"
+import { Animation, type IAnimation } from "./animation"
+import { type AnimationTransition } from "./transition"
 import { AnimationTransitions } from "./transitions"
 
 export type AnimationName = string

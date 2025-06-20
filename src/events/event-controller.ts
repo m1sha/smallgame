@@ -1,7 +1,7 @@
 import { unsafecast } from "../utils"
-import { EventQueue } from "./event-queue"
+import { type EventQueue } from "./event-queue"
 import { Point } from "../point"
-import { EventControllerOptions, TEventControllerOptions } from "./event-controller-options"
+import { EventControllerOptions, type TEventControllerOptions } from "./event-controller-options"
 import { GameEvents } from "./game-event"
 import { Keys } from "../keys/keys"
 

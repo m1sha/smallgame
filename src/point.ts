@@ -14,7 +14,7 @@ export class Point {
       this._y = args[1]
       return
     } 
-    else if (typeof args[0] === 'object' && Object.hasOwn(args[0], 'x') && Object.hasOwn(args[0], 'y') ) {
+    else if (typeof args[0] === 'object' && typeof args[0].x === 'number' && typeof args[0].y === 'number' ) {
       this._x = args[0].x
       this._y = args[0].y
       return

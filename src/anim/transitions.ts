@@ -1,4 +1,4 @@
-import { AnimationTransition } from "./transition"
+import { type AnimationTransition } from "./transition"
 
 export class AnimationTransitions {
   #items: AnimationTransition[] = []

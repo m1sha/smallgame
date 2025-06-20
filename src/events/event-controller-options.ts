@@ -14,6 +14,7 @@ export class EventControllerOptions {
 
   setTarget(htmlContainter: HTMLElement, source: string) {
     EventControllerOptions.lastTarget = htmlContainter
+    console.log(source)
   }
 
   canPressKey (htmlContainter: HTMLElement) {

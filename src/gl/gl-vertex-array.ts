@@ -1,6 +1,6 @@
-import { VertexAttribPointerTemplate } from "./utils"
+import { type VertexAttribPointerTemplate } from "./utils"
 
-type TVertexArray = Float32Array | Int32Array | Uint32Array
+// type TVertexArray = Float32Array | Int32Array | Uint32Array
 
 export class GlVertexArray {
   #gl: WebGL2RenderingContext

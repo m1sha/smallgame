@@ -1,4 +1,4 @@
-import { setPoint, TPoint } from "../point"
+import { setPoint, type TPoint } from "../point"
 import { Keys } from "../keys/keys"
 import { unsafecast } from "../utils"
 

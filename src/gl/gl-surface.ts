@@ -1,4 +1,4 @@
-import { ISurface } from "interfaces"
+import { type ISurface } from "../interfaces"
 import { Rect } from "../rect"
 import { GlProgram } from "./gl-program"
 import { FragmnetShader, VertexShader } from "./gl-shader"

@@ -1,6 +1,6 @@
 import { VertexShader, FragmnetShader } from "./gl-shader"
 import { GlVertexArray } from "./gl-vertex-array"
-import { IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, IGlAttributeTypeMap, getGlType, getGlTypeSize } from "./types"
+import { type IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, type IGlAttributeTypeMap, getGlType, getGlTypeSize } from "./types"
 import { getVertexAttribPointerTemplate } from "./utils"
 import { Surface } from "../surface"
 import { GlTextureList } from "./gl-texture"
