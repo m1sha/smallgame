@@ -137,14 +137,17 @@ export class Size implements TSize {
     if (args.length === 1 && typeof args[0] === 'number') {
       this.width = args[0]
       this.height = args[0]
+      return
     }
     if (args.length === 1 && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
       this.width = args[0].width
       this.height = args[0].height
+      return
     }
     if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
       this.width = args[0]
       this.height = args[1]
+      return
     }
 
     throw new Error('unsupported arguments.')
