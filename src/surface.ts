@@ -65,6 +65,13 @@ export class Surface {
     this.blitx(surface, rect, distRect)
   }
 
+  blita(alpha: number, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+    const a = this.ctx.globalAlpha
+    if (alpha < 1) this.ctx.globalAlpha = alpha
+    this.blitx(surface, rect, distRect)
+    if (alpha < 1) this.ctx.globalAlpha = a
+  }
+
   protected blitx(surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
     const { x, y, width, height } = Object.assign(rect, { 
       width: (rect as Rect).width ?? surface.width, 
@@ -226,6 +233,7 @@ export class Surface {
     return new Surface(canvas.width, canvas.height, options, canvas)
   }
 
+  // @ts-ignore
   static fromImages(images: HTMLImageElement[], rect: Rect, rows: number = 1, cols: number = -1, useAlpha: boolean = true, useSmooth: boolean = true) {
     const surface = new Surface(rect.width * images.length, rect.height, { useAlpha })
     surface.imageRendering = useSmooth ? 'auto' : 'pixelated'
