@@ -79,6 +79,10 @@ export class Color {
   }
 
   toString () {
+    if (typeof this.#rgba[3] === 'number') {
+      const conv = (v: number) => (0 | v * 255).toString(10)
+      return `rgba(${conv(this.#rgba[0])},${conv(this.#rgba[1])},${conv(this.#rgba[2])},${conv(this.#rgba[3])})`
+    }
     const conv = (v: number) => (0 | v * 255).toString(16).padStart(2, '0')
     return `#${conv(this.#rgba[0])}${conv(this.#rgba[1])}${conv(this.#rgba[2])}`
   }
