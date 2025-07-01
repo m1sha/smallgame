@@ -70,11 +70,18 @@ function strokeText (ctx: CanvasRenderingContext2D, style: TextStyle, text: stri
 }
 
 export class TextMeasurer {
-  private static defaultCanvas = document.createElement('canvas')
-  private static defaultCtx = this.defaultCanvas.getContext('2d')!
+  private static _defaultCanvas: HTMLCanvasElement | null = null
+  private static getGefaultCanvas () {
+    if (this._defaultCanvas) return this._defaultCanvas
+    return this._defaultCanvas = document.createElement('canvas')
+  } 
+  
+  private static getDefaultCtx() {
+    return this.getGefaultCanvas().getContext('2d')!
+  } 
 
   static measureText (text: string, style: TextStyle): { width: number, height: number } {
-    const ctx = TextMeasurer.defaultCtx
+    const ctx = TextMeasurer.getDefaultCtx()
     const metrics =this.measureTextInt(ctx, text, style)
     return {
       width: metrics.width,
@@ -102,7 +109,7 @@ export class TextMeasurer {
   }
 
   private static getWidth (text: string, style: TextStyle): number {
-    const ctx = TextMeasurer.defaultCtx
+    const ctx = TextMeasurer.getDefaultCtx()
     return this.measureTextInt(ctx, text, style).width
   }
 

@@ -36,11 +36,13 @@ export class Surface {
   }
 
   get imageRendering () { 
+    if (this.canvas instanceof OffscreenCanvas) return 'auto'
     const value = (this.canvas as HTMLCanvasElement).style.imageRendering || 'auto' 
     return value === 'auto' ? 'auto' : 'pixelated'
   }
 
   set imageRendering (value: 'auto' | 'pixelated') { 
+    if (this.canvas instanceof OffscreenCanvas) return
     ;(this.canvas as HTMLCanvasElement).style.imageRendering = value 
     this.ctx.imageSmoothingEnabled = value === 'auto'
   }
@@ -199,6 +201,11 @@ export class Surface {
     return this.draw.createPattern(this.canvas, repetition)
   }
 
+  toBitmap () {
+    if (this.canvas instanceof OffscreenCanvas) return this.canvas.transferToImageBitmap()
+    throw new Error('Method is unsupported')
+  }
+
   save (type?: string, quality?: any): Promise<Blob | null> {
     return new Promise((resolve) => {
       if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
@@ -220,7 +227,7 @@ export class Surface {
     return surface
   }
 
-  static fromImage(image: HTMLImageElement, rect: Rect, options?: { useAlpha?: boolean, useSmooth?: boolean }) {
+  static fromImage(image: HTMLImageElement | ImageBitmap, rect: Rect, options?: { useAlpha?: boolean, useSmooth?: boolean }) {
     const useAlpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha: true
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth: true
     const surface = new Surface(rect.width, rect.height, { useAlpha })
