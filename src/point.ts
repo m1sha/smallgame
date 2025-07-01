@@ -274,6 +274,10 @@ export class Point {
     return this
   }
 
+  equals (point: TPoint): boolean {
+    return this === point || (point.x === this.x && point.y === this.y)
+  }
+
   static get zero (): Point { return new Point(0, 0) }
   
   static get one (): Point { return new Point(1, 1) }
