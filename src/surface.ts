@@ -1,6 +1,6 @@
 import { mulPoints, Point, setPoint, sumPoints, type TPoint } from "./point"
 import { PixelMask } from "./pixel-mask"
-import { Rect } from "./rect"
+import { Rect, TRect } from "./rect"
 //import { Game } from "./game"
 import { Draw } from "./draw"
 import { coordconv, type CoordinateSystem } from "./coords"
@@ -54,7 +54,12 @@ export class Surface {
   get height () { return this.#rect.height }
 
 
-  clear () {
+  clear (rect?: TRect) {
+    if (rect) {
+      this.ctx.clearRect(rect.x, rect.y, rect.width, rect.height)  
+      return
+    }
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
@@ -63,11 +68,11 @@ export class Surface {
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit(surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blit (surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
     this.blitx(surface, rect, distRect)
   }
 
-  blita(alpha: number, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blita (alpha: number, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
     const a = this.ctx.globalAlpha
     if (alpha < 1) this.ctx.globalAlpha = alpha
     this.blitx(surface, rect, distRect)
