@@ -57,8 +57,8 @@ export class Rect implements MutableRect {
     this.height = height
   }
 
-  get topLeft () { 
-    return { x: this.x, y: this.y }
+  get topLeft (): Point { 
+    return new Point(this.x, this.y)
   }
 
   set topLeft (value: TPoint) {
@@ -66,8 +66,8 @@ export class Rect implements MutableRect {
     this.y = value.y
   }
 
-  get topRight () { 
-    return { x: this.absWidth, y: this.y }
+  get topRight (): Point { 
+    return new Point (this.absWidth, this.y)
   }
 
   set topRight (value: TPoint) {
@@ -75,8 +75,8 @@ export class Rect implements MutableRect {
     this.y = this.y
   }
 
-  get bottomLeft () { 
-    return { x: this.x, y: this.absHeight }
+  get bottomLeft (): Point { 
+    return new Point(this.x, this.absHeight)
   }
 
   set bottomLeft (value: TPoint) {
@@ -84,8 +84,8 @@ export class Rect implements MutableRect {
     this.height = value.y - this.y
   }
 
-  get bottomRight () { 
-    return { x: this.absWidth, y: this.absHeight }
+  get bottomRight (): Point { 
+    return new Point(this.absWidth, this.absHeight)
   }
 
   set bottomRight (value: TPoint) {
@@ -101,17 +101,17 @@ export class Rect implements MutableRect {
     return this.y + this.height
   }
 
-  get center (): TPoint {
-    return { x: this.width / 2, y: this.height / 2 }
+  get center (): Point {
+    return new Point(this.width / 2, this.height / 2)
   }
 
   set center (value: TPoint) {
     this.moveSelf(value, 'center-center')
   }
 
-  get absCenter () {
+  get absCenter (): Point {
     const { x, y } = this.center
-    return { x: this.x + x, y: this.y + y }
+    return new Point(this.x + x, this.y + y)
   }
 
   get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
@@ -152,11 +152,11 @@ export class Rect implements MutableRect {
     ((this.x >= rect.x && this.x <= rect.absWidth) && (this.y >= rect.y && this.y <= rect.absHeight))
   }
 
-  containsPoint({x, y}: TPoint) {
+  containsPoint ({x, y}: TPoint) {
     return x >= this.x && x <= this.absWidth &&  y>= this.y && y <= this.absHeight
   }
 
-  equals(rect: Rect | TRect) {
+  equals (rect: Rect | TRect) {
     if (this === rect) return true
     return this.x == rect.x && this.y === rect.y && this.width === rect.width && this.height === rect.height
   }
@@ -184,7 +184,6 @@ export class Rect implements MutableRect {
   move (point: TPoint, pivote?: Pivote): Rect
   move (x: number, y: number, pivote?: Pivote): Rect
   move (...args: Array<any>): Rect {
-    
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
       const [x, y] = this.calcPivote(args[2])
       return new Rect(args[0] + x, args[1] + y, this.width, this.height)
@@ -220,6 +219,22 @@ export class Rect implements MutableRect {
     throw new Error('Unsupport arguments.')
   }
 
+  shift (point: TPoint, pivote?: Pivote): Rect
+  shift (x: number, y: number, pivote?: Pivote): Rect
+  shift (...args: Array<any>): Rect  {
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      const [x, y] = this.calcPivote(args[2])
+      return new Rect(this.x + args[0] + x,  this.y + args[1] + y, this.width, this.height)
+    } else {
+      const point = args[0] as TPoint
+      const [x, y] = this.calcPivote(args[1])
+      if (point && typeof point.x === 'number' && typeof point.y === 'number') {
+        return new Rect(this.x + point.x + x, this.y + point.y + y, this.width, this.height)
+      }
+    }
+    throw new Error('Unsupport arguments.')
+  }
+
   shiftSelf (point: TPoint, pivote?: Pivote): Rect
   shiftSelf (x: number, y: number, pivote?: Pivote): Rect
   shiftSelf (...args: Array<any>): Rect  {
@@ -239,25 +254,128 @@ export class Rect implements MutableRect {
     }
     throw new Error('Unsupport arguments.')
   }
+  
+  resize (size: TSize): Rect
+  resize (width: number, height: number): Rect
+  resize (value: number): Rect
+  resize (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      return new Rect(this.x, this.y, args[0], args[0])
+    }
 
-  resize (width: number, height: number) {
-    return new Rect(this.x, this.y, width, height)
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Rect(this.x, this.y, args[0], args[1])
+    }
+
+    if (args.length === 1 && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      return new Rect(this.x, this.y, args[0].width, args[0].height)
+    }
+
+    throw new Error('Unsupport arguments.')
   }
 
-  resizeSelf (width: number, height: number) {
-    this.width = width
-    this.height = height
-    return this
+  resizeSelf (size: TSize): Rect
+  resizeSelf (width: number, height: number): Rect
+  resizeSelf (value: number): Rect
+  resizeSelf (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      this.width = args[0]
+      this.height = args[0]
+      return this
+    }
+
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      this.width = args[0]
+      this.height = args[1]
+      return this
+    }
+
+    if (args.length === 1 && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      this.width = args[0].width
+      this.height = args[0].height
+      return this
+    }
+    
+    throw new Error('Unsupport arguments.')
   }
 
-  scalesize (dw: number, dh: number) {
-    return new Rect(this.x, this.y, this.width * dw, this.height * dh)
+  scalesize (dw: number, dh: number): Rect
+  scalesize (size: TSize): Rect
+  scalesize (value: number): Rect
+  scalesize (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      return new Rect(this.x, this.y, this.width * args[0], this.height * args[0])  
+    }
+
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Rect(this.x, this.y, this.width * args[0], this.height * args[1])  
+    }
+
+    if (args.length === 1 && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      return new Rect(this.x, this.y, this.width * args[0].width, this.height * args[0].height)  
+    }
+
+    throw new Error('Unsupport arguments.')
   }
 
-  scalesizeSelf (dw: number, dh: number) {
-    this.width *= dw
-    this.height *= dh
-    return this
+  scalesizeSelf (dw: number, dh: number): Rect
+  scalesizeSelf (size: TSize): Rect
+  scalesizeSelf (value: number): Rect
+  scalesizeSelf (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      this.width *= args[0]
+      this.height *= args[0]
+      return this
+    }
+
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      this.width *= args[0]
+      this.height *= args[1]
+      return this
+    }
+
+    if (args.length === 1 && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      this.width *= args[0].width
+      this.height *= args[0].height
+      return this
+    }
+
+    throw new Error('Unsupport arguments.')
+  }
+
+  scale (dw: number, dh: number): Rect
+  scale (value: number): Rect
+  scale (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      return new Rect(this.x * args[0], this.y * args[0], this.width * args[0], this.height * args[0])
+    }
+    
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Rect(this.x * args[0], this.y * args[1], this.width * args[0], this.height * args[1])
+    }
+
+    throw new Error('Unsupport arguments.')
+  }
+
+  scaleSelf (dw: number, dh: number): Rect
+  scaleSelf (value: number): Rect
+  scaleSelf (...args: Array<any>): Rect {
+    if (args.length === 1 && typeof args[0] === 'number') {
+      this.x *= args[0]
+      this.y *= args[0]
+      this.width *= args[0]
+      this.height *= args[0]
+      return this
+    }
+
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      this.x *= args[0]
+      this.y *= args[1]
+      this.width *= args[0]
+      this.height *= args[1]
+      return this
+    }
+    throw new Error('Unsupport arguments.')
   }
 
   union (rect: TRect) {
@@ -307,6 +425,24 @@ export class Rect implements MutableRect {
     return new Rect(center.x - width * 0.5, center.y - height * 0.5, width, height)
   }
 
+  static merge (rects: TRect[]): Rect {
+    if (!rects || rects.length === 0) throw new Error('Count of rects must be more than zero.')
+    
+    let x0 = Number.MAX_SAFE_INTEGER
+    let y0 = Number.MAX_SAFE_INTEGER
+    let x1 = Number.MIN_SAFE_INTEGER
+    let y1 = Number.MIN_SAFE_INTEGER
+
+    rects.forEach(rect => {
+      if (rect.x < x0) x0 = rect.x
+      if (rect.y < y0) y0 = rect.y
+      if (x1 < rect.x + rect.width) x1 = rect.x + rect.width
+      if (y1 < rect.y + rect.height) y1 = rect.y + rect.height
+    })
+    
+    return Rect.fromTwoPoints(setPoint(x0, y0), setPoint(x1, y1))
+  }
+
   private calcPivote(pivote?: Pivote) {
     if (!pivote) return [0, 0]
     switch (pivote) {
@@ -322,99 +458,6 @@ export class Rect implements MutableRect {
   
       default: return [0, 0]
     }
-  }
-}
-
-export class ObservableRect implements MutableRect /* implicitly implements Observable */ {
-  /** @internal */ protected /*Observable.*/callback: ((sprite: Sprite) => void) | null = null
-  #sprite: Sprite
-
-  #rect: Rect
-  constructor (sprite: Sprite, x: number, y: number, width: number, height: number) {
-    this.#sprite = sprite
-    this.#rect = new Rect(x, y, width, height)
-  }
-
-  get x() { return this.#rect.x }
-  set x(value: number) { 
-    this.#rect.x = value
-    if (this.callback) this.callback(this.#sprite)
-  }
-
-  get y() { return this.#rect.y }
-  set y(value: number) { 
-    this.#rect.y = value
-    if (this.callback) this.callback(this.#sprite)
-  }
-
-  get width() { return this.#rect.width }
-  set width(value: number) { 
-    this.#rect.width = value
-    if (this.callback) this.callback(this.#sprite)
-  }
-
-  get height() { return this.#rect.height }
-  set height(value: number) { 
-    this.#rect.height = value
-    if (this.callback) this.callback(this.#sprite)
-  }
-  get center () { return this.#rect.center }
-  set center (value: TPoint) { this.#rect.center = value }
-  get absCenter () { return this.#rect.absCenter }
-  get absWidth () { return this.#rect.absWidth }
-  get absHeight () { return this.#rect.absHeight }
-  get topLeft () { return this.#rect.topLeft }
-  set topLeft (value: TPoint) { this.#rect.topLeft = value }
-  get topRight () { return this.#rect.topRight }
-  set topRight (value: TPoint) { this.#rect.topRight = value }
-  get bottomLeft () { return this.#rect.bottomLeft }
-  set bottomLeft (value: TPoint) { this.#rect.bottomLeft = value }
-  get bottomRight () { return this.#rect.bottomRight }
-  set bottomRight (value: TPoint) { this.#rect.bottomRight = value }
-  get diagonal () { return this.#rect.diagonal }
-  get points (): [TPoint, TPoint, TPoint, TPoint] { return this.#rect.points }
-  overlaps (rect: Rect) { return this.#rect.overlaps(rect) }
-  touchSide (rect: TRect) { return this.#rect.touchSide(rect) }
-  inside (rect: TRect): boolean { return this.#rect.inside(rect) }
-  contains (rect: Rect) { return this.#rect.contains(rect) }
-  containsPoint (point: TPoint) { return this.#rect.containsPoint(point) }
-  equals (rect: Rect) { return this.#rect.equals(rect) }
-  outline (padding: number): Rect
-  outline (top: number, left: number, bottom: number, right: number): Rect
-  outline (...args: Array<any>): Rect { 
-    return this.#rect.outline.apply(this.#rect, args as any)
-  }
-  clone () { return this.#rect.clone() }
-  move (point: TPoint, pivote?: Pivote): Rect
-  move (x: number, y: number, pivote?: Pivote): Rect
-  move (...args: Array<any>): Rect {
-    return this.#rect.move.apply(this.#rect, args as any)
-  }
-  moveSelf (point: TPoint, pivote?: Pivote): Rect
-  moveSelf (x: number, y: number, pivote?: Pivote): Rect
-  moveSelf (...args: Array<any>): Rect {
-    return this.#rect.moveSelf.apply(this.#rect, args as any)
-  }
-  resize (width: number, height: number) {
-    return this.#rect.resize(width, height)
-  }
-  resizeSelf (width: number, height: number) {
-    return this.#rect.resizeSelf(width, height)
-  }
-  scalesize (dw: number, dh: number) {
-    return this.#rect.scalesize(dw, dh)
-  }
-  scalesizeSelf (dw: number, dh: number) {
-    return this.#rect.scalesizeSelf(dw, dh)
-  }
-  union (rect: TRect) {
-    return this.#rect.union(rect)
-  }
-  unionSelf (rect: TRect) {
-    return this.#rect.unionSelf(rect)
-  }
-  rotate (a: number, pivot?: number | TPoint) {
-    return this.#rect.rotate(a, pivot)
   }
 }
 

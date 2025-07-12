@@ -1,11 +1,11 @@
 import { Surface } from "./surface"
 import { Drawable } from "./drawable"
-import { ObservableRect, Rect } from "./rect"
+import { Rect } from "./rect"
 
 export abstract class Sprite extends Drawable {
   image: Surface
-  rect: Rect | ObservableRect
-  collideRect: Rect | ObservableRect | null = null
+  rect: Rect
+  collideRect: Rect | null = null
 
   constructor () {
     super()
