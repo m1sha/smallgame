@@ -19,6 +19,21 @@ export class Array2D<T> {
     this.items[index] = value
   }
 
+  boundaryFill (row: number, col: number, value: T, predicate: (cell: T) => boolean) {
+    if (!predicate(this.get(row, col))) return
+     
+    this.set(row, col, value)
+
+    if (col + 1 < this.cols - 1)
+      this.boundaryFill(row, col + 1, value, predicate)
+    if (col - 1 > - 1)
+      this.boundaryFill(row, col - 1, value, predicate)
+    if (row + 1 < this.rows - 1)
+      this.boundaryFill(row + 1, col, value, predicate)
+    if (row - 1 > -1)
+      this.boundaryFill(row - 1, col, value, predicate)
+  }
+
   private getIndex (row: number, col: number) {
     return this.cols * row + col
   }
