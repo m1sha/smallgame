@@ -31,6 +31,18 @@ export class Point {
   
   set y (value: number) { this._y = value }
 
+  get magnitude () {
+    return Math.sqrt(this.dot(this))
+  }
+
+  get length () {
+    return this.magnitude
+  }
+
+  get magnitudeSq () {
+    return this.dot(this)
+  }
+
   move (value: number): Point 
   move (point: TPoint): Point 
   move (x: number, y: number): Point
@@ -155,6 +167,27 @@ export class Point {
     return this
   }
 
+  
+  diff (d: number): Point 
+  diff (dp: TPoint): Point 
+  diff (dx: number, dy: number): Point
+  diff (...args: Array<any>): Point {
+    if (args.length === 1 && typeof args[0] === 'number' ){
+      return new Point(this.x - args[0], this.y - args[0])
+    }
+
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      return new Point(this.x - args[0], this.y - args[1])
+    }
+
+    if (typeof args[0] === 'object' && args[0] && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      return new Point(this.x - args[0].x, this.y - args[0].y)
+    }
+    
+    throw new Error('unsupported arguments.')
+
+  }
+
   scale (d: number): Point 
   scale (dp: TPoint): Point 
   scale (dx: number, dy: number): Point
@@ -218,6 +251,14 @@ export class Point {
     return this
   }
 
+  dot (p: TPoint) {
+   return this.x * p.x + this.y * p.y
+  }
+
+  cross (p: TPoint) {
+   return this.x * p.y - this.y * p.x
+  }
+
   rotate (deg: number): Point {
     const a = rad(deg)
     return new Point(this.x + Math.cos(a), this.y + Math.sin(a))
@@ -276,6 +317,21 @@ export class Point {
 
   equals (point: TPoint): boolean {
     return this === point || (point.x === this.x && point.y === this.y)
+  }
+
+  swapAxis () {
+    return new Point(this.y, this.x)
+  }
+
+  swapAxisSelf () {
+    const x = this.x
+    this.x = this.y
+    this.y = x
+    return this
+  }
+
+  clone () {
+    return new Point(this._x, this._y)
   }
 
   static get zero (): Point { return new Point(0, 0) }
