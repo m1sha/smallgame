@@ -27,7 +27,7 @@ function main (container: HTMLElement) {
   const hero             = loadImage('hero.png')
   const velocity = Point.zero
   const speed = Point.zero
-  
+
   hero.rect.center = screen.rect.center
 
   gameloop(() => {
@@ -65,28 +65,10 @@ function main (container: HTMLElement) {
   })
 }
 
-main()
+main(
+  document.getElementById('container')
+)
 ```
-
-### Show an image
-
-```ts
-import { Game, loadImage } from 'smallgame'
-
-const GAME_WIDTH  = 800
-const GAME_HEIGHT = 800
-
-async function main () {
-  const container  = document.getElementById('container')
-  const { screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
-  const hero       = await loadImage('hero.png')
-
-  screen.blit(hero, hero.rect)
-}
-
-main()
-```
-
 
 ### Sprites
 
