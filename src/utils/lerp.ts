@@ -7,9 +7,10 @@ const lerpScalar = (g: number, c: number, dt: number): number => {
   return g
 }
 
-const lerp = (g: TPoint, c: TPoint, dt: number): void => {
+const lerp = (g: TPoint, c: TPoint, dt: number): TPoint => {
   c.x = lerpScalar(g.x, c.x, dt)
   c.y = lerpScalar(g.y, c.y, dt)
+  return c
 }
 
 export { lerp, lerpScalar }

@@ -10,61 +10,62 @@ index.html
   <body>
     <div id="container"></div>
 
-    <script src="index.js"></script>
+    <script src="index.ts"></script>
   </body>
 </html>
 ```
 
 index.ts
 ```ts
-import { Game, Key, Surface, Time, gameloop, lerp, zeroPoint } from 'smallgame'
+import { Game, Key, Point, Surface, Time, gameloop, lerp, loadImage } from 'smallgame'
 
-export function main (container: HTMLElement) {
+function main (container: HTMLElement) {
   const GAME_WIDTH       = 400
   const GAME_HEIGHT      = 400
-  const HERO_WIDTH       = 100
-  const HERO_HEIGHT      = 100
   const HERO_SPEED       = 20
   const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
-  const hero             = new Surface(HERO_WIDTH, HERO_HEIGHT) // or use loadImage(url) function
-  hero.fill('green')
+  const hero             = loadImage('hero.png')
+  const velocity = Point.zero
+  const speed = Point.zero
+  
   hero.rect.center = screen.rect.center
-  const velocity = zeroPoint()
-  const goal = zeroPoint()
 
   gameloop(() => {
     const keys = game.key.getPressed()
   
     if (keys[Key.K_A] || keys[Key.LEFT]) { 
-      goal.x = -HERO_SPEED 
+      speed.x = -HERO_SPEED 
     } 
     else
     if (keys[Key.K_D] || keys[Key.RIGHT]) { 
-      goal.x = HERO_SPEED 
+      speed.x = HERO_SPEED 
     } 
     else {
-      goal.x = 0
+      speed.x = 0
     }
     
     if (keys[Key.K_W] || keys[Key.UP]) { 
-      goal.y = -HERO_SPEED 
+      speed.y = -HERO_SPEED 
     } 
     else
     if (keys[Key.K_S] || keys[Key.DOWN]) { 
-      goal.y = HERO_SPEED 
+      speed.y = HERO_SPEED 
     }
     else {
-      goal.y = 0
+      speed.y = 0
     }
 
-    lerp(goal, velocity, Time.deltaTime)
-    hero.rect.x += velocity.x
-    hero.rect.y += velocity.y
+    
+    hero.rect.shiftSelf(
+      lerp(speed, velocity, Time.deltaTime)
+    )
 
     screen.fill('white')
     screen.blit(hero, hero.rect)
   })
 }
+
+main()
 ```
 
 ### Show an image
