@@ -27,6 +27,7 @@ export class Game {
   }
 
   kill () {
+    this.#screen?.dispose()
     this.controller.claerListeners()
   }
 

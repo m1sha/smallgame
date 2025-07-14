@@ -42,4 +42,8 @@ export class Screen extends Surface {
     
     this.blitx(surface, rect, distRect, this.viewport.zoom, this.viewport.position)
   }
+
+  dispose () {
+    this.originCanvas.remove()
+  }
 }
