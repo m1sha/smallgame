@@ -115,6 +115,12 @@ export class Surface {
     this.ctx.drawImage(ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height)
   }
 
+  extract (rect: TRect): Surface {
+    const result = new Surface(rect.width, rect.height)
+    result.draw.drawImage(this.ctx.canvas, rect.x, rect.y, rect.width, rect.height, this.rect.x, this.rect.y, rect.width, rect.height)
+    return result
+  }
+
   zoom (index: number) {
     if (index === 0) throw Error('Zero is not a support value.')
     if (index < 0) index = 1 / Math.abs(index)
