@@ -6,11 +6,11 @@ import { AnimationTransitions } from "./transitions"
 
 export type AnimationName = string
 export type AnimationSource = string
-export type AnimationOptions = { tileWidth: number, titleHight: number, rate: number }
+export type AnimationOptions = { tileWidth: number, tileHeight: number, rate: number }
 export type AddAnimationOptions = { url: string } & AnimationOptions
 type AnimationItem = { name: string, animation: Animation }
 export function setAnimation (tileWidth: number, titleHight: number, rate: number, url: string): AddAnimationOptions {
-  return { tileWidth, titleHight, rate, url}
+  return { tileWidth, tileHeight: titleHight, rate, url}
 }
 
 export type EndAnimationLoopCallback = (name: string) => void
@@ -32,15 +32,15 @@ export class Animator implements IAnimation {
     }
   }
 
-  async add (name: string, { tileWidth, titleHight, url, rate }: AddAnimationOptions): Promise<void> {
+  async add (name: string, { tileWidth, tileHeight: titleHight, url, rate }: AddAnimationOptions): Promise<void> {
     const map = await loadTileMap(tileWidth, titleHight, url)
     const animation = new Animation(map, rate)
     this.#items.push({ name, animation })
   }
 
-  async bulk (list: [AnimationName, AnimationSource][], { tileWidth, titleHight, rate }: AnimationOptions): Promise<void> {
+  async bulk (list: [AnimationName, AnimationSource][], { tileWidth, tileHeight: titleHight, rate }: AnimationOptions): Promise<void> {
     const promises = list.map(
-      ([name, url]) => this.add(name, { tileWidth, titleHight, url, rate })
+      ([name, url]) => this.add(name, { tileWidth, tileHeight: titleHight, url, rate })
     )
     await Promise.all(promises)
   }
@@ -98,4 +98,6 @@ export class Animator implements IAnimation {
   }
 
   get animations () { return this.#items.map(p => p.name) }
+
+  get currentAnimation () { return this.#current?.name }
 }
