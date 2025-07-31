@@ -36,7 +36,7 @@ export class Pixels {
     this.imageData.data[index] = value
   }
 
-  toInt32 (x: number, y: number): number {
+  int32 (x: number, y: number): number {
     const index = this.getIndex(x, y)
     return this.imageData.data[index + 3] << 24 | this.imageData.data[index + 1] << 16  | this.imageData.data[index + 2] << 8 | this.imageData.data[index + 3]
   }
