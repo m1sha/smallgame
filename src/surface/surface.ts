@@ -1,11 +1,10 @@
-import { mulPoints, Point, setPoint, sumPoints, type TPoint } from "./point"
-import { PixelMask } from "./pixel-mask"
-import { Rect, TRect } from "./rect"
-//import { Game } from "./game"
-import { Draw } from "./draw"
-import { coordconv, type CoordinateSystem } from "./coords"
-import { type ISurface } from "./interfaces"
-import { Pixels } from "./utils/pixels"
+import { mulPoints, Point, setPoint, sumPoints, type TPoint } from "../point"
+import { PixelMask } from "../pixel-mask"
+import { Rect, TRect } from "../rect"
+import { Draw } from "../draw"
+import { coordconv, type CoordinateSystem } from "../coords"
+import { type ISurface } from "../interfaces"
+import { Pixels } from "../utils/pixels"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
