@@ -8,7 +8,7 @@ export class Color {
   constructor (rgba: [number, number, number, number])
   constructor (r: number, g: number, b: number, a?: number)
   constructor (...args: Array<any>) {
-    let r = 0.0, g = 0.0, b = 0.0, a = 0.0
+    let r = 0.0, g = 0.0, b = 0.0, a = 1.0
     
     if (args.length >= 3 && typeof args[0] === 'number' && typeof args[1] === 'number' && typeof args[2] === 'number') {
       r = args[0]; g = args[1]; b = args[2]
@@ -76,6 +76,10 @@ export class Color {
 
   value () {
     return this.#rgba
+  }
+
+  toArray (): [number, number, number, number] {
+    return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
   }
 
   toString () {

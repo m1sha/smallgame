@@ -1,11 +1,13 @@
 const Primitive2D = {
   // @ts-ignore
-  rect (x?: number, y?: number, w?: number, h?: number) {
+  rect (gap?: number) {
+    const d = gap ? gap : 0
+    
     return [
-      -1.0, 1.0,
-      -1.0, -1.0,
-      1.0, 1.0,
-      1.0, -1.0
+      -1.0 + d, 1.0 - d,
+      -1.0 + d, -1.0 + d,
+      1.0 - d, 1.0 - d,
+      1.0 -d, -1.0 +d
     ]
   }
 }

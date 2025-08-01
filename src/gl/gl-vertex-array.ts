@@ -7,10 +7,12 @@ export class GlVertexArray {
   #template: VertexAttribPointerTemplate
   #data: number[] = []
   count: number = 0
+  #drawType: 'static' | 'dynamic' | 'stream'
 
-  constructor (gl: WebGL2RenderingContext, template: VertexAttribPointerTemplate) {
+  constructor (gl: WebGL2RenderingContext, template: VertexAttribPointerTemplate, drawType: 'static' | 'dynamic' | 'stream') {
     this.#gl = gl  
     this.#template = template
+    this.#drawType = drawType
   }
 
 
@@ -58,7 +60,8 @@ export class GlVertexArray {
 
   private pushData() {
     const gl = this.#gl
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.#data), gl.STATIC_DRAW)
+    const type = this.#drawType === 'dynamic' ? gl.DYNAMIC_DRAW : this.#drawType === 'stream' ? gl.STREAM_DRAW : gl.STATIC_DRAW
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.#data), type)
   }
 
   private getCount(items: Array<number[]>) {

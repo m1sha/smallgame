@@ -5,6 +5,7 @@ import { Draw } from "../draw"
 import { coordconv, type CoordinateSystem } from "../coords"
 import { type ISurface } from "../interfaces"
 import { Pixels } from "../utils/pixels"
+import { CombinedSurface } from "./types"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -267,24 +268,63 @@ export class Surface {
     return new Surface(1, 1)
   }
 
-  private cloneCanvas (size?: { width: number, height: number }) {
-    // const { width, height } = Object.assign({}, { 
-    //   width: size ? size.width : this.width,
-    //   height : size ? size.height : this.height,
-    // })
+  static combine (images: ISurface[], rows: number, cols: number): CombinedSurface {
+    
+    
+    const rects: Rect[] = []
+    let k = 0
+    const pos = Point.zero
+    let maxH = 0
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (k >= images.length) break
+        
+        const img = images[k++]
 
+        rects.push(new Rect(pos.x, pos.y, img.width, img.height))
+
+        pos.shiftXSelf(img.width)
+        if (img.height > maxH) maxH = img.height
+      }
+      
+      pos.shiftYSelf(maxH) 
+      pos.moveXSelf(0)
+      maxH = 0
+    }
+
+    const { width, height } = Rect.merge(rects)
+    const surface = new Surface(width, height)
+    k = 0
+    pos.moveSelf(0, 0)
+    maxH = 0
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (k >= images.length) break
+        
+        const rect = rects[k]
+        const img = images[k++]
+        
+        surface.blit(img, rect)
+
+        pos.shiftXSelf(img.width)
+        if (img.height > maxH) maxH = img.height
+      }
+      
+      pos.shiftYSelf(maxH) 
+      pos.moveXSelf(0)
+      maxH = 0
+    }
+
+
+    return { surface, rects }
+  }
+
+  private cloneCanvas (size?: { width: number, height: number }) {
     const shift = Point.zero
     if (size) {
       shift.move(Math.abs((size.width - this.width / 2)), Math.abs((size.height - this.height / 2)))
     }
 
-    // const imageDate = this.#ctx.getImageData(0, 0, width, height)
-    // const canvas = document.createElement('canvas')
-    // canvas.width = this.width
-    // canvas.height = this.height
-    // canvas.getContext('2d')!.putImageData(imageDate, shift.x, shift.y)
-    // return canvas
-    
     const canvas = document.createElement('canvas')
     canvas.width = this.width
     canvas.height = this.height

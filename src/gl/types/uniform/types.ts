@@ -36,6 +36,21 @@ export class u_vec4 extends GlUniformLocation {
   }
 }
 
+export class u_mat3 extends GlUniformLocation {
+  get value () { return this.gl.getUniform(this.program, this.origin) }
+  set value (value: [number, number, number, number, number, number, number, number, number]) {
+    if (this.valid) this.gl.uniformMatrix3fv(this.origin, false, value)
+  }
+
+  set (matrix: DOMMatrix) {
+    this.value = [
+      matrix.m11, matrix.m12, matrix.m13, 
+      matrix.m21, matrix.m22, matrix.m23, 
+      matrix.m31, matrix.m32, matrix.m33
+    ]
+  }
+}
+
 export class u_mat4 extends GlUniformLocation {
   get value () { return this.gl.getUniform(this.program, this.origin) }
   set value (value: [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]) {

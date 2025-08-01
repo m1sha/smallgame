@@ -1,4 +1,4 @@
-import { u_int, u_float, u_vec2, u_vec3, u_vec4, u_mat4 } from "./types"
+import { u_int, u_float, u_vec2, u_vec3, u_vec4, u_mat4, u_mat3 } from "./types"
 export * from "./types"
 
 export interface IGlUniformTypeMap {
@@ -7,6 +7,7 @@ export interface IGlUniformTypeMap {
   'vec2': u_vec2
   'vec3': u_vec3
   'vec4': u_vec4
+  'mat3': u_mat3
   'mat4': u_mat4
 }
 
@@ -16,6 +17,7 @@ const GlUniformTypeMap = {
   'vec2': u_vec2,
   'vec3': u_vec3,
   'vec4': u_vec4,
+  'mat3': u_mat3,
   'mat4': u_mat4
 }
 

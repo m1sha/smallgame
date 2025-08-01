@@ -1,10 +1,10 @@
 import { VertexShader, FragmnetShader } from "./gl-shader"
-import { GlVertexArray } from "./gl-vertex-array"
-import { type IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, type IGlAttributeTypeMap, getGlType, getGlTypeSize } from "./types"
+import { GlVertexArray as GlVertexBufferObject } from "./gl-vertex-array"
+import { type IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, type IGlAttributeTypeMap, getGlType, getGlTypeSize, vertexOf, sizeOf } from "./types"
 import { getVertexAttribPointerTemplate } from "./utils"
-import { Surface } from "../surface"
-import { GlTextureList } from "./gl-texture"
-import { GlSurface } from "./gl-surface"
+import { GlTextureList, ITextureOptions } from "./gl-texture"
+import { ISurface } from "../interfaces"
+import { GlSubBufferData as GlSubData } from "./gl-sub-buffer-data"
 
 type GlShape = 'points' | 'lines' | 'line-strip' | 'line-loop' | 'triangles' | 'triangle-strip' | 'triangle-fan'
 
@@ -48,7 +48,7 @@ export class GlProgram {
     const gl = this.#gl
     gl.clearColor(0.0, 0.0, 0.0, 0.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    // gl.colorMask(true, true, true, false)
+    //gl.colorMask(true, true, true, false)
   }
 
   drawArrays (type: GlShape = 'points', vertexCount: number = 1, offset: number = 0) {
@@ -71,7 +71,23 @@ export class GlProgram {
     return Reflect.construct(GlAttributeTypeMap[type], [this.#gl, this.origin, name])
   }
 
-  vertexArray<T extends {}> (type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: T) {
+  subData <K extends keyof IGlAttributeTypeMap> (name: string, type: K, length: number) {
+    const gl = this.#gl
+    
+    const typeSize = vertexOf(type as any) * sizeOf(type as any)
+    const texCoordData = new Float32Array(typeSize * length)
+    const buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, texCoordData.byteLength, gl.DYNAMIC_DRAW)
+
+    const attr = this.attribute(name, 'pointer_array')
+    attr.set(2, gl.FLOAT, false, 0, 0)
+    attr.enable()
+
+    return new GlSubData(gl, texCoordData)
+  }
+
+  vbo<T extends {}> (drawType: 'static' | 'dynamic' | 'stream', type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: T) {
     const gl = this.#gl
     const vertextBuffer = gl.createBuffer()
     if (!vertextBuffer) throw new Error(`Can't create the vertex buffer`)
@@ -89,10 +105,10 @@ export class GlProgram {
       pointer.enable()
     }
     
-    return new GlVertexArray(this.#gl, template)
+    return new GlVertexBufferObject(this.#gl, template, drawType)
   }
 
-  vertexBuffer (array: Float32Array) {
+  vertexBuffer (array: Float32Array, drawType: 'static' | 'dynamic' | 'stream') {
     const gl = this.#gl
     
     const vertextBuffer = gl.createBuffer()
@@ -102,9 +118,9 @@ export class GlProgram {
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW)
   }
 
-  createTexture (samplerName: string, surface: Surface | GlSurface) {
+  createTexture (samplerName: string, surface: ISurface, options?: ITextureOptions) {
     const sampler = this.uniform(samplerName, 'int')
-    return this.#textures.add(sampler, surface)
+    return this.#textures.add(sampler, surface, options ?? { minMag: 'linear' })
   }
 
   private getShape (type: GlShape): number {

@@ -1,3 +1,4 @@
+export * from './gl'
 export * from './gl-surface'
 export * from './gl-shader'
 export * from './gl-program'
