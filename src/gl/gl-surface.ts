@@ -3,22 +3,20 @@ import { Rect } from "../rect"
 import { GlProgram } from "./gl-program"
 import { FragmnetShader, VertexShader } from "./gl-shader"
 import { removeItem } from "../utils/array"
-
+import { GL } from "./gl"
 
 export class GlSurface implements ISurface {
-  protected canvas: HTMLCanvasElement
   #rect: Rect
-  private gl: WebGL2RenderingContext
-  protected get ctx () { return this.gl }
+  readonly context: GL
   readonly programs: GlProgram[] = []
 
   constructor (width: number, height: number) {
-    this.canvas = document.createElement('canvas')
-    this.canvas.width = width
-    this.canvas.height = height
+    this.context = new GL({ width, height })
     this.#rect = new Rect(0, 0, width, height)
-    this.gl = this.canvas.getContext('webgl2')!
   }
+
+  protected get canvas () { return this.context.canvas}
+  protected get ctx () { return this.context.ctx }
   
   get rect () {
     return this.#rect
@@ -27,14 +25,15 @@ export class GlSurface implements ISurface {
   get width (): number {
     return this.#rect.width
   }
+
   get height (): number {
     return this.#rect.height
   }
 
   createProgram (vertexShaderSource: string, fragmnetShaderSource: string) {
-    const vertexShader = new VertexShader(this.gl, vertexShaderSource)
-    const fragmnetShader = new FragmnetShader(this.gl, fragmnetShaderSource)
-    const program = new GlProgram(this.gl, vertexShader, fragmnetShader)
+    const vertexShader = new VertexShader(this.context.ctx, vertexShaderSource)
+    const fragmnetShader = new FragmnetShader(this.context.ctx, fragmnetShaderSource)
+    const program = new GlProgram(this.context.ctx, vertexShader, fragmnetShader)
     this.programs.push(program)
     program.create()
     return program
@@ -47,7 +46,7 @@ export class GlSurface implements ISurface {
   }
 
   useProgram (program: GlProgram) {
-    this.gl.useProgram(program.origin)
+    this.context.use(program)
   }
   
   deleteProgram (program: GlProgram) {

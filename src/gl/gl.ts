@@ -1,6 +1,7 @@
 import { TSize } from "size"
 import { GlProgram } from "./gl-program"
 import { FragmnetShader, VertexShader } from "./gl-shader"
+import { getShape, GlShape } from "./types"
 
 export class GL {
   #prog: GlProgram | undefined = undefined
@@ -23,6 +24,19 @@ export class GL {
     return this.#prog!
   }
 
+  clear () {
+    const gl = this.ctx
+    gl.clearColor(0.0, 0.0, 0.0, 0.0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+    //gl.colorMask(true, true, true, false)
+  }
+
+  drawArrays (type: GlShape = 'points', vertexCount: number = 1, offset: number = 0) {
+    const gl = this.ctx
+    const shape = getShape(gl, type)
+    gl.drawArrays(shape, offset, vertexCount)
+  }
+
   use (prog: GlProgram) {
     this.#prog = prog
     this.ctx.useProgram(prog.origin)
@@ -38,5 +52,4 @@ export class GL {
     if (options === 'assemble-and-use') this.use(prog)
     return prog
   }
-
 }

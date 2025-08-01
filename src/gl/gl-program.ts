@@ -1,12 +1,11 @@
 import { VertexShader, FragmnetShader } from "./gl-shader"
 import { GlVertexArray as GlVertexBufferObject } from "./gl-vertex-array"
-import { type IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, type IGlAttributeTypeMap, getGlType, getGlTypeSize, vertexOf, sizeOf } from "./types"
+import { type IGlUniformTypeMap, GlUniformTypeMap, GlAttributeTypeMap, type IGlAttributeTypeMap, getGlType, getGlTypeSize, vertexOf, sizeOf, GlShape, getShape } from "./types"
 import { getVertexAttribPointerTemplate } from "./utils"
 import { GlTextureList, ITextureOptions } from "./gl-texture"
 import { ISurface } from "../interfaces"
 import { GlSubBufferData as GlSubData } from "./gl-sub-buffer-data"
 
-type GlShape = 'points' | 'lines' | 'line-strip' | 'line-loop' | 'triangles' | 'triangle-strip' | 'triangle-fan'
 
 export class GlProgram {
   #gl: WebGL2RenderingContext
@@ -43,25 +42,6 @@ export class GlProgram {
     gl.deleteProgram(program);
     throw new Error(msg)
   }
-
-  clear () {
-    const gl = this.#gl
-    gl.clearColor(0.0, 0.0, 0.0, 0.0)
-    gl.clear(gl.COLOR_BUFFER_BIT)
-    //gl.colorMask(true, true, true, false)
-  }
-
-  drawArrays (type: GlShape = 'points', vertexCount: number = 1, offset: number = 0) {
-    const gl = this.#gl
-    const shape = this.getShape(type)
-    gl.drawArrays(shape, offset, vertexCount)
-  }
-
-  // drawElements (type: GlShape = 'points', vertexCount: number = 1, offset: number = 0) {
-  //   const gl = this.#gl
-  //   const shape = this.getShape(type)
-  //   gl.drawElements(shape, offset, vertexCount)
-  // }
 
   uniform<K extends keyof IGlUniformTypeMap> (name: string, type: K): IGlUniformTypeMap[K] {
     return Reflect.construct(GlUniformTypeMap[type], [this.#gl, this.origin, name])
@@ -108,32 +88,10 @@ export class GlProgram {
     return new GlVertexBufferObject(this.#gl, template, drawType)
   }
 
-  vertexBuffer (array: Float32Array, drawType: 'static' | 'dynamic' | 'stream') {
-    const gl = this.#gl
-    
-    const vertextBuffer = gl.createBuffer()
-    if (!vertextBuffer) throw new Error(`Can't create the vertex buffer`)
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertextBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW)
-  }
-
+  
   createTexture (samplerName: string, surface: ISurface, options?: ITextureOptions) {
     const sampler = this.uniform(samplerName, 'int')
     return this.#textures.add(sampler, surface, options ?? { minMag: 'linear' })
-  }
-
-  private getShape (type: GlShape): number {
-    const gl = this.#gl
-    switch (type) {
-      case "points": return gl.POINTS
-      case "lines": return gl.LINES
-      case "line-strip": return gl.LINE_STRIP
-      case "line-loop": return gl.LINE_LOOP
-      case "triangles": return gl.TRIANGLES
-      case "triangle-strip": return gl.TRIANGLE_STRIP
-      case "triangle-fan": return gl.TRIANGLE_FAN
-    }
   }
  
 }
