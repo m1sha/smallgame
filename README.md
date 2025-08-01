@@ -19,12 +19,12 @@ index.ts
 ```ts
 import { Game, Key, Point, Surface, Time, gameloop, lerp, loadImage } from 'smallgame'
 
-function main (container: HTMLElement) {
+async function main (container: HTMLElement) {
   const GAME_WIDTH       = 400
   const GAME_HEIGHT      = 400
   const HERO_SPEED       = 20
   const { game, screen } = Game.create(GAME_WIDTH, GAME_HEIGHT, container)
-  const hero             = loadImage('hero.png')
+  const hero             = await loadImage('hero.png')
   const velocity = Point.zero
   const speed = Point.zero
 
@@ -33,28 +33,27 @@ function main (container: HTMLElement) {
   gameloop(() => {
     const keys = game.key.getPressed()
   
-    if (keys[Key.K_A] || keys[Key.LEFT]) { 
+    if (keys[Key.LEFT]) { 
       speed.x = -HERO_SPEED 
     } 
     else
-    if (keys[Key.K_D] || keys[Key.RIGHT]) { 
+    if (keys[Key.RIGHT]) { 
       speed.x = HERO_SPEED 
     } 
     else {
       speed.x = 0
     }
     
-    if (keys[Key.K_W] || keys[Key.UP]) { 
+    if (keys[Key.UP]) { 
       speed.y = -HERO_SPEED 
     } 
     else
-    if (keys[Key.K_S] || keys[Key.DOWN]) { 
+    if (keys[Key.DOWN]) { 
       speed.y = HERO_SPEED 
     }
     else {
       speed.y = 0
     }
-
     
     hero.rect.shiftSelf(
       lerp(speed, velocity, Time.deltaTime)
