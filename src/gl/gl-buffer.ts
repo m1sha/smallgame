@@ -16,7 +16,10 @@ export class GlBuffer {
   private glType: number
 
   constructor (private gl: WebGL2RenderingContext, type: GlBufferType) {
-    this.buffer = gl.createBuffer()
+    const buffer = gl.createBuffer()
+    if (!buffer) throw new Error('Budder can not be created.')
+      
+    this.buffer = buffer
     this.glType = 0
     switch (type) {
       case 'array': this.glType = gl.ARRAY_BUFFER; break
