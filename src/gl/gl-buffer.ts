@@ -1,3 +1,5 @@
+import { type DrawType, getGlDrawType } from "./types"
+
 export type GlBufferType = 
   | 'array'
   | 'element-array'
@@ -32,8 +34,8 @@ export class GlBuffer {
     this.gl.bindBuffer(this.glType, this.buffer)
   }
 
-  data (array: Float32Array, drawType: 'static' | 'dynamic' | 'stream') {
-    const type = drawType === 'dynamic' ? this.gl.DYNAMIC_DRAW : drawType === 'stream' ? this.gl.STREAM_DRAW : this.gl.STATIC_DRAW
+  data (array: Float32Array, drawType: DrawType) {
+    const type = getGlDrawType(this.gl, drawType)
     this.gl.bufferData(this.glType, array, type)
   }
 

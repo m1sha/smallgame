@@ -1,20 +1,21 @@
+import { GlBuffer } from "./gl-buffer"
+import { type DrawType } from "./types"
 import { type VertexAttribPointerTemplate } from "./utils"
 
 // type TVertexArray = Float32Array | Int32Array | Uint32Array
 
-export class GlVertexArray {
-  #gl: WebGL2RenderingContext
+export class GlVertexBufferObject {
+  #buffer: GlBuffer
   #template: VertexAttribPointerTemplate
   #data: number[] = []
   count: number = 0
-  #drawType: 'static' | 'dynamic' | 'stream'
+  #drawType: DrawType
 
-  constructor (gl: WebGL2RenderingContext, template: VertexAttribPointerTemplate, drawType: 'static' | 'dynamic' | 'stream') {
-    this.#gl = gl  
+  constructor (buffer: GlBuffer, template: VertexAttribPointerTemplate, drawType: DrawType) {
+    this.#buffer = buffer,
     this.#template = template
     this.#drawType = drawType
   }
-
 
   push (...items: Array<number[]>) {
     const attrs = this.#template.attributes
@@ -58,10 +59,12 @@ export class GlVertexArray {
     return count
   }
 
+  remove () {
+    this.#buffer.remove()
+  }
+
   private pushData() {
-    const gl = this.#gl
-    const type = this.#drawType === 'dynamic' ? gl.DYNAMIC_DRAW : this.#drawType === 'stream' ? gl.STREAM_DRAW : gl.STATIC_DRAW
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.#data), type)
+    this.#buffer.data(new Float32Array(this.#data), this.#drawType)
   }
 
   private getCount(items: Array<number[]>) {

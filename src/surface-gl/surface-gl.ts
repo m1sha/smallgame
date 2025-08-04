@@ -1,52 +1,26 @@
 import { Rect, TRect } from "../rect"
 import { TPoint } from "../point"
 import { ISurface } from "../interfaces"
-import { FragmnetShader, GL, GlProgram, IGlUniformTypeMap, Primitive2D, TexCoord, u_mat3, u_mat4, vec2, VertexShader } from "../gl"
-import { FragmnetShaderSource } from "./fragmnet-shader-source"
-import defaultVerSource from './default-shaders/vert'
-import defaultFragSource from './default-shaders/frag'
+import { IGlUniformTypeMap, Primitive2D, TexCoord, u_float, u_int, u_mat4, vec2, VertexShader } from "../gl"
+import defaultVerSource from './shaders/default/vert'
+import defaultFragSource from './shaders/default/frag'
 import { GlTexture } from "../gl/gl-texture"
 import { Surface } from "../surface"
+import { SurfaceGLBase } from "./surface-gl-base"
 
-export type SurfaceGLCreateOptions = {
-  useAlpha?: boolean
-  useSmooth?: boolean
-  useOffscreen?: boolean
+type GlParams = {
+  transform: u_mat4
+  texTransform: u_mat4
+  texture: GlTexture
 }
 
-export class SurfaceGL implements ISurface {
-  protected context: GL
-  protected program: GlProgram | null = null
-  protected transform: u_mat4 | null = null
-  protected texTransform: u_mat4 | null = null
-  protected texture: GlTexture | null = null
-  #rect: Rect
-  vertexShader: string | null = null
-  fragmnetShader: FragmnetShaderSource
-  imageRendering:  'auto' | 'pixelated' = 'auto'
-
-  constructor(width: number, height: number, options?: SurfaceGLCreateOptions, canvas?: HTMLCanvasElement) {
-    this.context = new GL({ width, height }, options && options.useOffscreen, canvas)
-    this.#rect = new Rect(0, 0, width, height)
-    this.fragmnetShader = new FragmnetShaderSource('')
-  }
-
-  protected get canvas (): HTMLCanvasElement | OffscreenCanvas {
-    return this.context.canvas
-  }
-
-  protected get ctx () {
-    return this.context.ctx
-  }
-
-  clear () {
-    this.context.clear()
-  }
+export class SurfaceGL extends SurfaceGLBase {
+  protected glParams: GlParams | null = null
 
   blit (surface: ISurface, rect: TRect | TPoint, srcRect?: TRect) {
-    if (!this.program || !this.texture) throw new Error('Surface is not created.')
+    if (!this.program || !this.glParams) throw new Error('Surface is not created.')
     
-    this.texture.update(surface)
+    this.glParams.texture.update(surface)
 
     const r = new Rect(rect.x, rect.y, surface.width, surface.height)
     const isRect = rect as TRect 
@@ -54,49 +28,39 @@ export class SurfaceGL implements ISurface {
       r.resizeSelf(isRect)      
     }
     
-    this.drawTex(r, surface.width, surface.height, srcRect)
+    this.draw(r, surface.width, surface.height, srcRect)
+  }
+
+  blita (alpha: number, surface: ISurface, rect: TRect | TPoint, srcRect?: TRect) {
+    const oldAlpha = this.globalAlpha
+    this.globalAlpha = alpha
+    this.blit(surface, rect, srcRect)
+    this.globalAlpha = oldAlpha
   }
 
   create () {
-    const ver = new VertexShader(this.context.ctx, this.vertexShader ?? defaultVerSource)
-    const frag = new FragmnetShader(this.context.ctx, this.fragmnetShader.toString() ?? defaultFragSource)
-    this.program = new GlProgram(this.context.ctx, ver, frag)
-    this.program.create()
-    this.context.ctx.useProgram(this.program.origin)
+    super.create()
     
-    this.uniform('iResolution', 'vec2').value = [this.width, this.height]
-    this.transform = this.uniform('uMatrix', 'mat4')
-    this.transform.set(new DOMMatrix([1, 0, 0, 1, 0, 0]))
-    this.texTransform = this.uniform('uTexTransform', 'mat4')
-    this.texTransform.set(new DOMMatrix([1, 0, 0, 1, 0, 0]))
-    this.texture = this.program.createTexture('uSampler', Surface.default, { minMag: 'nearest' })
+    this.glParams = {
+      transform: this.uniform('uMatrix', 'mat4', new DOMMatrix().toFloat32Array()),
+      texTransform: this.uniform('uTexTransform', 'mat4', new DOMMatrix().toFloat32Array()),
+      texture: this.context.createTexture('uSampler', Surface.default, { minMag: this.imageRendering === 'pixelated' ? 'nearest' : 'linear' }),
+    }
   }
 
+  protected get defaultVerSource () { return defaultVerSource }
+  protected get defaultFragSource () { return defaultFragSource }
 
-  vertexArray<T extends {}> (type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: T) {
-    if (!this.program) throw new Error('Surface is not created.')
-    this.program.vbo('static', type, scheme)
-  }
-
-  drawRect () {
-    if (!this.program) throw new Error('Surface is not created.')
-    const vertexCount = this.program
-      .vbo('static', 'float', { aPosition: vec2 })
-      .push(Primitive2D.rect())
-    this.context.drawArrays('triangle-strip', vertexCount)
-  }
-
-  private drawTex (rect: TRect, imgWidth: number, imgHeight: number, srcRect?: TRect) {
-    if (!this.program) throw new Error('Surface is not created.')
-    const vertexCount = this.program
+  private draw (rect: TRect, imgWidth: number, imgHeight: number, srcRect?: TRect) {
+    const vertexCount = this.context
       .vbo('static', 'float', { a_Position: vec2, a_TexCoord: vec2 })
       .push(Primitive2D.rect(), TexCoord.rect())
 
-    const transform = new DOMMatrix([1, 0, 0, 1, 0, 0])
+    const transform = new DOMMatrix()
       .translate((rect.x + rect.width * 0.5 ) / (this.width * 0.5), ( -rect.height * 0.5 - rect.y) / (this.height * 0.5 ))
       .scale(rect.width / this.width, rect.height / this.height)
 
-    const texTransform = new DOMMatrix([1, 0, 0, 1, 0, 0])
+    const texTransform = new DOMMatrix()
     
     if (srcRect) {
       texTransform
@@ -104,22 +68,15 @@ export class SurfaceGL implements ISurface {
         .scaleSelf(srcRect.width / (imgWidth), srcRect.height / (imgHeight))
     }
     
-    this.transform?.set(transform)
-    this.texTransform?.set(texTransform)
+    this.glParams?.transform.set(transform)
+    this.glParams?.texTransform.set(texTransform)
     
     this.context.drawArrays('triangle-strip', vertexCount)
   }
 
-  release () {
-    if (!this.program) return
-    this.context.ctx.deleteProgram(this.program.origin)
-  }
-
-  get rect () { return this.#rect }
-  get width () { return this.#rect.width }
-  get height () { return this.#rect.height }
-
-  uniform <K extends keyof IGlUniformTypeMap> (name: string, type: K): IGlUniformTypeMap[K] {
-    return this.program!.uniform(name, type)
+  private uniform <K extends keyof IGlUniformTypeMap> (name: string, type: K, value?: any): IGlUniformTypeMap[K] {
+    const result = this.context.uniform(name, type)
+    if (typeof value !== 'undefined' && value !== undefined) result.value = value
+    return result
   }
 }

@@ -1,6 +1,5 @@
 import { ISurface } from "../interfaces"
 import { Surface } from "../surface"
-import { GlSurface } from "./gl-surface"
 import { TextureSlots, u_int } from "./types"
 
 export interface IMipmapOptions {
@@ -81,8 +80,8 @@ export class GlTexture {
     
     if (surface instanceof Surface)
       gl.texImage2D(gl.TEXTURE_2D, mipmapLevel, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, surface.draw.origin.canvas)
-    else if (surface instanceof GlSurface)
-      gl.texImage2D(gl.TEXTURE_2D, mipmapLevel, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, surface.origin)
+    else
+      gl.texImage2D(gl.TEXTURE_2D, mipmapLevel, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, (surface as any).origin)
 
     gl.generateMipmap(gl.TEXTURE_2D)
   }
@@ -95,8 +94,8 @@ export class GlTexture {
     
     if (surface instanceof Surface)
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, surface.draw.origin.canvas)
-    else  if (surface instanceof GlSurface)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, surface.origin)
+    else
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, (surface as any).origin)
   }
  
   delete () {

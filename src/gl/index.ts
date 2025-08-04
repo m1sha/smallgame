@@ -1,6 +1,6 @@
 export * from './gl'
-export * from './gl-surface'
 export * from './gl-shader'
+export * from './fragmnet-shader-source'
 export * from './gl-program'
 export * from './primitive-2d'
 export * from './tex-coord'

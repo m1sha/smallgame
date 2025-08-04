@@ -1,4 +1,4 @@
-export class GlSubBufferData {
+export class GlBufferSubData {
   constructor (private gl: WebGL2RenderingContext, private arr: Float32Array) {
 
   }
