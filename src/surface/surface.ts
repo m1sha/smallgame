@@ -6,6 +6,8 @@ import { coordconv, type CoordinateSystem } from "../coords"
 import { type ISurface } from "../interfaces"
 import { Pixels } from "../utils/pixels"
 import { CombinedSurface } from "./types"
+import { TColorSource } from "styles/color-source"
+import { int2Str } from "../color/imports/int-to-string"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -63,8 +65,8 @@ export class Surface {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
-  fill (color: string) {
-    this.ctx.fillStyle = color
+  fill (color: TColorSource) {
+    this.ctx.fillStyle = typeof color === 'number' ? int2Str(color) : color
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
 

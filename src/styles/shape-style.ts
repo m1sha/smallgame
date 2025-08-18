@@ -1,5 +1,6 @@
 /* global CanvasLineCap, CanvasLineJoin */
 
+import { int2Str } from "../color/imports/int-to-string"
 import { Surface } from "../surface"
 import { type  TColorSource } from "./color-source"
 import { type  PaintOrder } from "./paint-order"
@@ -57,7 +58,9 @@ export class ShapeStyle {
 export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
   if (style.stroke instanceof Surface) {
     ctx.strokeStyle = style.stroke.draw.origin
-  } else {
+  } else if (typeof style.stroke === 'number') {
+    ctx.strokeStyle = int2Str(style.stroke)
+  }  else {
     ctx.strokeStyle = style.stroke
   }
   
@@ -69,7 +72,7 @@ export function applyStroke (ctx: CanvasRenderingContext2D, style: ShapeStyle) {
 }
 
 export function applyFill (ctx: CanvasRenderingContext2D, color: TColorSource) {
-  ctx.fillStyle = color
+  ctx.fillStyle = typeof color === 'number' ? int2Str(color) : color
 }
 
 export class ShapeStyleResolver {

@@ -1,1 +1,1 @@
-export type TColorSource = string | CanvasPattern 
+export type TColorSource = string | CanvasPattern | number
