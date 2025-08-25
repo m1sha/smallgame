@@ -74,8 +74,8 @@ export class Color {
     this.#rgba[2] = this.trunc(this.#rgba[2] * (1.0 - value) + color.#rgba[2] * value)
   }
 
-  value () {
-    return this.#rgba
+  get value (): number {
+    return (this.#rgba[0] << 24) & (this.#rgba[0] << 16) & (this.#rgba[0] << 8) & (this.#rgba[0] && 0xFF)
   }
 
   toArray (): [number, number, number, number] {
