@@ -2,12 +2,13 @@ import { mulPoints, Point, setPoint, sumPoints, type TPoint } from "../point"
 import { PixelMask } from "../pixel-mask"
 import { Rect, TRect } from "../rect"
 import { Draw } from "../draw"
-import { coordconv, type CoordinateSystem } from "../coords"
+import { type CoordinateSystem } from "../coords"
 import { type ISurface } from "../interfaces"
 import { Pixels } from "../utils/pixels"
 import { CombinedSurface } from "./types"
 import { TColorSource } from "styles/color-source"
 import { int2Str } from "../color/imports/int-to-string"
+import { SurfaceBase } from "./surface-base"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -16,25 +17,23 @@ export type SurfaceCreateOptions = {
   coordinateSystem?: CoordinateSystem
 }
 
-export class Surface {
+export class Surface extends SurfaceBase {
   protected canvas: HTMLCanvasElement | OffscreenCanvas
   protected ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
-  #rect: Rect
-  #conv: (point: TPoint) => TPoint
   readonly draw: Draw
   
   constructor(width: number, height: number, options?: SurfaceCreateOptions, canvas?: HTMLCanvasElement) {
+    super(width, height, options && options.coordinateSystem ? options.coordinateSystem : 'screen')
+    
     this.canvas = canvas ? canvas : options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
     this.canvas.width = width
     this.canvas.height = height
-    const coordinateSystem = options && options.coordinateSystem ? options.coordinateSystem : 'screen'
     const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth : true
-    this.#conv = point => coordconv(coordinateSystem, point, width, height) 
-    this.#rect = new Rect(0, 0, width, height)
+    
     this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
     this.imageRendering = useSmooth ? 'auto' : 'pixelated'
-    this.draw = new Draw(this.ctx, coordinateSystem)
+    this.draw = new Draw(this.ctx, this.coordinateSystem)
   }
 
   get imageRendering () { 
@@ -48,13 +47,6 @@ export class Surface {
     ;(this.canvas as HTMLCanvasElement).style.imageRendering = value 
     this.ctx.imageSmoothingEnabled = value === 'auto'
   }
-
-  get rect () { return this.#rect }
-
-  get width () { return this.#rect.width }
-
-  get height () { return this.#rect.height }
-
 
   clear (rect?: TRect) {
     if (rect) {
@@ -87,8 +79,8 @@ export class Surface {
       height: (rect as Rect).height ?? surface.height 
     })
 
-    let p0 = this.#conv(setPoint(x, y))
-    let p1 = this.#conv(setPoint(x + width, y + height))
+    let p0 = this.conv(setPoint(x, y))
+    let p1 = this.conv(setPoint(x + width, y + height))
 
     if (shift) {
       p0 = sumPoints(mulPoints(p0, setPoint(zoom, zoom)), shift)
@@ -98,8 +90,8 @@ export class Surface {
     const outrect = Rect.fromTwoPoints(p0, p1)
 
     if (distRect) {
-      let p2 = this.#conv(distRect)
-      let p3 = this.#conv(setPoint(distRect.x + distRect.width, distRect.y + distRect.height))
+      let p2 = this.conv(distRect)
+      let p3 = this.conv(setPoint(distRect.x + distRect.width, distRect.y + distRect.height))
       if (shift) {
         p2 = sumPoints(mulPoints(p2, setPoint(zoom, zoom)), shift)
         p3 = sumPoints(mulPoints(p3, setPoint(zoom, zoom)), shift)
@@ -128,6 +120,10 @@ export class Surface {
     if (index < 0) index = 1 / Math.abs(index)
     
     this.resize(this.width * index, this.height * index)
+  }
+
+  scale (dx: number, dy: number) {
+    this.resize(this.width * dx, this.height * dy)
   }
 
   flip (position: 'x' | 'y' | 'xy') {
@@ -166,7 +162,7 @@ export class Surface {
     this.canvas.height = height
     if (this.imageRendering === 'pixelated') this.ctx.imageSmoothingEnabled = false
     this.ctx.drawImage(canvas, 0, 0, width, height)
-    this.#rect.resizeSelf(width, height)
+    this._rect.resizeSelf(width, height)
   }
 
   setCanvasSize  (width: number, height: number, shiftToCenter: boolean = true) {
@@ -178,7 +174,7 @@ export class Surface {
     this.canvas.height = height
     
     this.ctx.drawImage(canvas, shiftX, shiftY, canvas.width, canvas.height)
-    this.#rect.resizeSelf(width, height)
+    this._rect.resizeSelf(width, height)
   }
 
   get pixels (): Pixels {
@@ -195,43 +191,18 @@ export class Surface {
     this.blit(surface, rect, distRect)
     this.ctx.globalCompositeOperation = old
   }
-
-  createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
-    return new Promise((resolve) => {
-      const img = document.createElement("img")
-      img.onload = () => resolve(img)
-      img.src = this.toDataURL(type, quality)
-    })
-  }
-
-  toDataURL (type?: string, quality?: any): string {
-    if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
-    return this.canvas.toDataURL(type, quality)
-  }
-
+  
   toPattern (repetition: "repeat" | "repeat-x" | "repeat-y" | "no-repeat"): CanvasPattern {
     if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an pattern from the OffscreenCanvas.')
     return this.draw.createPattern(this.canvas, repetition)
   }
 
-  toBitmap () {
-    if (this.canvas instanceof OffscreenCanvas) return this.canvas.transferToImageBitmap()
-    throw new Error('Method is unsupported')
-  }
-
-  save (type?: string, quality?: any): Promise<Blob | null> {
-    return new Promise((resolve) => {
-      if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
-      this.canvas.toBlob(blob => resolve(blob), type, quality)
-    })
-  }
-
-  createMask () {
+  createMask (): PixelMask {
     const imageDate = this.ctx.getImageData(0, 0, this.width, this.height)
     return PixelMask.fromImageData(imageDate)
   }
 
-  clone () {
+  clone (): Surface {
     const surface = new Surface(this.width, this.height)
     const canvas = this.cloneCanvas()
     surface.canvas = canvas
@@ -271,8 +242,6 @@ export class Surface {
   }
 
   static combine (images: ISurface[], rows: number, cols: number): CombinedSurface {
-    
-    
     const rects: Rect[] = []
     let k = 0
     const pos = Point.zero
