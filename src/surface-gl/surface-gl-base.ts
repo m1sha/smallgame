@@ -1,10 +1,16 @@
-import { Rect } from "../rect"
+import { type TRect } from "../rect"
+import { type TPoint } from "../point"
 import { FragmnetShader, FragmnetShaderSource, GL, GlProgram, u_float, vec2, VertexShader } from "../gl"
+import { SurfaceBase } from "../surface/surface-base"
+import { type CoordinateSystem } from "../coords"
+import { type TColorSource } from "../styles/color-source"
+import { Color } from "../color"
 
 export type SurfaceGLCreateOptions = {
   useAlpha?: boolean
   useSmooth?: boolean
   useOffscreen?: boolean
+  coordinateSystem?: CoordinateSystem
 }
 
 export type GlBaseParams = {
@@ -12,19 +18,20 @@ export type GlBaseParams = {
   resolution: vec2
 }
 
-export abstract class SurfaceGLBase {
+export abstract class SurfaceGLBase extends SurfaceBase {
   protected program: GlProgram | null = null
   protected basePrams: GlBaseParams | null = null
   readonly context: GL
   imageRendering: 'auto' | 'pixelated' = 'auto'
   vertexShader: string | null = null
   fragmnetShader: FragmnetShaderSource
-  #rect: Rect
 
   constructor(width: number, height: number, options?: SurfaceGLCreateOptions, canvas?: HTMLCanvasElement) {
+    super(width, height, options && options.coordinateSystem ? options.coordinateSystem : 'screen')
     this.context = new GL({ width, height }, options && options.useOffscreen, canvas)
-    this.#rect = new Rect(0, 0, width, height)
+  
     this.fragmnetShader = new FragmnetShaderSource('')
+    this.create()
   }
 
   create (): void {
@@ -62,18 +69,49 @@ export abstract class SurfaceGLBase {
   protected abstract get defaultVerSource (): string
   protected abstract get defaultFragSource (): string
   
-  clear () {
-    this.context.clear()
+  clear (rect?: TRect) {
+    this.context.clear(0x0)
+  }
+
+  fill (color: TColorSource) {
+    if (typeof color === 'number'){
+     this.context.clear(color)
+    }
+      
+    if (typeof color === 'string' || color instanceof String) {
+      const c = Color.from(color).value
+      this.context.clear(c)
+    }
+  }
+
+  flip (position: 'x' | 'y' | 'xy') {
+    throw new Error('Not Implement')
+  }
+
+  resize (width: number, height: number) {
+    throw new Error('Not Implement')
+  }
+
+  scale (dx: number, dy: number) {
+    throw new Error('Not Implement')
+  }
+
+  rotate (a: number, pivot?: TPoint) {
+    throw new Error('Not Implement')
+  }
+
+  setCanvasSize  (width: number, height: number, shiftToCenter: boolean = true) {
+    throw new Error('Not Implement')
+  }
+
+  clone (): SurfaceBase {
+    throw new Error('Not Implement')
   }
 
   release () {
     if (!this.program) return
     this.context.ctx.deleteProgram(this.program.origin)
   }
-
-  get rect () { return this.#rect }
-  get width () { return this.#rect.width }
-  get height () { return this.#rect.height }
 
   get globalAlpha () {
     if (!this.basePrams) throw new Error('Surface is not created.')

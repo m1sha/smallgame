@@ -3,7 +3,7 @@ import { SurfaceGLBase } from "./surface-gl-base"
 import defaultVerSource from './shaders/tiled/vert'
 import defaultFragSource from './shaders/tiled/frag'
 import { Surface } from "../surface/surface"
-import { GlTexture } from "../gl/gl-texture"
+import { GlTexture } from "../gl/textures/gl-texture"
 
 export class TiledSurfaceGl extends SurfaceGLBase {
   private vertexCount: number = 0
