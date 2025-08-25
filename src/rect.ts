@@ -1,5 +1,4 @@
 import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, type TPoint, zeroPoint } from "./point"
-import { Sprite } from "./sprite"
 import { type Pivote } from './pivote'
 import { type TSize } from "./size"
 
@@ -441,6 +440,12 @@ export class Rect implements MutableRect {
     })
     
     return Rect.fromTwoPoints(setPoint(x0, y0), setPoint(x1, y1))
+  }
+
+  static isRect (rect: unknown): boolean {
+    if (!rect) return false
+    const r = rect as TRect
+    return typeof r.x === 'number' && typeof r.y === 'number' && typeof r.width === 'number' && typeof r.height === 'number'
   }
 
   private calcPivote(pivote?: Pivote) {
