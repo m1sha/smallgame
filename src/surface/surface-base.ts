@@ -29,6 +29,8 @@ export abstract class SurfaceBase {
   abstract setCanvasSize  (width: number, height: number, shiftToCenter: boolean): void
   abstract clone (): SurfaceBase
 
+  get origin () { return this.canvas }
+
   createImage (type?: string, quality?: any): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
       const img = document.createElement("img")

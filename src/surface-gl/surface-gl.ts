@@ -1,13 +1,13 @@
 import { Rect, TRect } from "../rect"
 import { Point, TPoint } from "../point"
-import { ISurface } from "../interfaces"
 import { IGlUniformTypeMap, Primitive2D, TexCoord, u_mat4, vec2 } from "../gl"
 import defaultVerSource from './shaders/default/vert'
 import defaultFragSource from './shaders/default/frag'
 import { GlTexture } from "../gl/textures/gl-texture"
 import { Surface } from "../surface"
-import { SurfaceGLBase } from "./surface-gl-base"
+import { SurfaceGLBase, SurfaceGLCreateOptions } from "./surface-gl-base"
 import { TBlitOptions } from "./blit-options"
+import { SurfaceBase } from "../surface/surface-base"
 
 type GlParams = {
   transform: u_mat4
@@ -18,8 +18,12 @@ type GlParams = {
 export class SurfaceGL extends SurfaceGLBase {
   protected glParams: GlParams | null = null
 
-  blit (surface: ISurface, rect: TRect | TPoint, srcRect?: TRect | TBlitOptions) {
-    if (!this.program || !this.glParams) throw new Error('Surface is not created.')
+  // constructor (width: number, height: number, options?: SurfaceGLCreateOptions, canvas?: HTMLCanvasElement) {
+  //   super (width, height, options, canvas)
+  // }
+
+  blit (surface: SurfaceBase, rect: TRect | TPoint, srcRect?: TRect | TBlitOptions) {
+    if (!this.glParams) throw new Error('Surface is not created.')
     
     this.glParams.texture.update(surface)
 
@@ -32,7 +36,7 @@ export class SurfaceGL extends SurfaceGLBase {
     this.draw(r, surface.width, surface.height, srcRect)
   }
 
-  blita (alpha: number, surface: ISurface, rect: TRect | TPoint, srcRect?: TRect | TBlitOptions) {
+  blita (alpha: number, surface: SurfaceBase, rect: TRect | TPoint, srcRect?: TRect | TBlitOptions) {
     const oldAlpha = this.globalAlpha
     this.globalAlpha = alpha
     this.blit(surface, rect, srcRect)

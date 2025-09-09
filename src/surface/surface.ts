@@ -3,7 +3,7 @@ import { PixelMask } from "../pixel-mask"
 import { Rect, TRect } from "../rect"
 import { Draw } from "../draw"
 import { type CoordinateSystem } from "../coords"
-import { type ISurface } from "../interfaces"
+
 import { Pixels } from "../utils/pixels"
 import { CombinedSurface } from "./types"
 import { TColorSource } from "styles/color-source"
@@ -22,16 +22,27 @@ export class Surface extends SurfaceBase {
   protected ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
   readonly draw: Draw
   
-  constructor(width: number, height: number, options?: SurfaceCreateOptions, canvas?: HTMLCanvasElement) {
+  constructor(width: number, height: number, options?: SurfaceCreateOptions, canvas?: HTMLCanvasElement | ImageBitmap) {
     super(width, height, options && options.coordinateSystem ? options.coordinateSystem : 'screen')
     
-    this.canvas = canvas ? canvas : options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+    const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
+
+    if (canvas instanceof ImageBitmap) {
+      this.canvas = options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+      const temp = new OffscreenCanvas(canvas.width, canvas.height)
+      temp.getContext('bitmaprenderer')?.transferFromImageBitmap(canvas)
+      this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
+      this.ctx.drawImage(temp, 0, 0)
+
+    } else {
+      this.canvas = canvas ? canvas : options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
+      this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
+    }
+    
     this.canvas.width = width
     this.canvas.height = height
-    const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
     const useSmooth = options && typeof options.useSmooth === 'boolean' ? options.useSmooth : true
     
-    this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
     this.imageRendering = useSmooth ? 'auto' : 'pixelated'
     this.draw = new Draw(this.ctx, this.coordinateSystem)
   }
@@ -48,6 +59,8 @@ export class Surface extends SurfaceBase {
     this.ctx.imageSmoothingEnabled = value === 'auto'
   }
 
+  get origin () { return this.canvas }
+
   clear (rect?: TRect) {
     if (rect) {
       this.ctx.clearRect(rect.x, rect.y, rect.width, rect.height)  
@@ -62,18 +75,18 @@ export class Surface extends SurfaceBase {
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit (surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blit (surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
     this.blitx(surface, rect, distRect)
   }
 
-  blita (alpha: number, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blita (alpha: number, surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
     const a = this.ctx.globalAlpha
     if (alpha < 1) this.ctx.globalAlpha = alpha
     this.blitx(surface, rect, distRect)
     if (alpha < 1) this.ctx.globalAlpha = a
   }
 
-  protected blitx(surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
+  protected blitx(surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
     const { x, y, width, height } = Object.assign(rect, { 
       width: (rect as Rect).width ?? surface.width, 
       height: (rect as Rect).height ?? surface.height 
@@ -98,15 +111,11 @@ export class Surface extends SurfaceBase {
       }
 
       const outDistrect = Rect.fromTwoPoints(p2, p3)
-      const ctx = (surface as any).ctx
-      if (!ctx) throw new Error('Context is not found.')
-      this.ctx.drawImage(ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
+      this.ctx.drawImage(surface.origin, outrect.x, outrect.y, outrect.width, outrect.height, outDistrect.x, outDistrect.y, outDistrect.width, outDistrect.height)
       return  
     }
-
-    const ctx = (surface as any).ctx
-    if (!ctx) throw new Error('Context is not found.')
-    this.ctx.drawImage(ctx.canvas, outrect.x, outrect.y, outrect.width, outrect.height)
+    
+    this.ctx.drawImage(surface.origin, outrect.x, outrect.y, outrect.width, outrect.height)
   }
 
   extract (rect: TRect): Surface {
@@ -185,7 +194,7 @@ export class Surface extends SurfaceBase {
     this.ctx.putImageData(value.imageData, 0, 0)
   }
 
-  mix (method: GlobalCompositeOperation, surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  mix (method: GlobalCompositeOperation, surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
     const old = this.ctx.globalCompositeOperation
     this.ctx.globalCompositeOperation = method
     this.blit(surface, rect, distRect)
@@ -241,7 +250,7 @@ export class Surface extends SurfaceBase {
     return new Surface(1, 1)
   }
 
-  static combine (images: ISurface[], rows: number, cols: number): CombinedSurface {
+  static combine (images: SurfaceBase[], rows: number, cols: number): CombinedSurface {
     const rects: Rect[] = []
     let k = 0
     const pos = Point.zero

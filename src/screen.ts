@@ -1,14 +1,19 @@
 import { CssViewport, TransformViewport, type Viewport, type ViewportType } from './viewport'
-import { Surface, type SurfaceCreateOptions } from './surface'
+import { type SurfaceCreateOptions } from './surface'
 import { type TPoint } from './point'
-import { Rect } from './rect'
-import { type ISurface } from './interfaces'
+import { Rect, TRect } from './rect'
+import { SurfaceGL } from './surface-gl'
+import { TColorSource } from './styles/color-source'
+import { SurfaceBase } from './surface/surface-base'
+import { TSize } from './size'
 
-export class Screen extends Surface {
+export class Screen {
   readonly viewport: Viewport
+  readonly surface: SurfaceGL 
 
   constructor(viewportType: ViewportType, width: number, height: number, options?: SurfaceCreateOptions) { 
-    super(width, height, options)
+    this.surface = new SurfaceGL(width, height, options) //super(width, height, options)
+    this.surface.create()
     
     this.viewport = viewportType === 'css' 
       ? new CssViewport(this.originCanvas) 
@@ -30,17 +35,37 @@ export class Screen extends Surface {
   }
 
   get originCanvas () {
-    return this.canvas as HTMLCanvasElement
+    return this.surface.context.canvas as HTMLCanvasElement
   }
 
+  get size (): TSize {
+    return this.surface.rect
+  }
+
+  fill (color: TColorSource) {
+    this.surface.fill(color)
+  }
+
+  clear (rect?: TRect) {
+    this.surface.clear(rect)
+  }
   
-  blit (surface: ISurface, rect: Rect | TPoint, distRect: Rect | null = null) {
+  blit (surface: SurfaceBase, rect: Rect | TPoint, distRect?: Rect) {
     if (this.viewport.type === 'css') {
-      this.blitx(surface, rect, distRect)  
+      this.surface.blit(surface, rect, distRect)  
       return
     }
     
-    this.blitx(surface, rect, distRect, this.viewport.zoom, this.viewport.position)
+    this.surface.blit(surface, rect, distRect)
+  }
+
+  blita (alpha: number, surface: SurfaceBase, rect: Rect | TPoint, distRect?: Rect) {
+    if (this.viewport.type === 'css') {
+      this.surface.blita(alpha, surface, rect)  
+      return
+    }
+    
+    this.surface.blita(alpha, surface, rect)
   }
 
   dispose () {

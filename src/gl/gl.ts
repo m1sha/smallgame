@@ -4,11 +4,11 @@ import { FragmnetShader, VertexShader } from "./gl-shader"
 import { DrawType, getGlType, getGlTypeSize, getShape, GlAttributeTypeMap, GlUniformTypeMap, IGlAttributeTypeMap, IGlUniformTypeMap, sizeOf, vertexOf, type GlShape } from "./types"
 import { getVertexAttribPointerTemplate } from "./utils"
 import { GlVertexBufferObject } from "./gl-vertex-buffer-object"
-import { ISurface } from "../interfaces"
 import { GlTextureList, ITextureOptions } from "./textures"
 import { GlBufferSubData } from "./gl-sub-buffer-data"
 import { GlBuffer } from "./gl-buffer"
 import { GlVertexArrayObject } from "./gl-vertex-array-object"
+import { SurfaceBase } from "../surface/surface-base"
 
 export class GL {
   #prog: GlProgram | undefined = undefined
@@ -33,6 +33,20 @@ export class GL {
     gl.clearColor((rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff)
     gl.clear(gl.COLOR_BUFFER_BIT)
     //gl.colorMask(true, true, true, false)
+  }
+
+  enableDepth () {
+    const gl = this.ctx
+    this.ctx.enable(gl.DEPTH_TEST)
+  }
+
+  enableScissor () {
+    const gl = this.ctx
+    this.ctx.enable(gl.SCISSOR_TEST)
+  }
+
+  scissor (size: TSize) {
+    this.ctx.scissor(0, 0, size.width, size.width)
   }
 
   drawArrays (type: GlShape = 'points', vertexCount: number = 1, offset: number = 0) {
@@ -116,13 +130,25 @@ export class GL {
     return vao
   }
   
-  createTexture (samplerName: string, surface: ISurface, options?: ITextureOptions) {
+  createTexture (samplerName: string, surface: SurfaceBase, options?: ITextureOptions) {
     const sampler = this.uniform(samplerName, 'int')
     return this.#textures.addTexture2D(sampler, surface, options ?? { minMag: 'linear' })
   }
 
-  createTextureArray (samplerName: string, surfaces: ISurface[], options?: ITextureOptions) {
+  createTextureArray (samplerName: string, surfaces: SurfaceBase[], options?: ITextureOptions) {
     const sampler = this.uniform(samplerName, 'int')
     return this.#textures.addTextureArray(sampler, surfaces, options ?? { minMag: 'linear' })
+  }
+
+  toBitmap () {
+    if (this.canvas instanceof HTMLCanvasElement) {
+      throw new Error('AAA')
+    }
+
+    return  this.canvas.transferToImageBitmap()
+  }
+
+  dispose () {
+    this.ctx.flush()
   }
 }

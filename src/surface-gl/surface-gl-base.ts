@@ -1,6 +1,6 @@
 import { type TRect } from "../rect"
 import { type TPoint } from "../point"
-import { FragmnetShader, FragmnetShaderSource, GL, GlProgram, u_float, vec2, VertexShader } from "../gl"
+import { FragmnetShaderSource, GL, u_float, vec2 } from "../gl"
 import { SurfaceBase } from "../surface/surface-base"
 import { type CoordinateSystem } from "../coords"
 import { type TColorSource } from "../styles/color-source"
@@ -19,7 +19,6 @@ export type GlBaseParams = {
 }
 
 export abstract class SurfaceGLBase extends SurfaceBase {
-  protected program: GlProgram | null = null
   protected basePrams: GlBaseParams | null = null
   readonly context: GL
   imageRendering: 'auto' | 'pixelated' = 'auto'
@@ -29,19 +28,13 @@ export abstract class SurfaceGLBase extends SurfaceBase {
   constructor(width: number, height: number, options?: SurfaceGLCreateOptions, canvas?: HTMLCanvasElement) {
     super(width, height, options && options.coordinateSystem ? options.coordinateSystem : 'screen')
     this.context = new GL({ width, height }, options && options.useOffscreen, canvas)
-  
     this.fragmnetShader = new FragmnetShaderSource('')
-    this.create()
   }
 
-  create (): void {
-    const ver = new VertexShader(this.context.ctx, this.vertexShader ?? this.defaultVerSource)
-    const frag = new FragmnetShader(this.context.ctx, this.fragmnetShader.toString() ?? this.defaultFragSource)
-    this.program = new GlProgram(this.context, ver, frag)
-    
-    this.program.create()
-    this.context.use(this.program)
+  protected get canvas () { return this.context.canvas }
 
+  create (): void {
+    this.context.createProgram(this.vertexShader ?? this.defaultVerSource, this.fragmnetShader.toString() ?? this.defaultFragSource, 'assemble-and-use')
     const resolution = this.context.uniform('iResolution', 'vec2')
     resolution.value = [this.width, this.height]
     const globalAplha = this.context.uniform('uGlobalAlpha', 'float')
@@ -51,15 +44,6 @@ export abstract class SurfaceGLBase extends SurfaceBase {
       globalAplha,
       resolution
     }
-  }
-
-  /** @deprecated use origin */
-  protected get canvas (): HTMLCanvasElement | OffscreenCanvas {
-    return this.origin
-  }
-
-  protected get origin (): HTMLCanvasElement | OffscreenCanvas {
-    return this.context.canvas
   }
   
   protected get ctx () {
@@ -109,8 +93,7 @@ export abstract class SurfaceGLBase extends SurfaceBase {
   }
 
   release () {
-    if (!this.program) return
-    this.context.ctx.deleteProgram(this.program.origin)
+    this.context.dispose()
   }
 
   get globalAlpha () {

@@ -1,8 +1,9 @@
 import { VertexShader, FragmnetShader } from "./gl-shader"
 import { type IGlUniformTypeMap, type IGlAttributeTypeMap, type DrawType } from "./types"
-import { type ITextureOptions } from "./gl-texture"
-import { type ISurface } from "../interfaces"
+import { type ITextureOptions } from "./textures/texture-options"
+
 import { GL } from "./gl"
+import { SurfaceBase } from "../surface/surface-base"
 
 export class GlProgram {
   #gl: GL
@@ -55,7 +56,7 @@ export class GlProgram {
   /** @deprecated Use GL context directly */ vbo<T extends {}> (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: T) {
     return this.#gl.vbo(drawType, type, scheme)
   }
-  /** @deprecated Use GL context directly */ createTexture (samplerName: string, surface: ISurface, options?: ITextureOptions) {
+  /** @deprecated Use GL context directly */ createTexture (samplerName: string, surface: SurfaceBase, options?: ITextureOptions) {
     return this.#gl.createTexture(samplerName, surface, options)
   }
 }
