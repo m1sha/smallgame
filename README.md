@@ -1,5 +1,7 @@
 # Smallgame Lib.
 
+[Documentation](https://smallgame-docs.github.io/docs/)
+
 ### Base game circle
 
 ![getting started output](getting-started.png)
