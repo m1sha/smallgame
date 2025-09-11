@@ -15,6 +15,7 @@ export type SurfaceCreateOptions = {
   useSmooth?: boolean
   useOffscreen?: boolean
   coordinateSystem?: CoordinateSystem
+  willReadFrequently?: boolean
 }
 
 export class Surface extends SurfaceBase {
@@ -25,18 +26,19 @@ export class Surface extends SurfaceBase {
   constructor(width: number, height: number, options?: SurfaceCreateOptions, canvas?: HTMLCanvasElement | ImageBitmap) {
     super(width, height, options && options.coordinateSystem ? options.coordinateSystem : 'screen')
     
-    const alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
+    this.alpha = options && typeof options.useAlpha === 'boolean' ? options.useAlpha : true
+    this.willReadFrequently = options && typeof options.willReadFrequently === 'boolean' ? options.willReadFrequently : true
 
     if (canvas instanceof ImageBitmap) {
       this.canvas = options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
       const temp = new OffscreenCanvas(canvas.width, canvas.height)
       temp.getContext('bitmaprenderer')?.transferFromImageBitmap(canvas)
-      this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
+      this.ctx = this.canvas.getContext('2d', { alpha: this.alpha, willReadFrequently: this.willReadFrequently })! as CanvasRenderingContext2D
       this.ctx.drawImage(temp, 0, 0)
 
     } else {
       this.canvas = canvas ? canvas : options && options.useOffscreen ? new OffscreenCanvas(width, height) : document.createElement('canvas')
-      this.ctx = this.canvas.getContext('2d', { alpha, willReadFrequently: true })! as CanvasRenderingContext2D
+      this.ctx = this.canvas.getContext('2d', { alpha: this.alpha, willReadFrequently: this.willReadFrequently })! as CanvasRenderingContext2D
     }
     
     this.canvas.width = width
@@ -118,24 +120,35 @@ export class Surface extends SurfaceBase {
     this.ctx.drawImage(surface.origin, outrect.x, outrect.y, outrect.width, outrect.height)
   }
 
-  extract (rect: TRect): Surface {
+  clip (rect: TRect): Surface {
     const result = new Surface(rect.width, rect.height)
     result.draw.drawImage(this.ctx.canvas, rect.x, rect.y, rect.width, rect.height, this.rect.x, this.rect.y, rect.width, rect.height)
     return result
   }
 
-  zoom (index: number) {
+  zoomSelf (index: number) {
     if (index === 0) throw Error('Zero is not a support value.')
     if (index < 0) index = 1 / Math.abs(index)
     
-    this.resize(this.width * index, this.height * index)
+    this.resizeSelf(this.width * index, this.height * index)
+  }
+
+  zoom (index: number): Surface {
+    if (index === 0) throw Error('Zero is not a support value.')
+    if (index < 0) index = 1 / Math.abs(index)
+    
+    return this.resize(this.width * index, this.height * index)
+  }
+
+  scaleSelf (dx: number, dy: number) {
+    this.resizeSelf(this.width * dx, this.height * dy)
   }
 
   scale (dx: number, dy: number) {
-    this.resize(this.width * dx, this.height * dy)
+    return this.resize(this.width * dx, this.height * dy)
   }
 
-  flip (position: 'x' | 'y' | 'xy') {
+  flipSelf (position: 'x' | 'y' | 'xy') {
     const w = position === 'y' ? 0 : this.width
     const h = position === 'x' ? 0 : this.height
     const x = position === 'y' ? 1 : -1
@@ -149,7 +162,29 @@ export class Surface extends SurfaceBase {
     this.ctx.resetTransform()
   }
 
-  rotate (a: number, pivot?: TPoint) {
+  flip (position: 'x' | 'y' | 'xy') {
+    const surface = new Surface(this.width, this.height, { 
+      coordinateSystem: this.coordinateSystem, 
+      useSmooth: this.imageRendering === 'auto',
+      useOffscreen: this instanceof OffscreenCanvas,
+      useAlpha: this.alpha,
+      willReadFrequently: this.willReadFrequently
+    })
+
+    const w = position === 'y' ? 0 : this.width
+    const h = position === 'x' ? 0 : this.height
+    const x = position === 'y' ? 1 : -1
+    const y = position === 'x' ? 1 : -1
+
+    surface.ctx.translate(w, h)
+    surface.ctx.scale(x, y)
+    surface.ctx.drawImage(this.origin, 0, 0)
+    surface.ctx.resetTransform()
+
+    return surface
+  }
+
+  rotateSelf (a: number, pivot?: TPoint) {
     const canvas = this.cloneCanvas()
     this.clear()
     let x = this.width / 2
@@ -165,7 +200,20 @@ export class Surface extends SurfaceBase {
     this.ctx.resetTransform()
   }
 
-  resize (width: number, height: number) {
+  resize (width: number, height: number): Surface {
+    const surface = new Surface(width, height, { 
+      coordinateSystem: this.coordinateSystem, 
+      useSmooth: this.imageRendering === 'auto',
+      useOffscreen: this instanceof OffscreenCanvas,
+      useAlpha: this.alpha,
+      willReadFrequently: this.willReadFrequently
+    })
+
+    surface.blit(this, surface.rect)
+    return surface
+  }
+
+  resizeSelf (width: number, height: number): void {
     const canvas = this.cloneCanvas()
     this.canvas.width = width
     this.canvas.height = height
@@ -297,6 +345,21 @@ export class Surface extends SurfaceBase {
 
 
     return { surface, rects }
+  }
+
+  static mix (method: GlobalCompositeOperation, bgSurface: SurfaceBase, fgSurface: SurfaceBase, fgRect: Rect | TPoint, distRect: Rect | null = null): Surface {
+    const surface = new Surface(bgSurface.width, bgSurface.width, { 
+      useOffscreen: bgSurface instanceof OffscreenCanvas,
+      coordinateSystem: (bgSurface as any).coordinateSystem,
+      willReadFrequently: (bgSurface as any).willReadFrequently,
+    })
+
+    surface.blit(bgSurface, bgSurface.rect)
+    const old = surface.ctx.globalCompositeOperation
+    surface.ctx.globalCompositeOperation = method
+    surface.blit(fgSurface, fgRect, distRect)
+    surface.ctx.globalCompositeOperation = old
+    return surface
   }
 
   private cloneCanvas (size?: { width: number, height: number }) {

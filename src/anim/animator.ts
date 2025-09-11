@@ -87,11 +87,11 @@ export class Animator implements IAnimation {
     
     const img = this.#current.animation.image
     if (this.#flipX && this.#flipY) {
-      img.flip('xy')
+      img.flipSelf('xy')
     } else if (this.#flipX) {
-      img.flip('x')
+      img.flipSelf('x')
     } else if (this.#flipY) {
-      img.flip('y')
+      img.flipSelf('y')
     }
 
     return img
