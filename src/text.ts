@@ -1,35 +1,77 @@
 import { Surface } from "./surface"
 import { Drawable } from "./drawable"
-import { type TPoint } from "./point"
+import { setPoint, type TPoint } from "./point"
 import { type TTextStyle, TextStyle } from "./styles/text-style"
-import { type Pivote } from "./pivote"
-
-export type TextPosition = TPoint & { pivote?: Pivote }
+import { TSize } from "./size"
+import { Rect, TRect } from "./rect"
 
 export class Text implements Drawable {
   content: string
-  #pos: TextPosition
+  #pos: TPoint
   style: TextStyle
   #mitrics: { width: number, height: number }
 
-  constructor (content: string, pos: TextPosition, style: TTextStyle | TextStyle) {
+  constructor (content: string, style: TTextStyle | TextStyle) {
     this.content = content
-    this.#pos = pos
+    this.#pos = setPoint(0, 0)
     this.style = style instanceof TextStyle ? style : new TextStyle(style)
     this.#mitrics = TextMeasurer.measureText(content, this.style)
   }
   
   draw (suface: Surface): void {
     assignTextStyle(suface.draw as any, this.style)
-
-    const x = this.#pos.x
-    const y = this.#pos.y + this.#mitrics.height
-
-    drawText(suface.draw as any, this.style, this.content, x, y)
+    const y = this.#pos.y + this.#mitrics.height + this.style.outlineWidth
+    drawText(suface.draw as any, this.style, this.content, this.#pos.x, y)
   }
 
-  get pos (): Readonly<TextPosition> {
+  get pos () {
     return this.#pos
+  }
+
+  set pos (value: TPoint) {
+    if (!value) throw new Error('Text.pos: the value is null.')
+    this.#pos.x = value.x
+    this.#pos.y = value.y
+  }
+
+  get bounds (): TRect {
+    return Rect.size(TextMeasurer.measureText(this.content, this.style))
+  }
+
+  toSurface (): Surface
+  toSurface (clipRect: TRect): Surface
+  toSurface (size: TSize): Surface
+  toSurface (width: number, height: number): Surface
+  toSurface (...args: Array<any>): Surface {
+    let w = this.#mitrics.width + (this.style.outlineWidth)
+    let h = this.#mitrics.height + 1 + (this.style.outlineWidth * 2)
+
+    this.#pos.x = 0
+    this.#pos.y = 0
+
+    if (args.length === 1 && args[0] && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width
+      h = args[0].height
+    }
+
+    if (args.length === 1 && args[0] && typeof args[0] === 'object' && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      this.#pos.x = args[0].x
+      this.#pos.y = args[0].y
+    }
+
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]
+      h = args[1]
+    }
+
+    this.#mitrics = TextMeasurer.measureText(this.content, this.style)
+    const result = new Surface(w, h)
+    this.draw(result)
+    return result
+  }
+
+  clone (): Text {
+    return new Text(this.content, this.style.clone())
   }
 }
 
@@ -45,7 +87,7 @@ function assignTextStyle (ctx: CanvasRenderingContext2D, style: TextStyle) {
   const italic = style.italic ? 'italic ' : 'normal'
   const fontVariant = style.fontVariant ?? 'normal'
   ctx.font = `${italic} ${bold} ${fontVariant} ${fontSize} ${fontName}`
- 
+  ctx.letterSpacing = style.letterSpacing
 }
 
 function drawText (ctx: CanvasRenderingContext2D, style: TextStyle, text: string, x: number, y: number) {
@@ -106,6 +148,8 @@ export class TextMeasurer {
     const italic = style.italic ? 'italic ' : 'normal'
     const fontVariant = style.fontVariant ?? 'normal'
     ctx.font = `${italic} ${bold} ${fontVariant} ${fontSize} ${fontName}`
+    ctx.letterSpacing = style.letterSpacing
+    ctx.lineWidth = style.outlineWidth
   }
 
   private static getWidth (text: string, style: TextStyle): number {

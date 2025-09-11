@@ -203,6 +203,9 @@ export class Draw {
   get font () { return this.#ctx.font }
   set font (value: string) { this.#ctx.font = value }
 
+  get letterSpacing () { return this.#ctx.letterSpacing }
+  set letterSpacing (value: string) { this.#ctx.letterSpacing = value }
+
   createPattern (canvas: CanvasImageSource, repetition: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat' ): CanvasPattern { 
     const result = this.#ctx.createPattern(canvas, repetition)
     if (!result) throw new Error('Can not create a canvas pattern.')

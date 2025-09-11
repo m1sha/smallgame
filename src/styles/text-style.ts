@@ -12,6 +12,7 @@ export interface TTextStyle {
   italic?: boolean
   fontVariant?: FontVariant
   paintOrder?: PaintOrder
+  letterSpacing?: string
   // readonly shadow?: Shadow
 }
 
@@ -25,6 +26,7 @@ export class TextStyle {
   italic: boolean
   fontVariant: FontVariant
   paintOrder: PaintOrder
+  letterSpacing: string
   // #shadow?: Shadow
 
   constructor (style: TTextStyle) {
@@ -38,7 +40,12 @@ export class TextStyle {
     this.italic = style.italic ? style.italic : false
     this.fontVariant = style.fontVariant ? style.fontVariant : 'normal'
     this.paintOrder = style.paintOrder ? style.paintOrder : 'fill'
+    this.letterSpacing = style.letterSpacing ?? '0px'
     //this.#shadow = style.shadow
     
+  }
+
+  clone () {
+    return new TextStyle(this)
   }
 }
