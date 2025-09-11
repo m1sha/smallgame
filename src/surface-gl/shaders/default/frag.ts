@@ -7,6 +7,8 @@ export default /*glsl*/`
 
   void main() {
     fragColor = texture(uSampler, v_TexCoord);
-    if (fragColor.a > 0.001) fragColor.a = uGlobalAlpha;
+    if (fragColor.a > 0.9) { 
+      fragColor.a = uGlobalAlpha;
+    }
   }
 `
