@@ -32,7 +32,7 @@ export class GL {
     const gl = this.ctx
     gl.clearColor((rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    //gl.colorMask(true, true, true, false)
+    gl.colorMask(true, true, true, true)
   }
 
   enableDepth () {

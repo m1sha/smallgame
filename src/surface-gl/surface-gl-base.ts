@@ -19,6 +19,7 @@ export type GlBaseParams = {
 }
 
 export abstract class SurfaceGLBase extends SurfaceBase {
+  private created: boolean = false
   protected basePrams: GlBaseParams | null = null
   readonly context: GL
   imageRendering: 'auto' | 'pixelated' = 'auto'
@@ -34,6 +35,9 @@ export abstract class SurfaceGLBase extends SurfaceBase {
   protected get canvas () { return this.context.canvas }
 
   create (): void {
+    if (this.created) return
+    this.created = true
+
     this.context.createProgram(this.vertexShader ?? this.defaultVerSource, this.fragmnetShader.toString() ?? this.defaultFragSource, 'assemble-and-use')
     const resolution = this.context.uniform('iResolution', 'vec2')
     resolution.value = [this.width, this.height]
@@ -72,7 +76,15 @@ export abstract class SurfaceGLBase extends SurfaceBase {
     throw new Error('Not Implement')
   }
 
+  flipSelf (position: 'x' | 'y' | 'xy') {
+    throw new Error('Not Implement')
+  }
+
   resize (width: number, height: number) {
+    throw new Error('Not Implement')
+  }
+
+  resizeSelf (width: number, height: number) {
     throw new Error('Not Implement')
   }
 
@@ -80,7 +92,11 @@ export abstract class SurfaceGLBase extends SurfaceBase {
     throw new Error('Not Implement')
   }
 
-  rotate (a: number, pivot?: TPoint) {
+  scaleSelf (dx: number, dy: number) {
+    throw new Error('Not Implement')
+  }
+
+  rotateSelf (a: number, pivot?: TPoint) {
     throw new Error('Not Implement')
   }
 
@@ -93,6 +109,7 @@ export abstract class SurfaceGLBase extends SurfaceBase {
   }
 
   release () {
+    this.created = false
     this.context.dispose()
   }
 
