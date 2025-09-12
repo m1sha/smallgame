@@ -42,6 +42,14 @@ export class Screen {
     return this.surface.rect
   }
 
+  get imageRendering () {
+    return this.surface.imageRendering
+  }
+
+  set imageRendering (value: 'auto' | 'pixelated') {
+    this.surface.imageRendering = value
+  }
+
   fill (color: TColorSource) {
     this.surface.fill(color)
   }
