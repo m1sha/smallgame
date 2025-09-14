@@ -42,6 +42,10 @@ export class Screen {
     return this.surface.rect
   }
 
+  set size (size: TSize) {
+    this.surface.setCanvasSize(size.width, size.height)
+  }
+
   get imageRendering () {
     return this.surface.imageRendering
   }

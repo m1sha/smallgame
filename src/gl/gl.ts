@@ -61,7 +61,9 @@ export class GL {
   }
 
   viewport (size: TSize) {
-    this.ctx.viewport(0, 0, size.width, size.width)
+    this.ctx.canvas.width = size.width
+    this.ctx.canvas.height = size.height
+    this.ctx.viewport(0, 0, size.width, size.height)
   }
 
   createProgram (vss: string, fss: string, options: 'default' | 'assemble' | 'assemble-and-use' = 'default') {

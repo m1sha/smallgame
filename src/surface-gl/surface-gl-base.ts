@@ -1,6 +1,6 @@
 import { type TRect } from "../rect"
 import { type TPoint } from "../point"
-import { FragmnetShaderSource, GL, u_float, vec2 } from "../gl"
+import { FragmnetShaderSource, GL, u_float, u_vec2 } from "../gl"
 import { SurfaceBase } from "../surface/surface-base"
 import { type CoordinateSystem } from "../coords"
 import { type TColorSource } from "../styles/color-source"
@@ -15,7 +15,7 @@ export type SurfaceGLCreateOptions = {
 
 export type GlBaseParams = {
   globalAplha: u_float
-  resolution: vec2
+  resolution: u_vec2
 }
 
 export abstract class SurfaceGLBase extends SurfaceBase {
@@ -100,8 +100,10 @@ export abstract class SurfaceGLBase extends SurfaceBase {
     throw new Error('Not Implement')
   }
 
-  setCanvasSize  (width: number, height: number, shiftToCenter: boolean = true) {
-    throw new Error('Not Implement')
+  setCanvasSize  (width: number, height: number) {
+    this.basePrams!.resolution.value = [width, height]
+    this.rect.resizeSelf({ width, height })
+    this.context.viewport({ width, height })
   }
 
   clone (): SurfaceBase {
