@@ -68,6 +68,10 @@ export class Parallax {
     this.layers.push(new ParallaxLayer(name, surface, rate, this.viewport, this.shift))
   }
 
+  clearLayers () {
+    this.layers = []
+  }
+
   getLayer (index: number): Readonly<ParallaxLayer> | null
   getLayer (name: string): Readonly<ParallaxLayer> | null
   getLayer (...args: Array<any>): Readonly<ParallaxLayer> | null {
@@ -92,10 +96,10 @@ export class Parallax {
   draw (screen: Surface, insertSuface?: Surface, insertIndex?: number): void {
     for (let i = 0; i < this.layers.length; i++) {
       const surface = this.layers[i].surface
-      screen.blit(surface, surface.rect)
+      screen.blit(surface, screen.rect)
       
       if (insertSuface && insertIndex === i) {
-        screen.blit(insertSuface, insertSuface.rect)
+        screen.blit(insertSuface, screen.rect)
       }
     }
 
