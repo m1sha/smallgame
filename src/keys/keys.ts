@@ -1,4 +1,5 @@
 //import { EventQueue } from "../events/event-queue"
+import { Point } from "../point"
 import { Key } from "./key"
 
 const keymap: Record<string, number> = {
@@ -103,6 +104,36 @@ export class Keys /* implicitly implements EventQueue */ {
 
   getPressed (): ReadonlyArray<number> {
     return this.keys
+  }
+
+  get horizontalAxis () {
+    const keys = this.keys
+    if (keys[Key.K_A] || keys[Key.LEFT]) { 
+      return -1
+    } 
+    else
+    if (keys[Key.K_D] || keys[Key.RIGHT]) { 
+      return 1 
+    } 
+    
+    return 0
+  }
+
+  get verticalAxis () {
+    const keys = this.keys
+    if (keys[Key.K_W] || keys[Key.UP]) { 
+      return -1
+    } 
+    else
+    if (keys[Key.K_S] || keys[Key.DOWN]) { 
+      return 1 
+    } 
+    
+    return 0
+  }
+
+  get axises () {
+    return new Point(this.horizontalAxis, this.verticalAxis)
   }
   
   /** @internal */ protected /*EventQueue.*/push (e: KeyboardEvent) {
