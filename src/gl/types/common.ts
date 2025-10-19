@@ -57,6 +57,7 @@ const knowledgeTypes = [
 ] as const
 
 type KnowledgeTypes = typeof knowledgeTypes[number]
+type GLSLTypes = bool | int | uint | float | vec2 | uvec2 | ivec2 | bvec2 | vec3 | uvec3 | ivec3 | bvec3 | vec4 | uvec4 | ivec4 | bvec4 | mat2 | mat3 | mat4 | mat2x3 | mat2x4 | mat3x2 | mat4x2 | mat4x3 | sampler2D | samplerCube
 
 export function vertexOf (typeName: KnowledgeTypes) {
   switch (typeName) {
@@ -115,4 +116,4 @@ export function getGlTypeSize (type: 'float' | 'short' | 'byte' | 'ushort' | 'ub
 }
 
 
-export { knowledgeTypes }
+export { knowledgeTypes, GLSLTypes }

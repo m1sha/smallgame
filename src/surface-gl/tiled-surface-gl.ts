@@ -31,4 +31,8 @@ export class TiledSurfaceGl extends SurfaceGLBase {
   drawTiles () {
     this.context.drawArrays('points', this.vertexCount)
   }
+
+  blit () {
+    
+  }
 }

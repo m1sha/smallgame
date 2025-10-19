@@ -40,7 +40,14 @@ export class GlProgram {
     throw new Error(msg)
   }
 
+  use (callback?: () => void) {
+    this.#gl.use(this)
+    callback?.()
+  }
+
   remove () {
+    this.#vertexShader.remove()
+    this.#fragmentShader.remove()
     this.#gl.ctx.deleteProgram(this.origin)
   }
   

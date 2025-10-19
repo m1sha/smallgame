@@ -19,4 +19,10 @@ export class GlVertexArrayObject {
     this.vbo.remove()
     this.ctx.deleteVertexArray(this.vaoId)
   }
+
+  use (callback: () => void) {
+    this.bind()
+    callback()
+    this.unbind()
+  }
 }

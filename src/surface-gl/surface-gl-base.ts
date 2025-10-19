@@ -1,6 +1,6 @@
 import { type TRect } from "../rect"
 import { type TPoint } from "../point"
-import { FragmnetShaderSource, GL, u_float, u_vec2 } from "../gl"
+import { FragmnetShaderSource, GL, GlProgram, u_float, u_vec2 } from "../gl"
 import { SurfaceBase } from "../surface/surface-base"
 import { type CoordinateSystem } from "../coords"
 import { type TColorSource } from "../styles/color-source"
@@ -19,6 +19,7 @@ export type GlBaseParams = {
 }
 
 export abstract class SurfaceGLBase extends SurfaceBase {
+  private program: GlProgram | null = null
   private created: boolean = false
   protected basePrams: GlBaseParams | null = null
   readonly context: GL
@@ -38,7 +39,7 @@ export abstract class SurfaceGLBase extends SurfaceBase {
     if (this.created) return
     this.created = true
 
-    this.context.createProgram(this.vertexShader ?? this.defaultVerSource, this.fragmnetShader.toString() ?? this.defaultFragSource, 'assemble-and-use')
+    this.program = this.context.createProgram(this.vertexShader ?? this.defaultVerSource, this.fragmnetShader.toString() ?? this.defaultFragSource, 'assemble-and-use')
     const resolution = this.context.uniform('iResolution', 'vec2')
     resolution.value = [this.width, this.height]
     const globalAplha = this.context.uniform('uGlobalAlpha', 'float')
@@ -110,9 +111,9 @@ export abstract class SurfaceGLBase extends SurfaceBase {
     throw new Error('Not Implement')
   }
 
-  release () {
+  remove () {
     this.created = false
-    this.context.dispose()
+    this.program?.remove()
   }
 
   get globalAlpha () {

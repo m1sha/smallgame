@@ -38,6 +38,10 @@ export abstract class GlShader {
   attach (program: WebGLProgram) {
     this.#gl.attachShader(program, this.origin)
   }
+
+  remove () {
+    this.#gl.deleteShader(this.origin)
+  }
 }
 
 export class VertexShader extends GlShader { 

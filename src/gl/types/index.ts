@@ -1,3 +1,4 @@
+export * from './blend-func-types'
 export * from './common'
 export * from './uniform'
 export * from './location'

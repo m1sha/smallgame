@@ -1,3 +1,4 @@
+export * from './array'
 export * from './array2d'
 export * from './unsafecast'
 export * from './lerp'
