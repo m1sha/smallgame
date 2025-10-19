@@ -1,11 +1,8 @@
 import { Surface } from "./surface"
-import { Drawable } from "./drawable"
-import { Rect } from "./rect"
+import { Entity } from "./entity"
 
-export abstract class Sprite extends Drawable {
+export abstract class Sprite extends Entity {
   image: Surface
-  rect: Rect
-  collideRect: Rect | null = null
 
   constructor () {
     super()
@@ -13,8 +10,7 @@ export abstract class Sprite extends Drawable {
     this.image = Surface.default
     this.rect = this.image.rect
   }
-
-  async create (): Promise<void> {}
+  
   protected update (): void {}
 
   draw (suface: Surface): void {
