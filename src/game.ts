@@ -38,6 +38,10 @@ export class Game {
     this.controller.claerListeners()
   }
 
+  [Symbol.dispose]() {
+    this.kill()
+  }
+
   static create (width: number, height: number, containter: HTMLElement, options?: InitCreateOptions) {
     Game.willReadFrequently = options && options.willReadFrequently ? options.willReadFrequently : true
     const viewportType = options && options.viewportType ? options.viewportType : 'transform'
