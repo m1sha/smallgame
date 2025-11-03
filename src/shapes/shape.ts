@@ -9,7 +9,9 @@ import { type Rectangle } from './rectangle'
 import { type RoundedRectangle } from './roundedrect'
 import { type SegmentLine } from './segment-line'
 import { Arrows } from './arrows'
+import { Arrow } from './arrow'
 import { type VLine } from './vline'
+
   
 export type Shape = (
   | Rectangle 
@@ -24,4 +26,5 @@ export type Shape = (
   | SegmentLine
   | Pixel
   | Arrows
+  | Arrow
 ) 
