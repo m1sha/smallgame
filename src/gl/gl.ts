@@ -13,7 +13,7 @@ import { FrameBufferObject } from "./gl-frame-buffer-object"
 import { RenderBufferObject } from "./gl-render-buffer-object"
 import { SurfaceGL } from "../surface-gl"
 import { SurfaceGLCreateOptions } from "../surface-gl/surface-gl-base"
-
+import { PixelBufferObject } from "./pixel-buffer-object"
 
 export class GL {
   #prog: GlProgram | undefined = undefined
@@ -108,6 +108,10 @@ export class GL {
 
   rbo (): RenderBufferObject {
     return new RenderBufferObject(this.ctx)
+  }
+
+  pbo (): PixelBufferObject {
+    return new PixelBufferObject(this.ctx)
   }
 
   createTransformFeedback () {

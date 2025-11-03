@@ -50,6 +50,10 @@ export class GlProgram {
     this.#fragmentShader.remove()
     this.#gl.ctx.deleteProgram(this.origin)
   }
+
+  [Symbol.dispose]() {
+    this.remove()
+  }
   
   /** @deprecated Use GL context directly */ uniform<K extends keyof IGlUniformTypeMap> (name: string, type: K): IGlUniformTypeMap[K] {
     return this.#gl.uniform(name, type)
