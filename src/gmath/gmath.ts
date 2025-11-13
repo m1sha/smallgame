@@ -1,0 +1,41 @@
+import { Point, type TPoint } from "point"
+import { lerpScalar, lerp, lerpAccum, lerpUnclamped, lerpUnclampedScalar, lerpUnclampedAccum, lerpAngle } from "./lerp"
+import { moveTowardsScalar, moveTowards, moveTowardsAccum, moveTowardsAngle } from "./move-towards"
+import { smoothDamp, smoothDampScalar } from "./smooth-damp"
+
+type VecType = number | TPoint
+type ReturnType<T> = T extends number ? number : T extends TPoint ? Point : never;
+
+const GMath = {
+  lerp: <T extends VecType>(a: T, b: T, t: number): ReturnType<T> => {
+    if (typeof a === 'number' && typeof b === 'number' ) return lerpScalar(a, b, t) as ReturnType<T>
+    return lerp(a as TPoint, b as TPoint, t) as ReturnType<T>
+  },
+
+  lerpAccum: (current: TPoint, goal: TPoint, t: number) => lerpAccum(current, goal, t),
+
+  lerpUnclamped: <T extends VecType>(a: T, b: T, t: number): ReturnType<T> => {
+    if (typeof a === 'number' && typeof b === 'number' ) return lerpUnclampedScalar(a, b, t) as ReturnType<T>
+    return lerpUnclamped(a as TPoint, b as TPoint, t) as ReturnType<T>
+  },
+
+  lerpUnclampedAccum: (current: TPoint, goal: TPoint, t: number) => lerpUnclampedAccum(current, goal, t),
+
+  lerpAngle: (current: number, target: number, t: number) => lerpAngle(current, target, t),
+
+  moveTowards: <T extends VecType>(goal: T, current: T, dt: number): ReturnType<T> => {
+    if (typeof goal === 'number' && typeof current === 'number' ) return moveTowardsScalar(goal, current, dt) as ReturnType<T>
+    return moveTowards(goal as TPoint, current as TPoint, dt) as ReturnType<T>
+  },
+
+  moveTowardsAccum: (goal: TPoint, current: TPoint, dt: number) => moveTowardsAccum(goal, current, dt),
+
+  moveTowardsAngle: (target: number, current: number, dt: number) => moveTowardsAngle(target, current, dt),
+
+  smoothDamp: <T extends VecType>(current: T, target: T, currentVelocity: { value: number } | { x: { value: number }, y: { value: number } }, smoothTime: number, deltaTime: number, maxSpeed = Infinity): ReturnType<T> => {
+    if (typeof current === 'number' && typeof target === 'number' ) return smoothDampScalar(current, target, currentVelocity as { value: number }, smoothTime, deltaTime, maxSpeed) as ReturnType<T>
+    return smoothDamp(current as TPoint, target as TPoint, currentVelocity as { x: { value: number }, y: { value: number } }, smoothTime, deltaTime, maxSpeed) as ReturnType<T>
+  }
+}
+
+export { GMath }
