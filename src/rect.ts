@@ -4,46 +4,7 @@ import { type TSize } from "./size"
 
 export type TRect = { x: number, y: number, width: number, height: number }
 
-export interface MutableRect extends TSize {
-  x: number
-  y: number
-  width: number 
-  height: number
-  readonly topLeft: TPoint
-  readonly topRight: TPoint
-  readonly bottomLeft: TPoint
-  get center(): TPoint
-  set center(value: TPoint)
-  readonly absCenter: TPoint
-  readonly absWidth: number
-  readonly diagonal: number
-  get points(): [TPoint, TPoint, TPoint, TPoint]
-  overlaps (rect: MutableRect): boolean
-  touchSide (rect: MutableRect): ('left' | 'right' | 'top' | 'bottom')[]
-  inside (rect: TRect): boolean
-  contains (rect: MutableRect): boolean
-  containsPoint({x, y}: TPoint): boolean 
-  equals(rect: MutableRect | TRect): boolean
-  outline (padding: number): MutableRect
-  outline (top: number, left: number, bottom: number, right: number): MutableRect
-  outline (...args: Array<any>): MutableRect
-  clone (): MutableRect
-  move (point: TPoint, pivote?: Pivote): MutableRect
-  move (x: number, y: number, pivote?: Pivote): MutableRect
-  move (...args: Array<any>): MutableRect
-  moveSelf (point: TPoint, pivote?: Pivote): MutableRect
-  moveSelf (x: number, y: number, pivote?: Pivote): MutableRect
-  moveSelf (...args: Array<any>): MutableRect
-  resize (width: number, height: number): MutableRect
-  resizeSelf (width: number, height: number): MutableRect
-  scalesize (dw: number, dh: number): MutableRect
-  scalesizeSelf (dw: number, dh: number): MutableRect
-  union (rect: MutableRect): MutableRect
-  unionSelf (rect: MutableRect): MutableRect
-  rotate (a: number, pivot?: number | TPoint): PolyRect
-}
-
-export class Rect implements MutableRect {
+export class Rect {
   x: number
   y: number
   width: number
