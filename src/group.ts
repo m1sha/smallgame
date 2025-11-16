@@ -2,10 +2,10 @@
 import { unsafecast, removeItem } from "./utils"
 import { Sprite } from "./sprite"
 import { Entity } from "./entity"
-import { Surface } from "./surface"
+import { SurfaceBase } from "./surface"
 import { CollisionHashmap } from "./utils/collision-hashmap"
 import { type TPoint } from "./point"
-import { type TRect } from "./rect"
+import { Rect, type TRect } from "./rect"
 
 
 export type GroupOptions = {
@@ -57,7 +57,7 @@ export class Group<T extends Entity>{
     if (this.#hashmap) this.#hashmap.add(sprite)
   }
 
-  draw (surface: Surface): void {
+  draw (surface: { blit: (image: SurfaceBase, rect: Rect) => void }): void {
     this.update()
     for (const sprite of this.#sprites) {
       if (sprite instanceof Sprite) sprite.draw(surface)
