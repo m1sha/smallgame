@@ -14,4 +14,13 @@ const Time = {
   get fps () { return FPSCounter.get() }
 }
 
-export { Time, InternalTimeSetter }
+const setDebounce = (callback: () => void, timeout: number): () => void => {
+  let startTime = millis()
+  return () => {
+    if (startTime + timeout > millis()) return
+    callback()
+    startTime = millis()
+  }
+}
+
+export { Time, InternalTimeSetter, setDebounce }
