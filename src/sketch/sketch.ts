@@ -2,12 +2,13 @@ import { ShapeStyle, type TShapeStyle, applyStroke, applyFill, type ShapeStyleTy
 import { Drawable } from '../drawable'
 import { Surface } from '../surface'
 import { PolyRect, Rect, type TRect } from '../rect'
-import { absPoint, Point, setPoint, type TPoint } from '../point'
-import { type Shape, type Rectangle, type PolyRectangle, type Circle, type Line, type RoundedRectangle, type VLine, type HLine, type Polygon, type Polydots, Arrows, Arrow } from '../shapes'
+import { Point, type TPoint } from '../point'
+import { type Shape, type Rectangle } from '../shapes'
 import { Boundedrect } from '../shapes/boundedrect'
 import { type TSegment } from '../segment'
 import { type CoordinateSystem } from '../coords'
 import { type TArrowDrawOptions, ArrowDrawOptions, RectDrawOptions, type TRectDrawOptions } from './options'
+import { drawerMap } from './drawers'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -162,194 +163,13 @@ export class Sketch extends Drawable {
   }
 
   draw (suface: Surface): void {
+    const shift = new Point(this.x, this.y)
+    const scale = new Point(this.sx, this.sy)
     for (const shape of this._shapes) {
-      
-      suface.draw.beginPath()
       if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
       if (shape.style.fill) applyFill(suface.draw as any, shape.style.fill)
-      switch (shape.type) {
-        case 'rectangle': {
-          suface.draw.rect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy)
-          break
-        }
-        case 'polyrectangle': {
-          suface.draw.moveTo(this.x + shape.topLeft.x * this.sx, this.y + shape.topLeft.y * this.sy)
-          suface.draw.lineTo(this.x + shape.topRight.x * this.sx, this.y + shape.topRight.y * this.sy)
-          suface.draw.lineTo(this.x + shape.bottomRight.x * this.sx, this.y + shape.bottomRight.y * this.sy)
-          suface.draw.lineTo(this.x + shape.bottomLeft.x * this.sx, this.y + shape.bottomLeft.y * this.sy)
-          suface.draw.closePath()
-          break
-        }
-        case 'polygon': {
-          if (shape.points.length < 2) return
-          suface.draw.moveTo(this.x + shape.points[0].x * this.sx, this.y + shape.points[0].y * this.sy)
-          for (let i = 1; i < shape.points.length; i++) {
-            suface.draw.lineTo(this.x + shape.points[i].x * this.sx, this.y + shape.points[i].y * this.sy)
-          }
-          suface.draw.closePath()
-          break
-        }
-        case 'polydots': {
-          for (let i = 0; i < shape.points.length; i++) {
-            suface.draw.ellipse(
-              this.x + shape.points[i].x * this.sx, 
-              this.y + shape.points[i].y * this.sy, 
-              shape.radius * this.sx, 
-              shape.radius * this.sy, 0, 0, 2*Math.PI
-            )
-            this.drawShape(shape, suface)
-            suface.draw.beginPath()
-          }
-          break
-        }
-        case 'arrows':
-          const alfa = (vector: TSegment): number => {
-            const { x, y } = setPoint(vector.p1.x - vector.p0.x, vector.p1.y - vector.p0.y) //new Point(vector.ep).dec(vector.sp)
-            return Math.atan2(y, x)
-          }
-
-          const arrow = (vector: TSegment, dir: number): TPoint[] => {
-            const result = []
-            const angle = alfa(vector)
-            const point = dir < 0 ? vector.p0 : vector.p1
-            const r = shape.arrowRadius
-            const turn = shape.arrowAngle
-            const cos1 = dir * Math.cos(angle - turn)
-            const sin1 = dir * Math.sin(angle - turn)
-            result.push({ x: point.x - r * cos1, y: point.y - r * sin1 })
-            result.push({ x: point.x, y: point.y })
-            result.push({ x: point.x, y: point.y })
-            const cos2 = dir * Math.cos(angle + turn)
-            const sin2 = dir * Math.sin(angle + turn)
-            result.push({ x: point.x - r * cos2, y: point.y - r * sin2 })
-            return result
-          }
-
-          for (let i = 0; i < shape.segments.length; i++) {
-            const { p0, p1 } = shape.segments[i]
-            suface.draw.moveTo(this.x + p0.x * this.sx, this.y + p0.y * this.sy)
-            suface.draw.lineTo(this.x + p1.x * this.sx, this.y + p1.y * this.sy)
-            this.drawShape(shape, suface)
-            suface.draw.beginPath()
-            const points = arrow(shape.segments[i], 1)
-            suface.draw.moveTo(this.x + points[0].x * this.sx, this.y + points[0].y * this.sy)
-            for (let j = 1; j < points.length; j++) {
-              const p = points[j]
-              const x = this.x + p.x * this.sx 
-              const y = this.y + p.y * this.sy
-              suface.draw.lineTo(x, y)
-            }
-            suface.draw.closePath()
-            applyFill(suface.draw as any, shape.style.stroke)
-            suface.draw.fill()
-            suface.draw.beginPath()
-          }
-          break
-        case 'arrow': {
-          const alfa = (vector: TSegment): number => {
-            const { x, y } = setPoint(vector.p1.x - vector.p0.x, vector.p1.y - vector.p0.y) //new Point(vector.ep).dec(vector.sp)
-            return Math.atan2(y, x)
-          }
-
-          const arrow = (vector: TSegment, dir: number, { arrowRadius, arrowAngle }: { arrowRadius: number, arrowAngle: number }): TPoint[] => {
-            const result = []
-            const angle = alfa(vector)
-            const point = dir < 0 ? vector.p0 : vector.p1
-            const r = arrowRadius
-            const turn = arrowAngle
-            const cos1 = dir * Math.cos(angle - turn)
-            const sin1 = dir * Math.sin(angle - turn)
-            result.push({ x: point.x - r * cos1, y: point.y - r * sin1 })
-            result.push({ x: point.x, y: point.y })
-            result.push({ x: point.x, y: point.y })
-            const cos2 = dir * Math.cos(angle + turn)
-            const sin2 = dir * Math.sin(angle + turn)
-            result.push({ x: point.x - r * cos2, y: point.y - r * sin2 })
-            return result
-          }
-
-          
-            const { p0, p1 } = shape
-            suface.draw.moveTo(this.x + p0.x * this.sx, this.y + p0.y * this.sy)
-            suface.draw.lineTo(this.x + p1.x * this.sx, this.y + p1.y * this.sy)
-            this.drawShape(shape, suface)
-            
-            if (shape.options.end) {
-              suface.draw.beginPath()
-              const points = arrow({ p0, p1 }, 1, shape.options.end as any)
-              suface.draw.moveTo(this.x + points[0].x * this.sx, this.y + points[0].y * this.sy)
-              for (let j = 1; j < points.length; j++) {
-                const p = points[j]
-                const x = this.x + p.x * this.sx 
-                const y = this.y + p.y * this.sy
-                suface.draw.lineTo(x, y)
-              }
-              suface.draw.closePath()
-              applyFill(suface.draw as any, shape.style.stroke)
-              suface.draw.fill()
-            }
-
-            if (shape.options.start) {
-              debugger
-              suface.draw.beginPath()
-              const points = arrow({ p0, p1 }, -1, shape.options.start as any)
-              suface.draw.moveTo(this.x + points[0].x * this.sx, this.y + points[0].y * this.sy)
-              for (let j = 1; j < points.length; j++) {
-                const p = points[j]
-                const x = this.x + p.x * this.sx 
-                const y = this.y + p.y * this.sy
-                suface.draw.lineTo(x, y)
-              }
-              suface.draw.closePath()
-              applyFill(suface.draw as any, shape.style.stroke)
-              suface.draw.fill()
-            }
-
-
-            
-            suface.draw.beginPath()
-          
-          break
-        }
-         
-        case 'roundedrectangle': {
-          const radii = [shape.topLeft, shape.topRight, shape.bottomRight, shape.bottomLeft].filter(p => p)
-          suface.draw.roundRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.width * this.sx, shape.height * this.sy, radii)
-          break
-        }
-        case 'circle': {
-          suface.draw.ellipse(this.x + shape.x * this.sx, this.y + shape.y * this.sy, shape.radius * this.sx, shape.radius * this.sy, 0, 0, 2*Math.PI)
-          break
-        }
-        case 'line': {
-          suface.draw.moveTo(this.x + shape.p0.x * this.sx, this.y + shape.p0.y * this.sy)
-          suface.draw.lineTo(this.x + shape.p1.x * this.sx, this.y + shape.p1.y * this.sy)
-          break
-        }
-        case 'vline': {
-          suface.draw.vline(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.height)
-          break
-        }
-        case 'hline': {
-          suface.draw.hline(this.x + shape.p.x * this.sx, this.y + shape.p.y * this.sy, shape.width)
-          break
-        }
-        case 'segmentline': {
-          const startPoint = shape.startPoint
-          suface.draw.moveTo(this.x + startPoint.x * this.sx, this.y + startPoint.y * this.sy)
-          for (const point of shape.points) {
-            suface.draw.lineTo(this.x + point.x * this.sx, this.y + point.y * this.sy)
-            suface.draw.moveTo(this.x + point.x * this.sx, this.y + point.y * this.sy)
-          }
-          break
-        }
-        case 'pixel': {
-          suface.draw.fillRect(this.x + shape.x * this.sx, this.y + shape.y * this.sy, 1, 1)
-          continue
-        }
-      }
-
-      this.drawShape(shape, suface)
+        
+      drawerMap.get(shape.type)?.(shape, suface, shift, scale)
     }
   }
 
@@ -376,16 +196,16 @@ export class Sketch extends Drawable {
     return this.toSurface(width, height, coordinateSystem).toPattern(repetition)
   }
 
-  private drawShape(shape: Shape, suface: Surface) {
-    if (shape.style.paintOrder === 'stroke') {
-      if (shape.style.stroke) suface.draw.stroke()
-      if (shape.style.fill) suface.draw.fill()
-      return
-    }
+  // private drawShape(shape: Shape, suface: Surface) {
+  //   if (shape.style.paintOrder === 'stroke') {
+  //     if (shape.style.stroke) suface.draw.stroke()
+  //     if (shape.style.fill) suface.draw.fill()
+  //     return
+  //   }
     
-    if (shape.style.fill) suface.draw.fill()
-    if (shape.style.stroke) suface.draw.stroke()
-  }
+  //   if (shape.style.fill) suface.draw.fill()
+  //   if (shape.style.stroke) suface.draw.stroke()
+  // }
 
   private initStyle (style: ShapeStyle | TShapeStyle | string): ShapeStyle {
     if (typeof style === 'string' || style instanceof String) {
