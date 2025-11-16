@@ -1,23 +1,14 @@
 TROUBLES
 
 [ ] BUG Sketch.toSurface() without paramters calls leak of memory
+[ ] BUG A lot of methods of Sketch doesn't work
 [ ] BUG Surface resize in tilemap
-
 
 
 LIST OF FEATURE
 
-[ ] Make parameter for "willReadFrequently"
-[ ] Point and Rect methods
-[ ] Other types of events Pen, Touch, Gamepad
+[ ] Handlers for events from a Pen, Touch, Gamepad
 [ ] Shapes in Sketch (ellipse, bezier)
 [ ] Bounded rects for all type of Shapes in Sketch
 [ ] Vector transformation for Sketch (move, rotate, scale, etc.)
-[ ] Sprite Groups
 [ ] Pixel mask collision detection
-[ ] Mouse wheel event
-
-[x] Sketch segment line
-[x] MOUSEENTER and MOUSELEAVE events
-[x] BUG Animation speed in different browsers
-[x] BUG Shape style dash line
