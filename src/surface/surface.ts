@@ -9,6 +9,7 @@ import { CombinedSurface } from "./types"
 import { TColorSource } from "styles/color-source"
 import { int2Str } from "../color/imports/int-to-string"
 import { SurfaceBase } from "./surface-base"
+import { TBlitOptions } from "./blit-options"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -77,18 +78,50 @@ export class Surface extends SurfaceBase {
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
 
-  blit (surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
-    this.blitx(surface, rect, distRect)
+  rot (a: number) {
+    const m = new DOMMatrix()
+      .translate(this.width / 2, this.height / 2)
+      .rotate(a)
+      .translate(-this.width / 2, -this.height / 2)
+    this.draw.setTransform(m)
   }
 
-  blita (alpha: number, surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
+  unrot () {
+    this.draw.resetTransform()
+  }
+
+  blit (surface: SurfaceBase, rect: Rect | TPoint, options?: TBlitOptions) {
+    const opt: TBlitOptions = options ?? {}
+    const m = new DOMMatrix()
+    
+    if (typeof opt.angle === 'number') {
+      if (!opt.pivote) {
+        m.rotateSelf(opt.angle)
+      }
+      else if (typeof opt.pivote === 'string') {
+        m.translateSelf(this.width / 2, this.height / 2)
+        .rotateSelf(opt.angle)
+        .translateSelf(-this.width / 2, -this.height / 2)
+      } else if (typeof opt.pivote.x === 'number' && typeof opt.pivote.y === 'number') {
+        m.translateSelf(opt.pivote.x, opt.pivote.y)
+        .rotateSelf(opt.angle)
+        .translateSelf(-opt.pivote.x, -opt.pivote.y)
+      }
+    }
+
+    this.draw.setTransform(m)
+    this.blitx(surface, rect, opt.distRect)
+    this.draw.resetTransform()
+  }
+
+  blita (alpha: number, surface: SurfaceBase, rect: Rect | TPoint, options?: TBlitOptions) {
     const a = this.ctx.globalAlpha
     if (alpha < 1) this.ctx.globalAlpha = alpha
-    this.blitx(surface, rect, distRect)
+    this.blit(surface, rect, options)
     if (alpha < 1) this.ctx.globalAlpha = a
   }
 
-  protected blitx(surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null, zoom: number = 1, shift?: TPoint) {
+  protected blitx(surface: SurfaceBase, rect: Rect | TPoint, distRect: TRect | undefined | null = undefined, zoom: number = 1, shift?: TPoint) {
     const { x, y, width, height } = Object.assign(rect, { 
       width: (rect as Rect).width ?? surface.width, 
       height: (rect as Rect).height ?? surface.height 
@@ -242,10 +275,10 @@ export class Surface extends SurfaceBase {
     this.ctx.putImageData(value.imageData, 0, 0)
   }
 
-  mix (method: GlobalCompositeOperation, surface: SurfaceBase, rect: Rect | TPoint, distRect: Rect | null = null) {
+  mix (method: GlobalCompositeOperation, surface: SurfaceBase, rect: Rect | TPoint, options?: TBlitOptions) {
     const old = this.ctx.globalCompositeOperation
     this.ctx.globalCompositeOperation = method
-    this.blit(surface, rect, distRect)
+    this.blit(surface, rect, options)
     this.ctx.globalCompositeOperation = old
   }
   
@@ -347,7 +380,7 @@ export class Surface extends SurfaceBase {
     return { surface, rects }
   }
 
-  static mix (method: GlobalCompositeOperation, bgSurface: SurfaceBase, fgSurface: SurfaceBase, fgRect: Rect | TPoint, distRect: Rect | null = null): Surface {
+  static mix (method: GlobalCompositeOperation, bgSurface: SurfaceBase, fgSurface: SurfaceBase, fgRect: Rect | TPoint, options?: TBlitOptions): Surface {
     const surface = new Surface(bgSurface.width, bgSurface.width, { 
       useOffscreen: bgSurface instanceof OffscreenCanvas,
       coordinateSystem: (bgSurface as any).coordinateSystem,
@@ -357,7 +390,7 @@ export class Surface extends SurfaceBase {
     surface.blit(bgSurface, bgSurface.rect)
     const old = surface.ctx.globalCompositeOperation
     surface.ctx.globalCompositeOperation = method
-    surface.blit(fgSurface, fgRect, distRect)
+    surface.blit(fgSurface, fgRect, options)
     surface.ctx.globalCompositeOperation = old
     return surface
   }
