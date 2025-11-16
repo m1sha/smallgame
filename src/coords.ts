@@ -1,4 +1,5 @@
-import { setPoint, type TPoint } from "./point"
+import { TSize } from "./size"
+import { Point, setPoint, type TPoint } from "./point"
 
 export type CoordinateSystem = 'screen' | 'math' | 'cartesian'
 
@@ -18,9 +19,23 @@ const fromCartesianCoord = (x: number, y: number, half_width: number, half_heigh
 const coordconv = (sys: CoordinateSystem, point: TPoint, width: number, height: number): TPoint => {
   switch (sys) {
     case "screen": return point
-    case "math": return fromMathCoord(point.x, point.y, width / 2, height / 2)
-    case "cartesian": return fromCartesianCoord(point.x, point.y, width / 2, height / 2)
+    case "math": return fromMathCoord(point.x, point.y, width * 0.5, height * 0.5)
+    case "cartesian": return fromCartesianCoord(point.x, point.y, width * 0.5, height * 0.5)
   }
 }
 
-export { fromMathCoord, fromScreenCoord, fromCartesianCoord, coordconv }
+const Coords = {
+  toCartesian: (point: TPoint, viewportSize: TSize) => {
+    return new Point(point.x - viewportSize.width / 2, viewportSize.height - point.y - viewportSize.height / 2)
+  },
+
+  fromCartesian: (point: TPoint, viewportSize: TSize) => {
+    return fromCartesianCoord(point.x, point.y, viewportSize.width / 2, viewportSize.height / 2)
+  }
+}
+
+
+export { fromMathCoord, fromScreenCoord, fromCartesianCoord, coordconv, Coords }
+
+
+
