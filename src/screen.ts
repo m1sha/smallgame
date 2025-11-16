@@ -1,5 +1,5 @@
 import { CssViewport, TransformViewport, type Viewport, type ViewportType } from './viewport'
-import { type SurfaceCreateOptions } from './surface'
+import { Surface, type SurfaceCreateOptions } from './surface'
 import { type TPoint } from './point'
 import { Rect, TRect } from './rect'
 import { SurfaceGL } from './surface-gl'
@@ -9,11 +9,14 @@ import { TSize } from './size'
 
 export class Screen {
   readonly viewport: Viewport
-  readonly surface: SurfaceGL 
+  //readonly surface: SurfaceGL 
+  readonly surface: Surface
 
   constructor(viewportType: ViewportType, width: number, height: number, options?: SurfaceCreateOptions) { 
-    this.surface = new SurfaceGL(width, height, options) //super(width, height, options)
-    this.surface.create()
+    // this.surface = new SurfaceGL(width, height, options) //super(width, height, options)
+    // this.surface.create()
+
+    this.surface = new Surface(width, height, options)
     
     this.viewport = viewportType === 'css' 
       ? new CssViewport(this.originCanvas) 
@@ -35,7 +38,7 @@ export class Screen {
   }
 
   get originCanvas () {
-    return this.surface.context.canvas as HTMLCanvasElement
+    return this.surface.origin as HTMLCanvasElement // this.surface.context.canvas as HTMLCanvasElement
   }
 
   get size (): TSize {
