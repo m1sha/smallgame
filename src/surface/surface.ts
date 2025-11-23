@@ -99,9 +99,13 @@ export class Surface extends SurfaceBase {
         m.rotateSelf(opt.angle)
       }
       else if (typeof opt.pivote === 'string') {
-        m.translateSelf(this.width / 2, this.height / 2)
+        const w = opt.pivoteOwner === 'self' ? ((rect as Rect).width ?? surface.width) / 2 + rect.x : this.width / 2
+        const h = opt.pivoteOwner === 'self' ? ((rect as Rect).height ?? surface.height) / 2 + rect.y : this.height / 2
+        
+        m.translateSelf(w, h)
         .rotateSelf(opt.angle)
-        .translateSelf(-this.width / 2, -this.height / 2)
+        .translateSelf(-w, -h)
+
       } else if (typeof opt.pivote.x === 'number' && typeof opt.pivote.y === 'number') {
         m.translateSelf(opt.pivote.x, opt.pivote.y)
         .rotateSelf(opt.angle)
