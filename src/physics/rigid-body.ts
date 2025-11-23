@@ -29,6 +29,7 @@ export class RigidBody2D {
   update () {
     this.angularVelocity *= (1 - this.angularDrag * Time.deltaTime * this.angularSpeed)
     this.angle += this.angularVelocity * Time.deltaTime * this.angularSpeed
+    this.angle %= 360
     //this.angle = ((this.angle + Math.PI) % (2 * Math.PI)) - Math.PI
   }
 }
