@@ -4,6 +4,7 @@ import { moveTowardsScalar, moveTowards, moveTowardsAccum, moveTowardsAngle } fr
 import { smoothDamp, smoothDampScalar } from "./smooth-damp"
 import { step } from "./step"
 import { smoothstep } from "./smooth-step"
+import { getLogZoom } from "./log-zoom"
 
 type VecType = number | TPoint
 type ReturnType<T> = T extends number ? number : T extends TPoint ? Point : never;
@@ -42,6 +43,8 @@ const GMath = {
   step: (edge: number, x: number) => step(edge, x),
   
   smoothstep: (edge0: number, edge1: number, x: number) => smoothstep(edge0, edge1, x),
+
+  logZoom: (step: number, steps: number, minZoom: number, maxZoom: number) => getLogZoom(step, steps, minZoom, maxZoom)
 }
 
 export { GMath }
