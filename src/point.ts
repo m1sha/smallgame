@@ -315,6 +315,16 @@ export class Point {
     return this
   }
 
+  int (): Point {
+    return new Point(0 | this.x, 0 | this.y)
+  }
+
+  intSelf (): Point {
+    this.x = 0 | this.x
+    this.y = 0 | this.y
+    return this
+  }
+
   equals (point: TPoint): boolean {
     return this === point || (point.x === this.x && point.y === this.y)
   }
