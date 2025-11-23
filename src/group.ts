@@ -79,6 +79,10 @@ export class Group<T extends Entity>{
     removeItem(this.#sprites, p => p === sprite)
   }
 
+  removeAll () {
+    while(this.#sprites.pop());
+  }
+
   find (predicate: (sprite: T) => boolean) {
     return this.sprites.find(predicate)
   }
