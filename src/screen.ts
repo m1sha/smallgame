@@ -90,4 +90,8 @@ export class Screen {
   dispose () {
     this.originCanvas.remove()
   }
+
+  disableContextMenu () {
+    this.originCanvas.addEventListener('contextmenu', e => e.preventDefault())
+  }
 }
