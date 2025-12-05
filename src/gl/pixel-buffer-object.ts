@@ -1,3 +1,5 @@
+type ImageDataArray = Uint8ClampedArray | Float32Array
+
 export class PixelBufferObject {
   origin: WebGLBuffer
 

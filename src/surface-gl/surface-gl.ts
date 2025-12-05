@@ -5,7 +5,7 @@ import defaultVerSource from './shaders/default/vert'
 import defaultFragSource from './shaders/default/frag'
 import { GlTexture } from "../gl/textures/gl-texture"
 import { Surface } from "../surface"
-import { SurfaceGLBase, SurfaceGLCreateOptions } from "./surface-gl-base"
+import { SurfaceGLBase } from "./surface-gl-base"
 import { TBlitOptions } from "./blit-options"
 import { SurfaceBase } from "../surface/surface-base"
 

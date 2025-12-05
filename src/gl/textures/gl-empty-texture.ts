@@ -1,7 +1,7 @@
 import { TSize } from "../../size"
 
 export class GlEmptyTexture {
-  origin: WebGLTexture
+  origin: WebGLTexture | null
   constructor (private gl: WebGL2RenderingContext, size: TSize, slot: number, onRemove: () => void) {
     this.origin = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, this.origin)

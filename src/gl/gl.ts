@@ -25,7 +25,7 @@ export class GL {
     this.canvas = canvas ? canvas : offscreen ? new OffscreenCanvas(viewportSize.width, viewportSize.height) : document.createElement('canvas')
     this.canvas.width = viewportSize.width
     this.canvas.height = viewportSize.height
-    this.ctx = this.canvas.getContext('webgl2')!
+    this.ctx = this.canvas.getContext('webgl2')! as any as WebGL2RenderingContext
     this.#textures = new GlTextureList(this.ctx)
   }
 

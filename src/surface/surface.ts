@@ -6,7 +6,7 @@ import { type CoordinateSystem } from "../coords"
 
 import { Pixels } from "../utils/pixels"
 import { CombinedSurface } from "./types"
-import { TColorSource } from "styles/color-source"
+import { TColorSource } from "../styles/color-source"
 import { int2Str } from "../color/imports/int-to-string"
 import { SurfaceBase } from "./surface-base"
 import { TBlitOptions } from "./blit-options"

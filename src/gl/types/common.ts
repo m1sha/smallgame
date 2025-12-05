@@ -116,4 +116,4 @@ export function getGlTypeSize (type: 'float' | 'short' | 'byte' | 'ushort' | 'ub
 }
 
 
-export { knowledgeTypes, GLSLTypes }
+export { knowledgeTypes, type GLSLTypes }

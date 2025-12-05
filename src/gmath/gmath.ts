@@ -1,4 +1,4 @@
-import { Point, type TPoint } from "point"
+import { Point, type TPoint } from "../point"
 import { lerpScalar, lerp, lerpAccum, lerpUnclamped, lerpUnclampedScalar, lerpUnclampedAccum, lerpAngle } from "./lerp"
 import { moveTowardsScalar, moveTowards, moveTowardsAccum, moveTowardsAngle } from "./move-towards"
 import { smoothDamp, smoothDampScalar } from "./smooth-damp"

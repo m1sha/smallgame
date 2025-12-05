@@ -77,17 +77,17 @@ export class Text implements Drawable {
 
 
 function assignTextStyle (ctx: CanvasRenderingContext2D, style: TextStyle) {
-  style = style || {}
-  ctx.fillStyle = style.color
-  ctx.strokeStyle = style.outlineColor
-  if (style.outlineWidth) ctx.lineWidth = style.outlineWidth
-  const fontName = style.fontName || 'serif'
-  const fontSize = style.fontSize || '10pt'
-  const bold = typeof style.bold === 'boolean' && style.bold ? 'bold ' : style.bold ? style.bold : 'normal'
-  const italic = style.italic ? 'italic ' : 'normal'
-  const fontVariant = style.fontVariant ?? 'normal'
+  const stl = style || {} as TTextStyle
+  ctx.fillStyle = stl.color
+  ctx.strokeStyle = stl.outlineColor
+  if (stl.outlineWidth) ctx.lineWidth = stl.outlineWidth
+  const fontName = stl.fontName || 'serif'
+  const fontSize = stl.fontSize || '10pt'
+  const bold = typeof stl.bold === 'boolean' && stl.bold ? 'bold ' : stl.bold ? stl.bold : 'normal'
+  const italic = stl.italic ? 'italic ' : 'normal'
+  const fontVariant = stl.fontVariant ?? 'normal'
   ctx.font = `${italic} ${bold} ${fontVariant} ${fontSize} ${fontName}`
-  ctx.letterSpacing = style.letterSpacing
+  ctx.letterSpacing = stl.letterSpacing
 }
 
 function drawText (ctx: CanvasRenderingContext2D, style: TextStyle, text: string, x: number, y: number) {
@@ -140,16 +140,16 @@ export class TextMeasurer {
   }
 
   private static assignTextStyle (ctx: CanvasRenderingContext2D, style: TextStyle) {
-    style = style || {}
-    ctx.fillStyle = style.color 
-    const fontName = style.fontName || 'serif'
-    const fontSize = style.fontSize || '10pt'
-    const bold = typeof style.bold === 'boolean' && style.bold ? 'bold ' : style.bold ? style.bold : 'normal'
-    const italic = style.italic ? 'italic ' : 'normal'
-    const fontVariant = style.fontVariant ?? 'normal'
+    const stl = style || {} as TTextStyle
+    ctx.fillStyle = stl.color 
+    const fontName = stl.fontName || 'serif'
+    const fontSize = stl.fontSize || '10pt'
+    const bold = typeof stl.bold === 'boolean' && stl.bold ? 'bold ' : stl.bold ? stl.bold : 'normal'
+    const italic = stl.italic ? 'italic ' : 'normal'
+    const fontVariant = stl.fontVariant ?? 'normal'
     ctx.font = `${italic} ${bold} ${fontVariant} ${fontSize} ${fontName}`
-    ctx.letterSpacing = style.letterSpacing
-    ctx.lineWidth = style.outlineWidth
+    ctx.letterSpacing = stl.letterSpacing
+    ctx.lineWidth = stl.outlineWidth
   }
 
   private static getWidth (text: string, style: TextStyle): number {

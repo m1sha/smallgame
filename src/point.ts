@@ -1,35 +1,37 @@
+import { TSize } from "./size"
 import { rad } from "./utils"
 
 export type TPoint = { x: number, y: number }
 
 export class Point {
-  protected _x: number = 0
-  protected _y: number = 0
+  // protected _x: number = 0
+  // protected _y: number = 0
+  private xy = new Float32Array(2)
 
   constructor (point: TPoint)
   constructor (x: number, y: number)
   constructor (...args: Array<any>) {
     if (typeof args[0] === 'number' && typeof args[1] === 'number' ) {
-      this._x = args[0]
-      this._y = args[1]
+      this.xy[0] = args[0]
+      this.xy[1] = args[1]
       return
     } 
     else if (typeof args[0] === 'object' && typeof args[0].x === 'number' && typeof args[0].y === 'number' ) {
-      this._x = args[0].x
-      this._y = args[0].y
+      this.xy[0] = args[0].x
+      this.xy[1] = args[0].y
       return
     }
 
     throw new Error('unsupported arguments.')
   }
 
-  get x (): number { return this._x }
+  get x (): number { return this.xy[0] }
   
-  set x (value: number) { this._x = value }
+  set x (value: number) { this.xy[0] = value }
   
-  get y (): number { return this._y }
+  get y (): number { return this.xy[1] }
   
-  set y (value: number) { this._y = value }
+  set y (value: number) { this.xy[1] = value }
 
   get magnitude () {
     return Math.sqrt(this.dot(this))
@@ -305,6 +307,10 @@ export class Point {
   negativeXSelf (): Point { return this.negXSelf() }
   negativeYSelf (): Point { return this.negYSelf() }
 
+  arr (): [number, number] {
+    return [this.x, this.y]
+  }
+
   abs (): Point {
     return new Point(Math.abs(this.x), Math.abs(this.y))
   }
@@ -325,6 +331,108 @@ export class Point {
     return this
   }
 
+  uv (size: TSize): Point
+  uv (width: number, height: number): Point
+  uv (...args: Array<any>): Point {
+    let w = 0, h = 0
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1];
+    }
+    if (args.length === 1 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height;
+    }
+    if (!w || !h) throw new Error('Incorrect size or unsupported arguments.')
+    
+    return new Point(this.x / w, 1 - this.y / h)
+  }
+
+  uvSelf (size: TSize): Point
+  uvSelf (width: number, height: number): Point
+  uvSelf (...args: Array<any>): Point {
+    let w = 0, h = 0
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1];
+    }
+    if (args.length === 1 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height;
+    }
+    if (!w || !h) throw new Error('Incorrect size or unsupported arguments.')
+    
+    this.x = this.x / w
+    this.y = 1 - this.y / h
+    return this
+  }
+
+  math (size: TSize): Point
+  math (width: number, height: number): Point
+  math (...args: Array<any>): Point {
+    let w = 0, h = 0
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1];
+    }
+    if (args.length === 1 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height;
+    }
+    if (!w || !h) throw new Error('Incorrect size or unsupported arguments.')
+    
+    return new Point((this.x / w) * 2 - 1,  (this.y / h) * -2 + 1)
+  }
+
+  mathSelf (size: TSize): Point
+  mathSelf (width: number, height: number): Point
+  mathSelf (...args: Array<any>): Point {
+    let w = 0, h = 0
+    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1];
+    }
+    if (args.length === 1 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height;
+    }
+    if (!w || !h) throw new Error('Incorrect size or unsupported arguments.')
+
+    this.x = (this.x / w) * 2 - 1
+    this.y = (this.y / h) * -2 + 1
+    return this
+  }
+
+  screen (size: TSize, from: 'uv' | 'math'): Point
+  screen (width: number, height: number, from: 'uv' | 'math'): Point
+  screen (...args: Array<any>): Point {
+    let w = 0, h = 0, from = ''
+    if (args.length === 3 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1]; from = args[3]
+    }
+    if (args.length === 2 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height; from = args[1]
+    }
+    if (!w || !h || !from) throw new Error('Incorrect size or unsupported arguments.')
+   
+    return from === 'math' ? new Point(((this.x + 1) / 2) * w, ((1 - this.y) / 2) * h) : new Point(this.x * w, (1 - this.y)*h)
+  }
+
+  screenSelf (size: TSize, from: 'uv' | 'math'): Point
+  screenSelf (width: number, height: number, from: 'uv' | 'math'): Point
+  screenSelf (...args: Array<any>): Point {
+    let w = 0, h = 0, from = ''
+    if (args.length === 3 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+      w = args[0]; h = args[1]; from = args[3]
+    }
+    if (args.length === 2 && args[0] && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      w = args[0].width; h = args[0].height; from = args[0].from
+    }
+    if (!w || !h || !from) throw new Error('Incorrect size or unsupported arguments.')
+   
+    if (from === 'math') {
+      this.x = ((this.x + 1) / 2) * w
+      this.y = ((1 - this.y) / 2) * h
+    } else {
+      this.x = this.x * w
+      this.y = (1 - this.y)*h
+    } 
+
+    return this
+  }
+
   equals (point: TPoint): boolean {
     return this === point || (point.x === this.x && point.y === this.y)
   }
@@ -341,7 +449,7 @@ export class Point {
   }
 
   clone () {
-    return new Point(this._x, this._y)
+    return new Point(this.xy[0], this.xy[1])
   }
 
   static get zero (): Point { return new Point(0, 0) }

@@ -1,6 +1,6 @@
 import { TPoint } from "../point"
 import { Pivote } from "../pivote"
-import { TRect } from "rect"
+import { TRect } from "../rect"
 
 export type TBlitOptions = {
   angle?: number

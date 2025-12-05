@@ -1,7 +1,7 @@
 import { type TPoint } from '../point'
 import { Rect, type TRect } from '../rect'
 import { coordconv, type CoordinateSystem } from '../coords'
-import { type TColorSource } from 'styles/color-source'
+import { type TColorSource } from '../styles/color-source'
 
 export abstract class SurfaceBase {
   protected conv: (point: TPoint) => TPoint

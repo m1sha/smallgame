@@ -69,13 +69,13 @@ export class Screen {
     this.surface.clear(rect)
   }
   
-  blit (surface: SurfaceBase, rect: Rect | TPoint, distRect?: Rect) {
+  blit (surface: SurfaceBase, rect: Rect | TPoint) {
     if (this.viewport.type === 'css') {
-      this.surface.blit(surface, rect, distRect)  
+      this.surface.blit(surface, rect)  
       return
     }
     
-    this.surface.blit(surface, rect, distRect)
+    this.surface.blit(surface, rect)
   }
 
   blita (alpha: number, surface: SurfaceBase, rect: Rect | TPoint, distRect?: Rect) {
