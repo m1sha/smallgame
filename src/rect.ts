@@ -80,6 +80,8 @@ export class Rect {
     return [this.topLeft, this.topRight, this.bottomRight, this.bottomLeft]
   }
 
+  get ratio () { return this.width / this.height }
+
   overlaps (rect: Rect) {
     const e1 =  this.containsPoint(rect.topLeft) 
     const e2 =  this.containsPoint(rect.topRight) 
@@ -383,6 +385,12 @@ export class Rect {
 
   static fromCenter (center: TPoint, width: number, height: number) {
     return new Rect(center.x - width * 0.5, center.y - height * 0.5, width, height)
+  }
+
+  static fromRatio (ratio: number, length: number, side: 'width' | 'height') {
+    const w = side === 'width' ? length : length / ratio
+    const h = side === 'height' ? length : length * ratio
+    return new Rect(0, 0, w, h)
   }
 
   static merge (rects: TRect[]): Rect {
