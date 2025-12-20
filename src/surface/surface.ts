@@ -10,6 +10,7 @@ import { TColorSource } from "../styles/color-source"
 import { int2Str } from "../color/imports/int-to-string"
 import { SurfaceBase } from "./surface-base"
 import { TBlitOptions } from "./blit-options"
+import { TSize } from "../size"
 
 export type SurfaceCreateOptions = {
   useAlpha?: boolean
@@ -111,6 +112,10 @@ export class Surface extends SurfaceBase {
         .rotateSelf(opt.angle)
         .translateSelf(-opt.pivote.x, -opt.pivote.y)
       }
+    }
+
+    if (typeof opt.transform === 'object')  {
+      m.multiplySelf(opt.transform)
     }
 
     this.draw.setTransform(m)
@@ -410,5 +415,17 @@ export class Surface extends SurfaceBase {
     canvas.height = this.height
     canvas.getContext('2d')!.drawImage(this.ctx.canvas, shift.x, shift.y)
     return canvas
+  }
+}
+
+export class MemSurface extends Surface {
+  constructor (size: TSize, options?: SurfaceCreateOptions) {
+    super(size.width, size.height, {
+      useOffscreen: true,
+      coordinateSystem: options?.coordinateSystem,
+      useAlpha: options?.useAlpha,
+      useSmooth: options?.useSmooth,
+      willReadFrequently:options?.willReadFrequently
+    })
   }
 }
