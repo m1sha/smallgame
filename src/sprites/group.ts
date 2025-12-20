@@ -1,11 +1,11 @@
 //import { removeItem } from "./utils/array"
-import { unsafecast, removeItem } from "./utils"
+import { unsafecast, removeItem } from "../utils"
 import { Sprite } from "./sprite"
-import { Entity } from "./entity"
-import { SurfaceBase } from "./surface"
-import { CollisionHashmap } from "./utils/collision-hashmap"
-import { type TPoint } from "./point"
-import { Rect, type TRect } from "./rect"
+import { Entity } from "../entity"
+import { SurfaceBase } from "../surface"
+import { CollisionHashmap } from "../utils/collision-hashmap"
+import { type TPoint } from "../point"
+import { Rect, type TRect } from "../rect"
 
 
 export type GroupOptions = {
