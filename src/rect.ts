@@ -89,17 +89,24 @@ export class Rect {
 
   get ratio () { return this.width / this.height }
 
-  overlaps (rect: Rect) {
-    const e1 =  this.containsPoint(rect.topLeft) 
-    const e2 =  this.containsPoint(rect.topRight) 
-    const e3 =  this.containsPoint(rect.bottomLeft) 
-    const e4 =  this.containsPoint(rect.bottomRight)
+  overlaps (rect: TRect) {
+    const x = Math.max(this.x, rect.x)
+    const y = Math.max(this.y, rect.y)
+    const x2 = Math.min(this.x + this.width, rect.x + rect.width)
+    const y2 = Math.min(this.y + this.height, rect.y + rect.height)
+    const w = x2 - x
+    const h = y2 - y
+    return w > 0 && h > 0
+  }
 
-    const e5 =  rect.containsPoint(this.topLeft) 
-    const e6 =  rect.containsPoint(this.topRight) 
-    const e7 =  rect.containsPoint(this.bottomLeft) 
-    const e8 =  rect.containsPoint(this.bottomRight)
-    return e1 || e2 || e3 || e4 || e5 || e6 || e7 || e8
+  getOverlapRect (rect: TRect) {
+    const x = Math.max(this.x, rect.x)
+    const y = Math.max(this.y, rect.y)
+    const x2 = Math.min(this.x + this.width, rect.x + rect.width)
+    const y2 = Math.min(this.y + this.height, rect.y + rect.height)
+    const w = x2 - x
+    const h = y2 - y
+    return (w > 0 && h > 0) ? new Rect(x, y, w, h) : null
   }
 
   touchSide (rect: TRect): ('left' | 'right' | 'top' | 'bottom')[] {
