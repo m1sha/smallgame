@@ -5,6 +5,7 @@ import { smoothDamp, smoothDampScalar } from "./smooth-damp"
 import { step } from "./step"
 import { smoothstep } from "./smooth-step"
 import { getLogZoom } from "./log-zoom"
+import { TRect } from "../rect"
 
 type VecType = number | TPoint
 type ReturnType<T> = T extends number ? number : T extends TPoint ? Point : never;
@@ -44,7 +45,26 @@ const GMath = {
   
   smoothstep: (edge0: number, edge1: number, x: number) => smoothstep(edge0, edge1, x),
 
-  logZoom: (step: number, steps: number, minZoom: number, maxZoom: number) => getLogZoom(step, steps, minZoom, maxZoom)
+  logZoom: (step: number, steps: number, minZoom: number, maxZoom: number) => getLogZoom(step, steps, minZoom, maxZoom),
+
+  max: (numbers: number[]) => Math.max.apply(null, numbers),
+  min: (numbers: number[]) => Math.min.apply(null, numbers),
+  maxX: (r: (TPoint | TRect | { rect: TRect })[]) => max<any>(r, p => typeof p.rect === 'object' ?  p.rect.x : p.x),
+  maxY: (r: (TPoint | TRect | { rect: TRect })[]) => max<any>(r, p => typeof p.rect === 'object' ?  p.rect.y : p.y),
+  maxHeight: (r: (TRect | { rect: TRect })[]) => max<any>(r, p => typeof p.rect === 'object' ?  p.rect.height : p.height),
+  maxWidth: (r: (TRect | { rect: TRect })[]) => max<any>(r, p => typeof p.rect === 'object' ?  p.rect.width : p.width),
+  minX: (r: (TPoint | TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.x : p.x),
+  minY: (r: (TPoint | TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.y : p.y),
+  minHeight: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.height : p.height),
+  minWidth: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.width : p.width)
 }
 
 export { GMath }
+
+function max<T> (items: T[], pred: (item: T)=> number) {
+  return Math.max.apply(null, items.map(p => pred(p)))
+}
+
+function min<T> (items: T[], pred: (item: T)=> number) {
+  return Math.max.apply(null, items.map(p => pred(p)))
+}
