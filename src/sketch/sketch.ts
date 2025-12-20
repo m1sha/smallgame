@@ -215,4 +215,8 @@ export class Sketch extends Drawable {
     }
     return ShapeStyle.from(style)
   }
+
+  static new () {
+    return new Sketch()
+  }
 }
