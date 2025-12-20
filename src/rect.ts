@@ -74,6 +74,13 @@ export class Rect {
     return new Point(this.x + x, this.y + y)
   }
 
+  set absCenter (value: TPoint) {
+    const { x, y } = this.center
+    this.x = value.x - x
+    this.y = value.y - y
+  }
+
+
   get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
 
   get points (): [TPoint, TPoint, TPoint, TPoint] {

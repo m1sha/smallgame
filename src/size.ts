@@ -1,3 +1,5 @@
+import { Point, TPoint } from "./point"
+
 export type TSize = { width: number, height: number }
 export function setSize (width: number, height: number): TSize { return { width, height }}
 
@@ -70,6 +72,7 @@ export class Size implements TSize {
 
   expand (value: number): Size
   expand (value: TSize): Size
+  expand (value: TPoint): Size
   expand (width: number, height: number): Size
   expand (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -78,15 +81,20 @@ export class Size implements TSize {
     if (args.length === 1 && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
       return new Size(this.width + args[0].width, this.height + args[0].height)
     }
+    if (args.length === 1 && typeof args[0] === 'object' && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      return new Size(this.width + args[0].x, this.height + args[0].y)
+    }
     if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
       return new Size(this.width + args[0], this.height + args[1])
     }
+    
 
     throw new Error('unsupported arguments.')
   }
 
   expandSelf (value: number): Size
   expandSelf (value: TSize): Size
+  expandSelf (value: TPoint): Size
   expandSelf (width: number, height: number): Size
   expandSelf (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -97,6 +105,11 @@ export class Size implements TSize {
     if (args.length === 1 && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
       this.width += args[0].width
       this.height += args[0].height
+      return this
+    }
+    if (args.length === 1 && typeof args[0] === 'object' && typeof args[0].x === 'number' && typeof args[0].y === 'number') {
+      this.width += args[0].x
+      this.height += args[0].y
       return this
     }
     if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
@@ -196,5 +209,9 @@ export class Size implements TSize {
   negHSelf (): Size { 
     this.height *= -1
     return this
+  }
+
+  toPoint (): Point {
+    return new Point(this.width, this.height)
   }
 }
