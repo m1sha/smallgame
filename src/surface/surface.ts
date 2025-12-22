@@ -298,7 +298,7 @@ export class Surface extends SurfaceBase {
 
   createMask (): PixelMask {
     const imageDate = this.ctx.getImageData(0, 0, this.width, this.height)
-    return PixelMask.fromImageData(imageDate)
+    return PixelMask.fromImageData(this, imageDate)
   }
 
   clone (): Surface {
