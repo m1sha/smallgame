@@ -1,3 +1,4 @@
+import { Color } from "./color"
 import { Rect } from "./rect"
 import { Surface } from "./surface"
 
@@ -38,14 +39,14 @@ export class PixelMask {
     return false
   }
 
-  async toSurface () {
+  async toSurface (fillColor?: Color) {
     const imageData = new ImageData(this.width, this.height)
     let j = 0
     for (let i = 0; i < imageData.data.length; i+=4) {
       const bwValue = !this.data[j++] ? 0 : 255
-      imageData.data[i] = bwValue
-      imageData.data[i + 1] = bwValue
-      imageData.data[i + 2] = bwValue
+      imageData.data[i] = bwValue > 0 ? fillColor ? fillColor.ri : bwValue : bwValue
+      imageData.data[i + 1] = bwValue > 0 ? fillColor ? fillColor.gi : bwValue : bwValue
+      imageData.data[i + 2] = bwValue > 0 ? fillColor ? fillColor.bi : bwValue : bwValue
       imageData.data[i + 3] = bwValue
     }
     const img = await createImageBitmap(imageData)
