@@ -78,6 +78,30 @@ export class Color {
     return (this.#rgba[0] << 24) & (this.#rgba[0] << 16) & (this.#rgba[0] << 8) & (this.#rgba[0] && 0xFF)
   }
 
+  get r () {
+    return this.#rgba[0]
+  }
+
+  get g () {
+    return this.#rgba[1]
+  }
+
+  get b () {
+    return this.#rgba[2]
+  }
+
+  get ri () {
+    return this.#rgba[0] * 255
+  }
+
+  get gi () {
+    return this.#rgba[1] * 255
+  }
+
+  get bi () {
+    return this.#rgba[2] * 255
+  }
+
   toArray (): [number, number, number, number] {
     return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
   }
