@@ -21,7 +21,7 @@ export class GL {
   readonly ctx: WebGL2RenderingContext
   #textures: GlTextureList
 
-  constructor (viewportSize: TSize, offscreen: boolean = false, canvas?: HTMLCanvasElement) {
+  constructor (viewportSize: TSize, offscreen: boolean = true, canvas?: HTMLCanvasElement) {
     this.canvas = canvas ? canvas : offscreen ? new OffscreenCanvas(viewportSize.width, viewportSize.height) : document.createElement('canvas')
     this.canvas.width = viewportSize.width
     this.canvas.height = viewportSize.height
@@ -142,7 +142,7 @@ export class GL {
     return new GlBufferSubData(gl, texCoordData)
   }
 
-  vbo<T extends {}> (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: T) {
+  vbo (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: { [key: string]: GLSLTypes }) {
     const gl = this.ctx
     const buffer = new GlBuffer(gl, 'array')
     buffer.bind()
@@ -162,7 +162,7 @@ export class GL {
     return new GlVertexBufferObject(buffer, template, drawType)
   }
 
-  vao (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: Record<string, GLSLTypes>, ...data: Array<number[]>) {
+  vao (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: { [key: string]: GLSLTypes }, ...data: Array<number[]>) {
     const gl = this.ctx
     const vaoId = gl.createVertexArray()
     gl.bindVertexArray(vaoId)

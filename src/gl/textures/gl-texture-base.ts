@@ -22,7 +22,7 @@ export abstract class TextureBase {
     this.gl.activeTexture(TextureSlots[this.slot]) // options.slot
   }
 
-  delete () {
+  remove () {
     this.gl.deleteTexture(this.texture)
     this.onRemove()
   }

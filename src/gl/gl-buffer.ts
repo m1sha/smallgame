@@ -42,6 +42,10 @@ export class GlBuffer {
     this.gl.bufferData(this.glType, array, type)
   }
 
+  subdata (array: Float32Array, dstByteOffset: number) {
+    this.gl.bufferSubData(this.glType, dstByteOffset, array)
+  }
+
   remove () {
     this.gl.deleteBuffer(this.buffer)
   }

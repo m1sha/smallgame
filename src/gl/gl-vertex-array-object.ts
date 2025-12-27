@@ -25,4 +25,8 @@ export class GlVertexArrayObject {
     callback()
     this.unbind()
   }
+
+  update (...items: Array<number[]>) {
+    this.vbo.push(...items)
+  }
 }

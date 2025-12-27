@@ -57,7 +57,7 @@ const knowledgeTypes = [
 ] as const
 
 type KnowledgeTypes = typeof knowledgeTypes[number]
-type GLSLTypes = bool | int | uint | float | vec2 | uvec2 | ivec2 | bvec2 | vec3 | uvec3 | ivec3 | bvec3 | vec4 | uvec4 | ivec4 | bvec4 | mat2 | mat3 | mat4 | mat2x3 | mat2x4 | mat3x2 | mat4x2 | mat4x3 | sampler2D | samplerCube
+type GLSLTypes = typeof bool | typeof int | typeof uint | typeof float | typeof vec2 | typeof uvec2 | typeof ivec2 | typeof bvec2 | typeof vec3 | typeof uvec3 | typeof ivec3 | typeof bvec3 | typeof vec4 | typeof uvec4 | typeof ivec4 | typeof bvec4 | typeof mat2 | typeof mat3 | typeof mat4 | typeof mat2x3 | typeof mat2x4 | typeof mat3x2 | typeof mat4x2 | typeof mat4x3 | typeof sampler2D | typeof samplerCube
 
 export function vertexOf (typeName: KnowledgeTypes) {
   switch (typeName) {
