@@ -437,6 +437,14 @@ export class Point {
     return this === point || (point.x === this.x && point.y === this.y)
   }
 
+  inRadius (point: TPoint, radius: number) {
+    return Math.abs(this.distance(point)) <= radius
+  }
+
+  distance (point: TPoint) {
+    return Point.distance(this, point)
+  }
+
   swapAxis () {
     return new Point(this.y, this.x)
   }
@@ -474,6 +482,10 @@ export class Point {
 
   static from (point: TPoint) {
     return new Point(point)
+  }
+
+  static fromAngle (rad: number) {
+    return new Point(Math.cos(rad), Math.sin(rad))
   }
 }
 

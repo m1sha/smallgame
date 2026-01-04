@@ -1,6 +1,6 @@
 import { absPoint, copyPoint, isTPoint, Point, setPoint, subPoints, type TPoint, zeroPoint } from "./point"
 import { type Pivote } from './pivote'
-import { type TSize } from "./size"
+import { Size, type TSize } from "./size"
 
 export type TRect = { x: number, y: number, width: number, height: number }
 
@@ -88,6 +88,10 @@ export class Rect {
   }
 
   get ratio () { return this.width / this.height }
+
+  get size () {
+    return new Size(this.width, this.height)
+  }
 
   overlaps (rect: TRect) {
     const x = Math.max(this.x, rect.x)
@@ -370,6 +374,45 @@ export class Rect {
   rotate (a: number, pivot?: number | TPoint) {
     const { x, y, width, height } = this
     return new PolyRect(x, y, width, height).rotateSelf(a, pivot as any)
+  }
+
+  gl (size: TSize, tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
+    if (tri === 'triangle-strip')
+    return [
+      ...this.bottomLeft.math(size).arr(),
+      ...this.topLeft.math(size).arr(),
+      ...this.bottomRight.math(size).arr(),
+      ...this.topRight.math(size).arr(),
+    ]
+
+    return [
+      ...this.bottomLeft.math(size).arr(),
+      ...this.topLeft.math(size).arr(),
+      ...this.bottomRight.math(size).arr(),
+      
+      ...this.topRight.math(size).arr(),
+      ...this.bottomRight.math(size).arr(),
+      ...this.topLeft.math(size).arr(),
+    ]
+  }
+
+  uv (size: TSize, tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
+    if (tri === 'triangle-strip')
+      return [
+        ...this.bottomLeft.uv(size).arr(),
+        ...this.topLeft.uv(size).arr(),
+        ...this.bottomRight.uv(size).arr(),
+        ...this.topRight.uv(size).arr(),
+       ]
+    return [
+      ...this.bottomLeft.uv(size).arr(),
+      ...this.topLeft.uv(size).arr(),
+      ...this.bottomRight.uv(size).arr(),
+      
+      ...this.topRight.uv(size).arr(),
+      ...this.bottomRight.uv(size).arr(),
+      ...this.topLeft.uv(size).arr(),
+    ]
   }
 
   static get zero () {

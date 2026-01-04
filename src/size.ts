@@ -214,4 +214,6 @@ export class Size implements TSize {
   toPoint (): Point {
     return new Point(this.width, this.height)
   }
+
+  static get zero () { return new Size(0, 0) }
 }
