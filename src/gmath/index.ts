@@ -1,2 +1,5 @@
 export * from './calc-arrow-head'
 export * from './gmath'
+export * from './matrix'
+export * from './splines'
+export { SmoothDampVelocity } from './smooth-damp'

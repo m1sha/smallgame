@@ -36,3 +36,12 @@ export function smoothDamp (current: TPoint, target: TPoint, currentVelocity: { 
     smoothDampScalar(current.y, target.y, currentVelocity.y, smoothTime, deltaTime, maxSpeed)
   )
 }
+
+export class SmoothDampVelocity {
+  x: { value: number } = { value: 0 }
+  y: { value: number } = { value: 0 }
+
+  get point () {
+    return new Point(this.x.value, this.y.value)
+  }
+}

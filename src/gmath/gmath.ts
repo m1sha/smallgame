@@ -6,9 +6,12 @@ import { step } from "./step"
 import { smoothstep } from "./smooth-step"
 import { getLogZoom } from "./log-zoom"
 import { TRect } from "../rect"
+import { max, min } from "./minmax"
 
 type VecType = number | TPoint
 type ReturnType<T> = T extends number ? number : T extends TPoint ? Point : never;
+const rad = Math.PI / 180.0
+const deg = 180.0 / Math.PI
 
 const GMath = {
   lerp: <T extends VecType>(a: T, b: T, t: number): ReturnType<T> => {
@@ -56,15 +59,11 @@ const GMath = {
   minX: (r: (TPoint | TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.x : p.x),
   minY: (r: (TPoint | TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.y : p.y),
   minHeight: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.height : p.height),
-  minWidth: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.width : p.width)
+  minWidth: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.width : p.width),
+
+  rad,
+  deg
 }
 
 export { GMath }
 
-function max<T> (items: T[], pred: (item: T)=> number) {
-  return Math.max.apply(null, items.map(p => pred(p)))
-}
-
-function min<T> (items: T[], pred: (item: T)=> number) {
-  return Math.max.apply(null, items.map(p => pred(p)))
-}
