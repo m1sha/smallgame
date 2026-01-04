@@ -58,6 +58,11 @@ export class MouseGameEvent extends InputGameEvent<MouseEvent> {
       ? setPoint(0, 0) 
       : setPoint(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
   }
+
+  get lbc () { return this.button === MouseButton.LEFT }
+  get rbc () { return this.button === MouseButton.RIGHT }
+  get mbc () { return this.button === MouseButton.MIDDLE }
+  get cmdKey () { return this.altKey || this.ctrlKey || this.shiftKey || this.metaKey }
 }
 
 export class MouseWheelGameEvent extends InputGameEvent<WheelEvent> { 
