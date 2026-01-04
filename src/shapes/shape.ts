@@ -11,6 +11,7 @@ import { type SegmentLine } from './segment-line'
 import { Arrows } from './arrows'
 import { Arrow } from './arrow'
 import { type VLine } from './vline'
+import { CubicBezier } from './cubic-bezier'
 
   
 export type Shape = (
@@ -27,4 +28,5 @@ export type Shape = (
   | Pixel
   | Arrows
   | Arrow
+  | CubicBezier
 ) 

@@ -162,15 +162,29 @@ export class Sketch extends Drawable {
     return shape
   }
 
+  cubicBezier (style: ShapeStyle | TShapeStyle | string, a: TPoint, b: TPoint, cp1: TPoint, cp2: TPoint) {
+    const shape: Shape = { 
+      type: 'cubicbezier', 
+      a, b, cp1, cp2,
+      style: this.initStyle(style),
+    }
+    this._shapes.push(shape)
+    return this
+  }
+
   draw (suface: Surface): void {
     const shift = new Point(this.x, this.y)
     const scale = new Point(this.sx, this.sy)
+    
     for (const shape of this._shapes) {
+      suface.draw.save()  
       if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
       if (shape.style.fill) applyFill(suface.draw as any, shape.style.fill)
         
       drawerMap.get(shape.type)?.(shape, suface, shift, scale)
+      suface.draw.restore()  
     }
+    
   }
 
   get bounds () {
