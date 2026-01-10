@@ -98,7 +98,7 @@ export class EventController {
   private pointerdown (e: PointerEvent) {
     this.leave = false
 
-    if (this.mousemown) return
+    //if (this.mousemown) return
     this.mousemown = true
     this.event.push('MOUSEDOWN', e)
     if (this.callback) this.callback()
