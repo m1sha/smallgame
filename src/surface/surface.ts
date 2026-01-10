@@ -58,7 +58,10 @@ export class Surface extends SurfaceBase {
   }
 
   set imageRendering (value: 'auto' | 'pixelated') { 
-    if (this.canvas instanceof OffscreenCanvas) return
+    if (this.canvas instanceof OffscreenCanvas) {
+      this.ctx.imageSmoothingEnabled = value === 'auto'
+      return
+    }
     ;(this.canvas as HTMLCanvasElement).style.imageRendering = value 
     this.ctx.imageSmoothingEnabled = value === 'auto'
   }
