@@ -1,4 +1,4 @@
-import { setPoint, type TPoint } from "../point"
+import { setPoint, type TPoint, Point } from "../point"
 import { Keys } from "../keys/keys"
 import { unsafecast } from "../utils"
 
@@ -44,19 +44,19 @@ export class MouseButton {
 
 export class MouseGameEvent extends InputGameEvent<MouseEvent> {
   readonly type: MouseEventTypeNames
-  readonly pos: TPoint
-  readonly shift: TPoint
+  readonly pos: Point
+  readonly shift: Point
   readonly button: number = -1
 
   constructor (type: MouseEventTypeNames, e: MouseEvent) {
     super(e)
     this.type = type
-    this.pos = setPoint(e.offsetX,  e.offsetY)
+    this.pos = new Point(e.offsetX,  e.offsetY)
     this.button = e.buttons
     const prevMousePos = unsafecast<any>(e).prevMousePos as TPoint
     this.shift = !prevMousePos 
-      ? setPoint(0, 0) 
-      : setPoint(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
+      ? new Point(0, 0) 
+      : new Point(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
   }
 
   get lbc () { return this.button === MouseButton.LEFT }
