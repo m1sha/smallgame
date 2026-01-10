@@ -11,7 +11,7 @@ export class RigidBody2D {
   mass: number = 1
   velocity = Point.zero
 
-  constructor (inertia: number, angularDrag: number = 0.1) {
+  constructor (inertia: number = 1, angularDrag: number = 0.1) {
     this.inertia = inertia
     this.angularDrag = angularDrag
   }
