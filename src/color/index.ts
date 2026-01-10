@@ -1,4 +1,5 @@
-import { fromString } from "./imports/from-string";
+import { GMath } from "../gmath"
+import { fromString } from "./imports/from-string"
 
 export class Color {
   #rgba: Float32Array
@@ -17,7 +18,7 @@ export class Color {
       r = args[0]; g = args[0]; b = args[0]
     } else if (args.length === 1 && Array.isArray(args[0]) && typeof args[0][0] === 'number' && typeof args[0][1] === 'number' && typeof args[0][2] === 'number') {
       r = args[0][0]; g = args[0][1]; b = args[0][2]
-      a = typeof args[0][3] === 'number' ? a : 0.0
+      a = typeof args[0][3] === 'number' ? args[0][3] : 1.0
     }
 
     if (r < 0.0 || r > 1.0) throw Error('the R value must be between 0.0 and 1.0.')
@@ -74,6 +75,14 @@ export class Color {
     this.#rgba[2] = this.trunc(this.#rgba[2] * (1.0 - value) + color.#rgba[2] * value)
   }
 
+  lerp (color: Color, t: number) {
+    const r = GMath.lerp(this.#rgba[0], color.#rgba[0], t)
+    const g = GMath.lerp(this.#rgba[1], color.#rgba[1], t)
+    const b = GMath.lerp(this.#rgba[2], color.#rgba[2], t)
+    const a = GMath.lerp(this.#rgba[3], color.#rgba[3], t)
+    return new Color([r, g, b, a])
+  }
+
   get value (): number {
     return (this.#rgba[0] << 24) & (this.#rgba[0] << 16) & (this.#rgba[0] << 8) & (this.#rgba[0] && 0xFF)
   }
@@ -106,13 +115,11 @@ export class Color {
     return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
   }
 
-  toString () {
-    if (typeof this.#rgba[3] === 'number') {
-      const conv = (v: number) => (0 | v * 255).toString(10)
-      return `rgba(${conv(this.#rgba[0])},${conv(this.#rgba[1])},${conv(this.#rgba[2])},${conv(this.#rgba[3])})`
-    }
+  toString (format: 'rgb' | 'rgba' = 'rgb') {
     const conv = (v: number) => (0 | v * 255).toString(16).padStart(2, '0')
-    return `#${conv(this.#rgba[0])}${conv(this.#rgba[1])}${conv(this.#rgba[2])}`
+    return format === 'rgb' 
+      ? `#${conv(this.#rgba[0])}${conv(this.#rgba[1])}${conv(this.#rgba[2])}`
+      : `#${conv(this.#rgba[0])}${conv(this.#rgba[1])}${conv(this.#rgba[2])}${conv(this.#rgba[3])}`
   }
 
 
