@@ -5,13 +5,12 @@ import { drawShape } from "./draw-shape"
 
 export function drawPolygon (shape: Polygon, surface: Surface, shift: TPoint, scale: TPoint) {
   if (shape.points.length < 2) return
-debugger
   //surface.draw.save()
   surface.draw.beginPath()
   surface.draw.moveTo(shift.x + shape.points[0].x * scale.x, shift.y + shape.points[0].y * scale.y)
   for (let i = 1; i < shape.points.length; i++) {
     surface.draw.lineTo(shift.x + shape.points[i].x * scale.x, shift.y + shape.points[i].y * scale.y)
-    drawShape(shape, surface)
+    //drawShape(shape, surface)
   }
   surface.draw.moveTo(shift.x + shape.points[0].x * scale.x, shift.y + shape.points[0].y * scale.y)
   drawShape(shape, surface)
