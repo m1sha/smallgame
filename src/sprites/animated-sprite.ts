@@ -13,6 +13,7 @@ export class AnimatedSprite extends Sprite {
   private batch: SpriteSheetBatch | null = null
   private _frameNum = 0
   rotationAngle = 0
+  playing = true
   
   constructor (readonly spriteSheet: SpriteSheet, size?: TSize) {
     super ()
@@ -20,6 +21,7 @@ export class AnimatedSprite extends Sprite {
     this.originRect = Rect.size(size ? size.width : spriteSheet.size.width, size ? size.height : spriteSheet.size.height)
     const diagonal = this.originRect.diagonal
     this.image = new MemSurface(new Size(diagonal))
+    this.image.imageRendering = 'pixelated'
     this.rect = this.image.rect
     this.batch = spriteSheet.defaultBatch()
   }
@@ -29,11 +31,13 @@ export class AnimatedSprite extends Sprite {
     const end = this.batch ? start + this.batch.count : this.spriteSheet.count
     const rate = this.batch && this.batch.rate ? this.batch.rate : this.spriteSheet.rate
 
+    if (this._frameNum < start) this._frameNum = start
+
     this._frameNum += Time.deltaTime * rate
     if (this._frameNum > end) this._frameNum = start
 
     const frameNum = (0 | this._frameNum)
-    const sprite = this.spriteSheet.getTile(frameNum)
+    const sprite = this.spriteSheet.getTile(this.playing ? frameNum : start)
 
     this.image.clear()
     this.image.blit(sprite, this.originRect.move(this.rect.center, 'center-center'), { angle: this.rotationAngle, pivote: 'center-center' })
