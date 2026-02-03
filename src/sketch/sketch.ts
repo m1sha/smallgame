@@ -18,8 +18,9 @@ export class Sketch extends Drawable {
   sx: number = 1
   sy: number = 1
 
-  defineStyle (name: string, style: TShapeStyle): ShapeStyle {
-    return this._styleList[name] = ShapeStyle.from(style)
+  defineStyle (name: string, style: TShapeStyle): Sketch {
+    this._styleList[name] = ShapeStyle.from(style)
+    return this
   }
 
   get styleNames () { return Object.keys(this._styleList) }
@@ -169,6 +170,32 @@ export class Sketch extends Drawable {
       style: this.initStyle(style),
     }
     this._shapes.push(shape)
+    return this
+  }
+
+  cross (style: ShapeStyle | TShapeStyle | string, rect: TRect, options?: { crossShift?: TPoint, tickWidth?: number, tickThickness?: number, tickGap?: number }) {
+    const r = rect instanceof Rect ? rect as Rect : Rect.from(rect)
+    this.hline(style, r.midLeft, r.width)
+    this.vline(style, r.midTop, r.height)
+
+    if (options && options.tickWidth) {
+      const tw = options.tickWidth
+      const tg = options.tickGap ?? 1
+      const tt = options.tickThickness ?? 1
+      const hw = r.width / 2
+      const hh = r.height / 2
+      const stpw = tg + tt -1
+
+      for (let i = 1; i < hw / stpw; i++) {
+        this.vline(style, r.absCenter.shift(i * stpw, -tw / 2), tw)
+        this.vline(style, r.absCenter.shift(i * -stpw, -tw / 2), tw)
+      }
+
+      for (let i = 1; i < hh / stpw; i++) {
+        this.hline(style, r.absCenter.shift(-tw / 2, i * stpw), tw)
+        this.hline(style, r.absCenter.shift(-tw / 2, i * -stpw), tw)
+      }
+    }
     return this
   }
 
