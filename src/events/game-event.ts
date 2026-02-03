@@ -67,8 +67,8 @@ export class MouseGameEvent extends InputGameEvent<MouseEvent> {
 
 export class MouseWheelGameEvent extends InputGameEvent<WheelEvent> { 
   readonly type: MouseWheelEventType
-  readonly pos: TPoint
-  readonly shift: TPoint
+  readonly pos: Point
+  readonly shift: Point
   readonly button: number = -1
   readonly deltaMode: number
   readonly deltaX: number
@@ -78,12 +78,12 @@ export class MouseWheelGameEvent extends InputGameEvent<WheelEvent> {
   constructor (type: MouseWheelEventType, e: WheelEvent) {
     super(e)
     this.type = type
-    this.pos = setPoint(e.offsetX,  e.offsetY)
+    this.pos = new Point(e.offsetX,  e.offsetY)
     this.button = e.buttons
     const prevMousePos = unsafecast<any>(e).prevMousePos as TPoint
     this.shift = !prevMousePos 
-      ? setPoint(0, 0) 
-      : setPoint(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
+      ? new Point(0, 0) 
+      : new Point(e.offsetX - prevMousePos.x, e.offsetY - prevMousePos.y)
 
     this.deltaMode = e.deltaMode
     this.deltaX = e.deltaX
