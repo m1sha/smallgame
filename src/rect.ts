@@ -80,6 +80,22 @@ export class Rect {
     this.y = value.y - y
   }
 
+  get midLeft () {
+    return new Point(this.x, this.y + this.height / 2)
+  }
+
+  get midRight () {
+    return new Point(this.x + this.width, this.y + this.height / 2)
+  }
+
+  get midTop () {
+    return new Point(this.x + this.width / 2, this.y)
+  }
+
+  get midBottom () {
+    return new Point(this.x + this.width / 2, this.y + this.height)
+  }
+
 
   get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
 
@@ -161,8 +177,8 @@ export class Rect {
     return new Rect(this.x, this.y, this.width, this.height)
   }
 
-  move (point: TPoint, pivote?: Pivote): Rect
-  move (x: number, y: number, pivote?: Pivote): Rect
+  move (point: TPoint, pivote?: Pivote | TPoint): Rect
+  move (x: number, y: number, pivote?: Pivote | TPoint): Rect
   move (...args: Array<any>): Rect {
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
       const [x, y] = this.calcPivote(args[2])
@@ -179,8 +195,8 @@ export class Rect {
     
   }
 
-  moveSelf (point: TPoint, pivote?: Pivote): Rect
-  moveSelf (x: number, y: number, pivote?: Pivote): Rect
+  moveSelf (point: TPoint, pivote?: Pivote | TPoint): Rect
+  moveSelf (x: number, y: number, pivote?: Pivote | TPoint): Rect
   moveSelf (...args: Array<any>): Rect  {
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
       const [x, y] = this.calcPivote(args[2])
@@ -202,9 +218,11 @@ export class Rect {
   shift (point: TPoint, pivote?: Pivote): Rect
   shift (x: number, y: number, pivote?: Pivote): Rect
   shift (...args: Array<any>): Rect  {
+    
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
-      const [x, y] = this.calcPivote(args[2])
-      return new Rect(this.x + args[0] + x,  this.y + args[1] + y, this.width, this.height)
+      const [x, y] = this.calcShiftPivote(args[2])
+      const n =  setPoint(args[0], args[1])
+      return new Rect(this.x + n.x + x, this.y + n.y + y, this.width, this.height)
     } else {
       const point = args[0] as TPoint
       const [x, y] = this.calcPivote(args[1])
@@ -323,39 +341,18 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
-  scale (dw: number, dh: number): Rect
-  scale (value: number): Rect
+  scale (dw: number, dh: number, pivote?: Pivote | TPoint): Rect
+  scale (value: number, pivote?: Pivote | TPoint): Rect
   scale (...args: Array<any>): Rect {
-    if (args.length === 1 && typeof args[0] === 'number') {
-      return new Rect(this.x * args[0], this.y * args[0], this.width * args[0], this.height * args[0])
-    }
-    
-    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
-      return new Rect(this.x * args[0], this.y * args[1], this.width * args[0], this.height * args[1])
-    }
-
-    throw new Error('Unsupport arguments.')
+    return Rect.from(scaleRect(this, ...args))
   }
 
-  scaleSelf (dw: number, dh: number): Rect
-  scaleSelf (value: number): Rect
+  scaleSelf (dw: number, dh: number, pivote?: Pivote | TPoint): Rect
+  scaleSelf (value: number, pivote?: Pivote | TPoint): Rect
   scaleSelf (...args: Array<any>): Rect {
-    if (args.length === 1 && typeof args[0] === 'number') {
-      this.x *= args[0]
-      this.y *= args[0]
-      this.width *= args[0]
-      this.height *= args[0]
-      return this
-    }
-
-    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
-      this.x *= args[0]
-      this.y *= args[1]
-      this.width *= args[0]
-      this.height *= args[1]
-      return this
-    }
-    throw new Error('Unsupport arguments.')
+    const [x, y, w, h] = scaleRect(this, ...args)
+    this.x = x; this.y = y; this.width = w; this.height = h;
+    return this
   }
 
   union (rect: TRect) {
@@ -419,20 +416,32 @@ export class Rect {
     return new Rect(0, 0, 0, 0)
   }
 
-  static size (width: number, height: number): Rect
-  static size (size: TSize): Rect
+  static size (width: number, height: number, pos?: any): Rect
+  static size (size: TSize, pos?: any): Rect
   static size (...args: Array<any>): Rect {
-    if (args.length === 1 && args[0] && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
-      return new Rect(0, 0, args[0].width, args[0].height)
+    if (args[0] && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
+      const r = new Rect(0, 0, args[0].width, args[0].height)
+      if (args[3]) {
+        const pos = args[3]
+        const movetoField = Object.keys(pos)[0]
+        ;(r as any)[movetoField] = pos[movetoField]
+      }
+      return r
     }
-    if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
-      return new Rect(0, 0, args[0], args[1])
+    if (typeof args[0] === 'number' && typeof args[1] === 'number') {
+      const r = new Rect(0, 0, args[0], args[1])
+       if (args[2]) {
+        const pos = args[2]
+        const movetoField = Object.keys(pos)[0]
+        ;(r as any)[movetoField] = pos[movetoField]
+      }
+      return r
     }
     throw new Error('Unsupport arguments.')
   }
 
-  static from ({ x, y, width, height }: TRect) {
-    return new Rect(x, y, width, height)
+  static from (rect: TRect | [number, number, number, number]) {
+    return Array.isArray(rect) ? new Rect(rect[0], rect[1], rect[2], rect[3]) : new Rect(rect.x, rect.y, rect.width, rect.height)
   }
 
   static fromTwoPoints (p0: TPoint, p1: TPoint) {
@@ -474,9 +483,15 @@ export class Rect {
     return typeof r.x === 'number' && typeof r.y === 'number' && typeof r.width === 'number' && typeof r.height === 'number'
   }
 
-  private calcPivote(pivote?: Pivote) {
-    if (!pivote) return [0, 0]
-    switch (pivote) {
+  private calcPivote(pivote?: Pivote | TPoint) {
+    if (isTPoint(pivote)) {
+      const p = pivote as TPoint
+      return [p.x, p.y]
+    }
+    const pvt = pivote as Pivote
+
+    if (!pvt) return [0, 0]
+    switch (pvt) {
       case 'bottom-right': return [0, 0]
       case 'bottom-left': return [-this.width, 0]
       case 'top-right': return [0, -this.height]
@@ -490,6 +505,23 @@ export class Rect {
       default: return [0, 0]
     }
   }
+  private calcShiftPivote(pivote?: Pivote) {
+    if (!pivote) return [0, 0]
+    switch (pivote) {
+      case 'top-left': return [-this.width, -this.height]
+      case 'top-right': return [this.width, -this.height]
+      case 'bottom-left': return [-this.width, this.height]
+      case 'bottom-right': return [this.width, this.height]
+      case 'center-center': return [0, 0]
+      case 'bottom-center': return [0, 0 | this.height]
+      case 'top-center': return [0 | 0, -this.height]
+      case 'left-center': return [-this.width, 0]
+      case 'right-center': return [this.width, 0]
+  
+      default: return [0, 0]
+    }
+  }
+  
 }
 
 export class PolyRect {
@@ -651,3 +683,47 @@ export function resetRect(rect: TRect, x?: number, y?: number, width?: number, h
   if (typeof height === 'number') rect.height = height 
 }
 
+function calcScalePivote(size: TSize, pivote?: Pivote) {
+  if (!pivote) return [0, 0]
+  switch (pivote) {
+    case 'top-left': return [0, 0]
+    case 'top-right': return [size.width, 0]
+    case 'bottom-left': return [0, size.height]
+    case 'bottom-right': return [size.width, size.height]
+    case 'center-center': return [0 | size.width / 2, 0 | size.height  / 2]
+    case 'bottom-center': return [0 | size.width / 2, 0 | size.height]
+    case 'top-center': return [0 | size.width / 2, 0]
+    case 'left-center': return [0, 0 | size.height  / 2]
+    case 'right-center': return [size.width, 0 | size.height  / 2]
+    default: return [0, 0]
+  }
+}
+
+function scalePos ({ x, y, width, height }: TRect, dx: number, dy: number, pivote?: Pivote | TPoint ) {
+  if (isTPoint(pivote)) {
+    const p = pivote as TPoint
+    const px = p.x
+    const py = p.y
+    return setPoint(x + px * dx, y + py * dy)
+  } else {
+    const p = calcScalePivote({ width, height },  pivote as Pivote)
+    return setPoint(p[0] * -dx + p[0] + x, p[1] * -dy + p[1] + y)
+  }
+}
+
+// function scaleRect (point: TPoint, pivote?: Pivote | TPoint): [number, number, number, number]
+// function scaleRect (d: number, pivote?: Pivote | TPoint): [number, number, number, number]
+// function scaleRect (dx: number, dy: number, pivote?: Pivote | TPoint): [number, number, number, number]
+function scaleRect (self: Rect, ...args: Array<any>): [number, number, number, number] {
+  if (typeof args[0] === 'number' && (typeof args[1] !== 'number' || typeof args[1] === 'string')) {
+    const pos = scalePos(self, args[0], args[0], args[1])
+    return [pos.x, pos.y, self.width * args[0], self.height * args[0]]
+  }
+    
+  if (typeof args[0] === 'number' && typeof args[1] === 'number' && (!args[2] || typeof args[2] === 'string' || typeof args[2] === 'object')) {
+    const pos = scalePos(self, args[0], args[1], args[2])
+    return [pos.x, pos.y, self.width * args[0], self.height * args[1]]
+  }
+
+  throw new Error('Unsupport arguments.')
+}
