@@ -60,6 +60,7 @@ const GMath = {
   minY: (r: (TPoint | TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.y : p.y),
   minHeight: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.height : p.height),
   minWidth: (r: (TRect | { rect: TRect })[]) => min<any>(r, p => typeof p.rect === 'object' ?  p.rect.width : p.width),
+  clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
 
   rad,
   deg
