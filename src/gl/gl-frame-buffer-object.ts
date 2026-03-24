@@ -4,7 +4,7 @@ export class FrameBufferObject {
   origin: WebGLFramebuffer
 
   constructor (private gl: WebGL2RenderingContext) {
-    this.origin = gl.createFramebuffer()
+    this.origin = gl.createFramebuffer()!
   }
 
   use (callback: () => void) {

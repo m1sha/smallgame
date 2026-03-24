@@ -4,7 +4,7 @@ export class PixelBufferObject {
   origin: WebGLBuffer
 
   constructor (private gl: WebGL2RenderingContext) {
-    this.origin = gl.createBuffer()
+    this.origin = gl.createBuffer()!
   }
 
   setData (data: ImageDataArray) {
