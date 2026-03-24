@@ -3,12 +3,30 @@ import { Point, TPoint } from "./point"
 export type TSize = { width: number, height: number }
 export function setSize (width: number, height: number): TSize { return { width, height }}
 
+/**
+ * Represents a size with width and height dimensions.
+ */
 export class Size implements TSize {
+  /** The width dimension */
   width: number
+  /** The height dimension */
   height: number
 
+  /**
+   * Creates a new Size instance.
+   * @param value - A number to set both width and height, or an object with width and height properties
+   */
   constructor (value: number)
+  /**
+   * Creates a new Size instance from another TSize object.
+   * @param value - An object implementing TSize interface
+   */
   constructor (value: TSize)
+   /**
+   * Creates a new Size instance with specified width and height.
+   * @param width - The width dimension
+   * @param height - The height dimension
+   */
   constructor (width: number, height: number)
   constructor (...args: Array<any>) {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -30,8 +48,24 @@ export class Size implements TSize {
     throw new Error('unsupported arguments.')
   }
 
+  /**
+   * Scales the size by multiplying with the given values.
+   * @param value - A number to scale both dimensions, or an object with width and height properties
+   * @returns A new Size instance with scaled dimensions
+   */
   scale (value: number): Size
+   /**
+   * Scales the size by multiplying with another TSize object.
+   * @param value - An object implementing TSize interface
+   * @returns A new Size instance with scaled dimensions
+   */
   scale (value: TSize): Size
+   /**
+   * Scales the size by multiplying width and height with separate values.
+   * @param width - The scale factor for width
+   * @param height - The scale factor for height
+   * @returns A new Size instance with scaled dimensions
+   */
   scale (width: number, height: number): Size
   scale (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -47,8 +81,24 @@ export class Size implements TSize {
     throw new Error('unsupported arguments.')
   }
 
+  /**
+   * Scales this size by multiplying with the given values and modifies the current instance.
+   * @param value - A number to scale both dimensions, or an object with width and height properties
+   * @returns This Size instance with modified dimensions
+   */
   scaleSelf (value: number): Size
+   /**
+   * Scales this size by multiplying with another TSize object and modifies the current instance.
+   * @param value - An object implementing TSize interface
+   * @returns This Size instance with modified dimensions
+   */
   scaleSelf (value: TSize): Size
+   /**
+   * Scales this size by multiplying width and height with separate values and modifies the current instance.
+   * @param width - The scale factor for width
+   * @param height - The scale factor for height
+   * @returns This Size instance with modified dimensions
+   */
   scaleSelf (width: number, height: number): Size
   scaleSelf (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -70,9 +120,30 @@ export class Size implements TSize {
     throw new Error('unsupported arguments.')
   }
 
+  /**
+   * Expands the size by adding the given values.
+   * @param value - A number to add to both dimensions, or an object with width and height properties
+   * @returns A new Size instance with expanded dimensions
+   */
   expand (value: number): Size
+   /**
+   * Expands the size by adding another TSize object.
+   * @param value - An object implementing TSize interface
+   * @returns A new Size instance with expanded dimensions
+   */
   expand (value: TSize): Size
+   /**
+   * Expands the size by adding a TPoint object's x and y values.
+   * @param value - An object implementing TPoint interface
+   * @returns A new Size instance with expanded dimensions
+   */
   expand (value: TPoint): Size
+   /**
+   * Expands the size by adding separate width and height values.
+   * @param width - The value to add to width
+   * @param height - The value to add to height
+   * @returns A new Size instance with expanded dimensions
+   */
   expand (width: number, height: number): Size
   expand (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -92,9 +163,30 @@ export class Size implements TSize {
     throw new Error('unsupported arguments.')
   }
 
+  /**
+   * Expands this size by adding the given values and modifies the current instance.
+   * @param value - A number to add to both dimensions, or an object with width and height properties
+   * @returns This Size instance with modified dimensions
+   */
   expandSelf (value: number): Size
+  /**
+   * Expands this size by adding another TSize object and modifies the current instance.
+   * @param value - An object implementing TSize interface
+   * @returns This Size instance with modified dimensions
+   */
   expandSelf (value: TSize): Size
+   /**
+   * Expands this size by adding a TPoint object's x and y values and modifies the current instance.
+   * @param value - An object implementing TPoint interface
+   * @returns This Size instance with modified dimensions
+   */
   expandSelf (value: TPoint): Size
+   /**
+   * Expands this size by adding separate width and height values and modifies the current instance.
+   * @param width - The value to add to width
+   * @param height - The value to add to height
+   * @returns This Size instance with modified dimensions
+   */
   expandSelf (width: number, height: number): Size
   expandSelf (...args: Array<any>): Size {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -121,10 +213,30 @@ export class Size implements TSize {
     throw new Error('unsupported arguments.')
   }
 
- 
+
+  /**
+   * Returns a new Size with inverted dimensions (1/width, 1/height).
+   * @returns A new Size instance with inverted dimensions
+   */
   inverse (): Size
+  /**
+   * Returns a new Size with dimensions inverted using the given divisor.
+   * @param value - A number to use as divisor for both dimensions
+   * @returns A new Size instance with inverted dimensions
+   */
   inverse (value: number): Size
+  /**
+   * Returns a new Size with dimensions inverted using another TSize object as divisors.
+   * @param value - An object implementing TSize interface to use as divisors
+   * @returns A new Size instance with inverted dimensions
+   */
   inverse (value: TSize): Size
+   /**
+   * Returns a new Size with dimensions inverted using separate divisors.
+   * @param width - The divisor for width
+   * @param height - The divisor for height
+   * @returns A new Size instance with inverted dimensions
+   */
   inverse (width: number, height: number): Size
   inverse (...args: Array<any>): Size {
     if (args.length === 0)

@@ -4,12 +4,29 @@ import { Size, type TSize } from "./size"
 
 export type TRect = { x: number, y: number, width: number, height: number }
 
+/**
+ * Axis‑aligned rectangle
+ *
+ * All coordinates are expressed in the same units as {@link Point}.
+ */
 export class Rect {
+  /** X‑coordinate of the top‑left corner. */
   x: number
+  /** Y‑coordinate of the top‑left corner. */
   y: number
+  /** Width of the rectangle. */
   width: number
+  /** Height of the rectangle. */
   height: number
 
+  /**
+   * Creates a new {@link Rect}.
+   *
+   * @param {number} x      X‑coordinate of the top‑left corner.
+   * @param {number} y      Y‑coordinate of the top‑left corner.
+   * @param {number} width  Width of the rectangle.
+   * @param {number} height Height of the rectangle.
+   */
   constructor (x: number, y: number, width: number, height: number) {
     this.x = x
     this.y = y
@@ -17,98 +34,126 @@ export class Rect {
     this.height = height
   }
 
+  /** @returns {Point} Top‑left corner as a {@link Point}. */
   get topLeft (): Point { 
     return new Point(this.x, this.y)
   }
-
+  /** @param {TPoint} value New top‑left corner. */
   set topLeft (value: TPoint) {
     this.x = value.x
     this.y = value.y
   }
 
+  /** @returns {Point} Top‑right corner. */
   get topRight (): Point { 
     return new Point (this.absWidth, this.y)
   }
 
+  /** @param {TPoint} value New top‑right corner. */
   set topRight (value: TPoint) {
     this.width = value.x - this.x
     this.y = this.y
   }
 
+  /** @returns {Point} Bottom‑left corner. */
   get bottomLeft (): Point { 
     return new Point(this.x, this.absHeight)
   }
 
+  /** @param {TPoint} value New bottom‑left corner. */
   set bottomLeft (value: TPoint) {
     this.x = this.x
     this.height = value.y - this.y
   }
 
+  /** @returns {Point} Bottom‑right corner. */
   get bottomRight (): Point { 
     return new Point(this.absWidth, this.absHeight)
   }
 
+  /** @param {TPoint} value New bottom‑right corner. */
   set bottomRight (value: TPoint) {
     this.width = value.x - this.x
     this.height = value.y - this.y
   }
 
+  /** @returns {number} X‑coordinate of the right edge (x + width). */
   get absWidth () {
     return this.x + this.width
   }
 
+  /** @returns {number} Y‑coordinate of the bottom edge (y + height). */
   get absHeight () {
     return this.y + this.height
   }
 
+  /** @returns {Point} Center point relative to the rectangle’s origin. */
   get center (): Point {
     return new Point(this.width / 2, this.height / 2)
   }
 
+  /** Moves the rectangle so that its centre aligns with {@link value}. */
   set center (value: TPoint) {
     this.moveSelf(value, 'center-center')
   }
 
+  /** @returns {Point} Absolute centre (relative to the global coordinate space). */
   get absCenter (): Point {
     const { x, y } = this.center
     return new Point(this.x + x, this.y + y)
   }
 
+  /** @param {TPoint} value New absolute centre. */
   set absCenter (value: TPoint) {
     const { x, y } = this.center
     this.x = value.x - x
     this.y = value.y - y
   }
 
+  /** @returns {Point} Mid‑left point (center of the left edge). */
   get midLeft () {
     return new Point(this.x, this.y + this.height / 2)
   }
 
+  /** @returns {Point} Mid‑right point (center of the right edge). */
   get midRight () {
     return new Point(this.x + this.width, this.y + this.height / 2)
   }
 
+  /** @returns {Point} Mid‑top point (center of the top edge). */
   get midTop () {
     return new Point(this.x + this.width / 2, this.y)
   }
 
+  /** @returns {Point} Mid‑bottom point (center of the bottom edge). */
   get midBottom () {
     return new Point(this.x + this.width / 2, this.y + this.height)
   }
 
-
+  /** @returns {number} Length of the diagonal (Pythagorean). */
   get diagonal () { return Math.sqrt(this.width * this.width + this.height * this.height) }
 
+  /**
+   * @returns {[TPoint, TPoint, TPoint, TPoint]} Four points in the order:
+   * top‑left, top‑right, bottom‑right, bottom‑left.
+   */
   get points (): [TPoint, TPoint, TPoint, TPoint] {
     return [this.topLeft, this.topRight, this.bottomRight, this.bottomLeft]
   }
 
+  /** @returns {number} Width‑to‑height ratio. */
   get ratio () { return this.width / this.height }
 
+  /** @returns {Size} Current size as a {@link Size} instance. */
   get size () {
     return new Size(this.width, this.height)
   }
 
+  /**
+   * Checks if this rectangle overlaps with another rectangle
+   * @param rect - The rectangle to check overlap with
+   * @returns True if rectangles overlap, false otherwise
+   */
   overlaps (rect: TRect) {
     const x = Math.max(this.x, rect.x)
     const y = Math.max(this.y, rect.y)
@@ -119,6 +164,11 @@ export class Rect {
     return w > 0 && h > 0
   }
 
+  /**
+   * Gets the overlapping rectangle between this and another rectangle
+   * @param rect - The rectangle to check overlap with
+   * @returns The overlapping rectangle or null if no overlap
+   */
   getOverlapRect (rect: TRect) {
     const x = Math.max(this.x, rect.x)
     const y = Math.max(this.y, rect.y)
@@ -129,6 +179,11 @@ export class Rect {
     return (w > 0 && h > 0) ? new Rect(x, y, w, h) : null
   }
 
+  /**
+   * Determines which sides of this rectangle touch another rectangle
+   * @param rect - The rectangle to check against
+   * @returns Array of touching sides ['left'|'right'|'top'|'bottom']
+   */
   touchSide (rect: TRect): ('left' | 'right' | 'top' | 'bottom')[] {
     const result: ('left' | 'right' | 'top' | 'bottom')[] = new Array(2)
     const { x, y } = this.absCenter
@@ -139,25 +194,58 @@ export class Rect {
     return result
   }
 
+  /**
+   * Checks if this rectangle is completely inside another rectangle
+   * @param rect - The containing rectangle
+   * @returns True if this rectangle is inside the other rectangle
+   */
   inside (rect: TRect): boolean {
     return rect.x <= this.x && rect.y <= this.y && (this.x + this.width) <= (rect.x + rect.width) && (this.y + this.height) <= (rect.y + rect.height)
   }
 
+  /**
+   * Checks if this rectangle contains another rectangle
+   * @param rect - The rectangle to check
+   * @returns True if this rectangle contains the other rectangle
+   */
   contains (rect: Rect) {
     return ((rect.x >= this.x && rect.x <= this.absWidth) && (rect.y >= this.y && rect.y <= this.absHeight)) ||
     ((this.x >= rect.x && this.x <= rect.absWidth) && (this.y >= rect.y && this.y <= rect.absHeight))
   }
 
+  /**
+   * Checks if this rectangle contains a point
+   * @param point - The point to check
+   * @returns True if this rectangle contains the point
+   */
   containsPoint ({x, y}: TPoint) {
     return x >= this.x && x <= this.absWidth &&  y>= this.y && y <= this.absHeight
   }
 
+  /**
+   * Checks if this rectangle equals another rectangle
+   * @param rect - The rectangle to compare with
+   * @returns True if rectangles are equal
+   */
   equals (rect: Rect | TRect) {
     if (this === rect) return true
     return this.x == rect.x && this.y === rect.y && this.width === rect.width && this.height === rect.height
   }
 
+  /**
+   * Creates a new rectangle with padding (positive value)/margin (nigative value) applied
+   * @param padding - Uniform padding for all sides
+   * @returns New rectangle with applied padding
+   */
   outline (padding: number): Rect
+  /**
+   * Creates a new rectangle with specific padding for each side
+   * @param top - Top padding
+   * @param left - Left padding
+   * @param bottom - Bottom padding
+   * @param right - Right padding
+   * @returns New rectangle with applied padding
+   */
   outline (top: number, left: number, bottom: number, right: number): Rect
   outline (...args: Array<any>): Rect {
     if (args.length === 4 && !args.some(p => typeof p !== 'number')) {
@@ -173,11 +261,33 @@ export class Rect {
     }
   }
 
+  /** @deprecated use method dup() instead */
   clone () {
     return new Rect(this.x, this.y, this.width, this.height)
   }
 
+  /** 
+   * Creates a copy of this rectangle 
+   * @returns A new rectangle with the same properties
+   */
+  dup () {
+    return new Rect(this.x, this.y, this.width, this.height)
+  }
+
+  /** 
+   * Transfers the rectangle to a new position 
+   * @param point - New position as a point
+   * @param pivote - Pivot point for positioning
+   * @returns New rectangle at the new position
+   */
   move (point: TPoint, pivote?: Pivote | TPoint): Rect
+  /** 
+   * Transfers the rectangle to a new position 
+   * @param x - New x position
+   * @param y - New y position
+   * @param pivote - Pivot point for positioning
+   * @returns New rectangle at the new position
+   */
   move (x: number, y: number, pivote?: Pivote | TPoint): Rect
   move (...args: Array<any>): Rect {
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
@@ -195,7 +305,20 @@ export class Rect {
     
   }
 
+  /** 
+   * Moves this rectangle to a new position (mutating)
+   * @param point - New position as a point
+   * @param pivote - Pivot point for positioning
+   * @returns This rectangle at the new position
+   */
   moveSelf (point: TPoint, pivote?: Pivote | TPoint): Rect
+  /** 
+   * Moves this rectangle to a new position (mutating)
+   * @param x - New x position
+   * @param y - New y position
+   * @param pivote - Pivot point for positioning
+   * @returns This rectangle at the new position
+   */
   moveSelf (x: number, y: number, pivote?: Pivote | TPoint): Rect
   moveSelf (...args: Array<any>): Rect  {
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
@@ -215,7 +338,20 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Shifts the rectangle by relative coordinates
+   * @param point - Relative shift as a point
+   * @param pivote - Pivot point for shifting
+   * @returns New shifted rectangle
+   */
   shift (point: TPoint, pivote?: Pivote): Rect
+  /** 
+   * Shifts the rectangle by relative coordinates
+   * @param x - Relative x shift
+   * @param y - Relative y shift
+   * @param pivote - Pivot point for shifting
+   * @returns New shifted rectangle
+   */
   shift (x: number, y: number, pivote?: Pivote): Rect
   shift (...args: Array<any>): Rect  {
     
@@ -233,7 +369,20 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Shifts this rectangle by relative coordinates (mutating)
+   * @param point - Relative shift as a point
+   * @param pivote - Pivot point for shifting
+   * @returns This shifted rectangle
+   */
   shiftSelf (point: TPoint, pivote?: Pivote): Rect
+  /** 
+   * Shifts this rectangle by relative coordinates (mutating)
+   * @param x - Relative x shift
+   * @param y - Relative y shift
+   * @param pivote - Pivot point for shifting
+   * @returns This shifted rectangle
+   */
   shiftSelf (x: number, y: number, pivote?: Pivote): Rect
   shiftSelf (...args: Array<any>): Rect  {
     if (typeof args[0] === 'number' && typeof args[1] === 'number') {
@@ -253,8 +402,24 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
   
+  /** 
+   * Resizes the rectangle to new dimensions
+   * @param size - New size as TSize
+   * @returns New resized rectangle
+   */
   resize (size: TSize): Rect
+  /** 
+   * Resizes the rectangle to new dimensions
+   * @param width - New width
+   * @param height - New height
+   * @returns New resized rectangle
+   */
   resize (width: number, height: number): Rect
+  /** 
+   * Resizes the rectangle to new square dimensions
+   * @param value - New width and height
+   * @returns New resized rectangle
+   */
   resize (value: number): Rect
   resize (...args: Array<any>): Rect {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -272,8 +437,24 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Resizes this rectangle to new dimensions (mutating)
+   * @param size - New size as TSize
+   * @returns This resized rectangle
+   */
   resizeSelf (size: TSize): Rect
+  /** 
+   * Resizes this rectangle to new dimensions (mutating)
+   * @param width - New width
+   * @param height - New height
+   * @returns This resized rectangle
+   */
   resizeSelf (width: number, height: number): Rect
+  /** 
+   * Resizes this rectangle to new square dimensions (mutating)
+   * @param value - New width and height
+   * @returns This resized rectangle
+   */
   resizeSelf (value: number): Rect
   resizeSelf (...args: Array<any>): Rect {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -297,8 +478,24 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Scales the rectangle dimensions
+   * @param dw - Width scaling factor
+   * @param dh - Height scaling factor
+   * @returns New scaled rectangle
+   */
   scalesize (dw: number, dh: number): Rect
+  /** 
+   * Scales the rectangle dimensions
+   * @param size - Scaling factors as TSize
+   * @returns New scaled rectangle
+   */
   scalesize (size: TSize): Rect
+  /** 
+   * Scales the rectangle dimensions uniformly
+   * @param value - Scaling factor for both dimensions
+   * @returns New scaled rectangle
+   */
   scalesize (value: number): Rect
   scalesize (...args: Array<any>): Rect {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -316,8 +513,24 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Scales this rectangle dimensions (mutating)
+   * @param dw - Width scaling factor
+   * @param dh - Height scaling factor
+   * @returns This scaled rectangle
+   */
   scalesizeSelf (dw: number, dh: number): Rect
+  /** 
+   * Scales this rectangle dimensions (mutating)
+   * @param size - Scaling factors as TSize
+   * @returns This scaled rectangle
+   */
   scalesizeSelf (size: TSize): Rect
+  /** 
+   * Scales this rectangle dimensions uniformly (mutating)
+   * @param value - Scaling factor for both dimensions
+   * @returns This scaled rectangle
+   */
   scalesizeSelf (value: number): Rect
   scalesizeSelf (...args: Array<any>): Rect {
     if (args.length === 1 && typeof args[0] === 'number') {
@@ -341,13 +554,39 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Scales the rectangle with pivot point consideration
+   * @param dw - Width scaling factor
+   * @param dh - Height scaling factor
+   * @param pivote - Pivot point for scaling
+   * @returns New scaled rectangle
+   */
   scale (dw: number, dh: number, pivote?: Pivote | TPoint): Rect
+  /** 
+   * Scales the rectangle uniformly with pivot point consideration
+   * @param value - Scaling factor
+   * @param pivote - Pivot point for scaling
+   * @returns New scaled rectangle
+   */
   scale (value: number, pivote?: Pivote | TPoint): Rect
   scale (...args: Array<any>): Rect {
     return Rect.from(scaleRect(this, ...args))
   }
 
+  /** 
+   * Scales this rectangle with pivot point consideration (mutating)
+   * @param dw - Width scaling factor
+   * @param dh - Height scaling factor
+   * @param pivote - Pivot point for scaling
+   * @returns This scaled rectangle
+   */
   scaleSelf (dw: number, dh: number, pivote?: Pivote | TPoint): Rect
+  /** 
+   * Scales this rectangle uniformly with pivot point consideration (mutating)
+   * @param value - Scaling factor
+   * @param pivote - Pivot point for scaling
+   * @returns This scaled rectangle
+   */
   scaleSelf (value: number, pivote?: Pivote | TPoint): Rect
   scaleSelf (...args: Array<any>): Rect {
     const [x, y, w, h] = scaleRect(this, ...args)
@@ -355,6 +594,11 @@ export class Rect {
     return this
   }
 
+  /** 
+   * Creates a union rectangle that encompasses both rectangles
+   * @param rect - Rectangle to union with
+   * @returns New rectangle encompassing both
+   */
   union (rect: TRect) {
     return Rect.fromTwoPoints(
       new Point(Math.min(this.x, rect.x), Math.min(this.y, rect.y) ), 
@@ -362,17 +606,34 @@ export class Rect {
     )
   }
 
+  /** 
+   * Unions this rectangle with another rectangle (mutating)
+   * @param rect - Rectangle to union with
+   * @returns This rectangle encompassing both
+   */
   unionSelf (rect: TRect) {
     this.topLeft = new Point(Math.min(this.x, rect.x), Math.min(this.y, rect.y) )
     this.bottomRight = new Point(Math.max(this.absWidth, rect.width + rect.x), Math.max(this.absHeight, rect.height + rect.y))
     return this
   }
 
+  /** 
+   * Rotates the rectangle around a pivot point
+   * @param a - Rotation angle in degrees
+   * @param pivot - Pivot point for rotation
+   * @returns New rotated PolyRect
+   */
   rotate (a: number, pivot?: number | TPoint) {
     const { x, y, width, height } = this
     return new PolyRect(x, y, width, height).rotateSelf(a, pivot as any)
   }
 
+  /** 
+   * Gets WebGL vertex coordinates
+   * @param size - Size for normalization
+   * @param tri - Triangle mode ('triangle-strip' or 'triangles')
+   * @returns Array of vertex coordinates
+   */
   gl (size: TSize, tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
     if (tri === 'triangle-strip')
     return [
@@ -393,6 +654,12 @@ export class Rect {
     ]
   }
 
+  /** 
+   * Gets WebGL UV coordinates
+   * @param size - Size for normalization
+   * @param tri - Triangle mode ('triangle-strip' or 'triangles')
+   * @returns Array of UV coordinates
+   */
   uv (size: TSize, tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
     if (tri === 'triangle-strip')
       return [
@@ -412,11 +679,27 @@ export class Rect {
     ]
   }
 
+  /**
+   * Gets a zero rectangle (0,0,0,0)
+   */
   static get zero () {
     return new Rect(0, 0, 0, 0)
   }
 
+  /** 
+   * Creates a rectangle from size parameters
+   * @param width - Width of rectangle
+   * @param height - Height of rectangle
+   * @param pos - Position configuration
+   * @returns New rectangle
+   */
   static size (width: number, height: number, pos?: any): Rect
+  /** 
+   * Creates a rectangle from size object
+   * @param size - Size as TSize
+   * @param pos - Position configuration
+   * @returns New rectangle
+   */
   static size (size: TSize, pos?: any): Rect
   static size (...args: Array<any>): Rect {
     if (args[0] && typeof args[0] === 'object' && typeof args[0].width === 'number' && typeof args[0].height === 'number') {
@@ -440,25 +723,55 @@ export class Rect {
     throw new Error('Unsupport arguments.')
   }
 
+  /** 
+   * Creates a rectangle from TRect or array format
+   * @param rect - Rectangle data as TRect or [x,y,width,height]
+   * @returns New rectangle
+   */
   static from (rect: TRect | [number, number, number, number]) {
     return Array.isArray(rect) ? new Rect(rect[0], rect[1], rect[2], rect[3]) : new Rect(rect.x, rect.y, rect.width, rect.height)
   }
 
+  /** 
+   * Creates a rectangle from two corner points
+   * @param p0 - First corner point
+   * @param p1 - Second corner point
+   * @returns New rectangle
+   */
   static fromTwoPoints (p0: TPoint, p1: TPoint) {
     const p = absPoint(subPoints(p1, p0))
     return new Rect(p0.x, p0.y, p.x, p.y)
   }
 
+  /** 
+   * Creates a rectangle from center point and dimensions
+   * @param center - Center point
+   * @param width - Rectangle width
+   * @param height - Rectangle height
+   * @returns New rectangle
+   */
   static fromCenter (center: TPoint, width: number, height: number) {
     return new Rect(center.x - width * 0.5, center.y - height * 0.5, width, height)
   }
 
+  /** 
+   * Creates a rectangle with specified aspect ratio
+   * @param ratio - Aspect ratio (width/height)
+   * @param length - Length of fixed side
+   * @param side - Which side is fixed ('width' or 'height')
+   * @returns New rectangle
+   */
   static fromRatio (ratio: number, length: number, side: 'width' | 'height') {
     const w = side === 'width' ? length : length / ratio
     const h = side === 'height' ? length : length * ratio
     return new Rect(0, 0, w, h)
   }
 
+  /** 
+   * Merges multiple rectangles into one encompassing rectangle
+   * @param rects - Array of rectangles to merge
+   * @returns New merged rectangle
+   */
   static merge (rects: TRect[]): Rect {
     if (!rects || rects.length === 0) throw new Error('Count of rects must be more than zero.')
     
@@ -477,6 +790,11 @@ export class Rect {
     return Rect.fromTwoPoints(setPoint(x0, y0), setPoint(x1, y1))
   }
 
+  /** 
+   * Checks if an object is a valid rectangle
+   * @param rect - Object to check
+   * @returns True if object is a valid rectangle
+   */
   static isRect (rect: unknown): boolean {
     if (!rect) return false
     const r = rect as TRect
@@ -702,9 +1020,9 @@ function calcScalePivote(size: TSize, pivote?: Pivote) {
 function scalePos ({ x, y, width, height }: TRect, dx: number, dy: number, pivote?: Pivote | TPoint ) {
   if (isTPoint(pivote)) {
     const p = pivote as TPoint
-    const px = p.x
-    const py = p.y
-    return setPoint(x + px * dx, y + py * dy)
+    const nx = p.x -  dx * (p.x - x) 
+    const ny = p.y -  dy * (p.y - y) 
+    return setPoint(nx, ny) //setPoint(x + p.x * dx, y + p.y * dy) // setPoint(p.x * -dx + p.x + x, p.y * -dy + p.y + y) 
   } else {
     const p = calcScalePivote({ width, height },  pivote as Pivote)
     return setPoint(p[0] * -dx + p[0] + x, p[1] * -dy + p[1] + y)
