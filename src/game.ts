@@ -58,12 +58,15 @@ export class Game {
 }
 
 
-let gameloopRequestAnimationFrameId = 0
+const gameloopList: number[] = [] // TODO: It's need to remake. In the gameloopList accumulating removed values
 
 export const gameloop = (callback: () => void) => {
+  gameloopList.push(0)
+  let index = gameloopList.length
+
   let lastTime = millis()  
   const nextFrame = () => {
-    gameloopRequestAnimationFrameId = requestAnimationFrame(nextFrame)  
+    gameloopList[index] = requestAnimationFrame(nextFrame)  
      
     const delta = (millis() - lastTime) * 0.001
     InternalTimeSetter.deltaTime = delta
@@ -72,7 +75,8 @@ export const gameloop = (callback: () => void) => {
     
     callback()
   }
-  gameloopRequestAnimationFrameId = requestAnimationFrame(nextFrame)
+  gameloopList[index] = requestAnimationFrame(nextFrame)
+  return index
 }
 
-export const killgameloop = () => cancelAnimationFrame(gameloopRequestAnimationFrameId)
+export const killgameloop = (gameloopId: number) => cancelAnimationFrame(gameloopList[gameloopId])
