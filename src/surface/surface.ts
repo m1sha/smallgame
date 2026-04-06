@@ -287,7 +287,7 @@ export class Surface extends SurfaceBase {
     this.ctx.putImageData(value.imageData, 0, 0)
   }
 
-  mix (method: GlobalCompositeOperation, surface: SurfaceBase, rect: Rect | TPoint, options?: TBlitOptions) {
+  mix (method: GlobalCompositeOperation, surface: SurfaceBase, rect: Rect | TPoint = Point.zero, options?: TBlitOptions) {
     const old = this.ctx.globalCompositeOperation
     this.ctx.globalCompositeOperation = method
     this.blit(surface, rect, options)
