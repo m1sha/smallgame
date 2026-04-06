@@ -111,8 +111,9 @@ export class Color {
     return this.#rgba[2] * 255
   }
 
-  toArray (): [number, number, number, number] {
-    return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
+  toArray (format: 'rgb' | 'rgba' = 'rgb'): [number, number, number] | [number, number, number, number] {
+    if (format == 'rgba') return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
+    return [this.#rgba[0], this.#rgba[1], this.#rgba[2]]
   }
 
   toString (format: 'rgb' | 'rgba' = 'rgb') {
