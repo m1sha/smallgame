@@ -660,7 +660,7 @@ export class Rect {
    * @param tri - Triangle mode ('triangle-strip' or 'triangles')
    * @returns Array of UV coordinates
    */
-  uv (size: TSize, tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
+  uv (size: TSize, tri: 'triangle-strip' | 'triangles' | 'lbrt' = 'triangle-strip') {
     if (tri === 'triangle-strip')
       return [
         ...this.bottomLeft.uv(size).arr(),
@@ -668,6 +668,7 @@ export class Rect {
         ...this.bottomRight.uv(size).arr(),
         ...this.topRight.uv(size).arr(),
        ]
+    if (tri === 'triangles')
     return [
       ...this.bottomLeft.uv(size).arr(),
       ...this.topLeft.uv(size).arr(),
@@ -676,6 +677,36 @@ export class Rect {
       ...this.topRight.uv(size).arr(),
       ...this.bottomRight.uv(size).arr(),
       ...this.topLeft.uv(size).arr(),
+    ]
+    if (tri === 'lbrt')
+      return [
+        ...this.bottomLeft.uv(size).arr(),
+        ...this.topRight.uv(size).arr(),
+       ]
+  }
+
+  /** 
+   * Gets WebGL vertex in the screen coordinates
+   * @param tri - Triangle mode ('triangle-strip' or 'triangles')
+   * @returns Array of vertex coordinates
+   */
+  triangles (tri: 'triangle-strip' | 'triangles' = 'triangle-strip') {
+    if (tri === 'triangle-strip')
+    return [
+      ...this.bottomLeft.arr(),
+      ...this.topLeft.arr(),
+      ...this.bottomRight.arr(),
+      ...this.topRight.arr(),
+    ]
+
+    return [
+      ...this.bottomLeft.arr(),
+      ...this.topLeft.arr(),
+      ...this.bottomRight.arr(),
+      
+      ...this.topRight.arr(),
+      ...this.bottomRight.arr(),
+      ...this.topLeft.arr(),
     ]
   }
 
