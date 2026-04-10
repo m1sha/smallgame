@@ -12,8 +12,10 @@ export type GlBufferType =
 
 
 export class GlBuffer {
+  private _data: Float32Array | null = null
   private buffer: WebGLBuffer
   private glType: number
+  private _len: number = 0
 
   constructor (private gl: WebGL2RenderingContext, type: GlBufferType) {
     const buffer = gl.createBuffer()
@@ -33,11 +35,18 @@ export class GlBuffer {
     }
   }
 
+  get length () { return this._len }
+
   bind () {
     this.gl.bindBuffer(this.glType, this.buffer)
   }
 
   data (array: Float32Array, drawType: DrawType) {
+    const data = new Float32Array(array)
+    if (drawType === 'dynamic') {
+      this._data = data
+    }
+    this._len = array.length
     const type = getGlDrawType(this.gl, drawType)
     this.gl.bufferData(this.glType, array, type)
   }

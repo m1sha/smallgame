@@ -91,6 +91,58 @@ export function vertexOf (typeName: KnowledgeTypes) {
   }
 }
 
+export function getPrimitiveTypeCode (type: GLSLTypes) {
+  const float = 0x1406
+  const byte = 0x1400
+  const int = 5124
+  const uint = 5125
+  switch (type.name) {
+    case "bool": return byte
+    case "int": return int
+    case "uint": return uint
+    case "float": return float
+    case "vec2": return float
+    case "uvec2": return uint
+    case "ivec2": return int
+    case "bvec2": return byte
+    case "vec3": return float
+    case "uvec3": return uint
+    case "ivec3": return int
+    case "bvec3": return byte
+    case "vec4": return float
+    case "uvec4": return uint
+    case "ivec4": return int
+    case "bvec4": return byte
+    case "mat2": return float
+    case "mat3": return float
+    case "mat4": return float
+    case "mat2x3": return float
+    case "mat2x4": return float
+    case "mat3x2": return float
+    case "mat3x4": return float
+    case "mat4x2": return float
+    case "mat4x3": return float
+    case "sampler2D": return 0
+    case "samplerCube": return 0
+  }
+}
+
+export function getSizeFromTypeCode (typeCode: number) {
+  const float = 0x1406
+  const short = 0x1402
+  const byte = 0x1400
+  //const int = 5124
+  //const uint = 5125
+  switch (typeCode) {
+    case float: return 4
+    case short: return 1
+    case byte: return 1
+    case short: return 1
+    case byte: return 1
+  }
+  return new Error('Unknown type code.')
+}
+
 export function sizeOf (_/*typeName*/: string) {
   return 4
 }

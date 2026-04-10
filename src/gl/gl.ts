@@ -1,7 +1,7 @@
 import { type TSize } from "../size"
 import { GlProgram } from "./gl-program"
 import { FragmnetShader, VertexShader } from "./gl-shader"
-import { __blendFuncDic, type BlendFunc, type DrawType, getGlType, getGlTypeSize, getShape, GlAttributeTypeMap, GlUniformTypeMap, IGlAttributeTypeMap, IGlUniformTypeMap, sizeOf, vertexOf, type GlShape, type GLSLTypes } from "./types"
+import { __blendFuncDic, type BlendFunc, type DrawType, getGlType, getGlTypeSize, getShape, GlAttributeTypeMap, GlUniformTypeMap, IGlAttributeTypeMap, IGlUniformTypeMap, sizeOf, vertexOf, type GlShape, type GLSLTypes, mat3, a_pointer_array, getPrimitiveTypeCode, getSizeFromTypeCode } from "./types"
 import { getVertexAttribPointerTemplate } from "./utils"
 import { GlVertexBufferObject } from "./gl-vertex-buffer-object"
 import { GlEmptyTexture, GlTextureList, ITextureOptions } from "./textures"
@@ -14,6 +14,7 @@ import { RenderBufferObject } from "./gl-render-buffer-object"
 import { SurfaceGL } from "../surface-gl"
 import { SurfaceGLCreateOptions } from "../surface-gl/surface-gl-base"
 import { PixelBufferObject } from "./pixel-buffer-object"
+import { GlPointerArrayBufferObject } from "./gl-pointer-array-buffer"
 
 export class GL {
   #prog: GlProgram | undefined = undefined
@@ -80,6 +81,12 @@ export class GL {
     gl.drawArrays(shape, offset, vertexCount)
   }
 
+  drawArraysInstanced (type: GlShape = 'points', first: number = 0, count: number = 1, instanceCount: number = 1) {
+    const gl = this.ctx
+    const shape = getShape(gl, type)
+    gl.drawArraysInstanced(shape, first, count, instanceCount)
+  }
+
   use (prog: GlProgram) {
     this.#prog = prog
     this.ctx.useProgram(prog.origin)
@@ -142,6 +149,22 @@ export class GL {
     return new GlBufferSubData(gl, texCoordData)
   }
 
+  pabo (name: string, glslType: GLSLTypes, drawType: DrawType = 'static'): GlPointerArrayBufferObject {
+    const gl = this.ctx
+    const buffer = new GlBuffer(gl, 'array')
+    buffer.bind()
+    
+    const size = vertexOf(glslType.name as any)
+    const glType = getPrimitiveTypeCode(glslType)
+    
+    const pointer = this.attribute(name, 'pointer_array')
+    pointer.set(size, glType!, false, 0, 0)
+    pointer.enable()
+    
+
+    return new GlPointerArrayBufferObject(gl, buffer, pointer, size, drawType)
+  }
+
   vbo (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: { [key: string]: GLSLTypes }) {
     const gl = this.ctx
     const buffer = new GlBuffer(gl, 'array')
@@ -162,15 +185,32 @@ export class GL {
     return new GlVertexBufferObject(buffer, template, drawType)
   }
 
+  /** @deprecated use createVAO instead */
   vao (drawType: DrawType, type: 'float' | 'short' | 'byte' | 'ushort' | 'ubyte', scheme: { [key: string]: GLSLTypes }, ...data: Array<number[]>) {
     const gl = this.ctx
-    const vaoId = gl.createVertexArray()
+    const vaoId = gl.createVertexArray()!
     gl.bindVertexArray(vaoId)
     const vbo = this.vbo(drawType, type, scheme)
     vbo.push(...data)
     const vao = new GlVertexArrayObject(gl, vaoId, vbo)
     gl.bindVertexArray(null)
     return vao
+  }
+
+  createVAO () {
+    const gl = this.ctx
+    const vaoId = gl.createVertexArray()!
+
+    return {
+      use: (callback: () => void) => {
+        gl.bindVertexArray(vaoId)
+        callback()
+        gl.bindVertexArray(null)
+      },
+      remove: () => {
+        gl.deleteVertexArray(vaoId)
+      }
+    }
   }
   
   createTexture (samplerName: string, surface: SurfaceBase, options?: ITextureOptions) {
