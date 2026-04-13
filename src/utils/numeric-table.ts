@@ -1,22 +1,11 @@
-type DataType = 'f32' | 'f64' | 'i8' | 'i16' | 'i32' | 'u8' | 'u16' | 'u32' | 'u8C' 
-
-interface TypedArray {
-  [index: number]: number
-  readonly length: number
-  readonly buffer: ArrayBuffer
-  fill: (value: number) => void
-  subarray: (begin?: number, end?: number) => TypedArray
-  slice: (start?: number | undefined, end?: number | undefined) => TypedArray
-  set: (array: ArrayLike<number>, offset?: number | undefined) => void
-  copyWithin: (target: number, start: number, end?: number | undefined) => TypedArray
-}
+import { createTypedArray, isTypedArray, ITypedArray, TypedArrayType } from "./typed-array"
 
 export class NumericTable {
   #rows: number
   #cols: number
-  #data: TypedArray
+  #data: ITypedArray
 
-  constructor(rows: number, cols: number, private defaultValue: number = 0, private type: DataType = 'f32') {
+  constructor(rows: number, cols: number, private defaultValue: number = 0, private type: TypedArrayType = 'f32') {
     this.#rows = rows  
     this.#cols = cols
     this.#data = this.createArray(rows * cols)
@@ -205,11 +194,11 @@ export class NumericTable {
   }
 
   shiftRows (start: number, count: number = 1, shift: number = 1) {
-
+    throw new Error('Not Implemented')
   }
 
   shiftColumns (start: number, count: number = 1, shift: number = 1) {
-
+    throw new Error('Not Implemented')
   }
 
   getIndex (row: number, col: number) {
@@ -223,42 +212,11 @@ export class NumericTable {
   }
 
   private createArray (size: number) {
-    switch (this.type) {
-      case 'f32': return new Float32Array(size)
-      case 'f64': return new Float64Array(size)
-      case 'i8': return new Int8Array(size)
-      case 'i16': return new Int16Array(size)
-      case 'i32': return new Int32Array(size)
-      case 'u8': return new Uint8Array(size)
-      case 'u16': return new Uint16Array(size)
-      case 'u32': return new Uint32Array(size)
-      case 'u8C': return new Uint8ClampedArray(size)
-      default: return new Float32Array(size)
-    }
+    return createTypedArray(this.type, size)
   }
 
-  private arrayFrom (arr: number[] | Float32Array | Float64Array | Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Uint8ClampedArray): TypedArray {
-    if (arr instanceof Float32Array) return arr as TypedArray
-    if (arr instanceof Float64Array) return arr as TypedArray
-    if (arr instanceof Int8Array) return arr as TypedArray
-    if (arr instanceof Int16Array) return arr as TypedArray
-    if (arr instanceof Int32Array) return arr as TypedArray
-    if (arr instanceof Uint8Array) return arr as TypedArray
-    if (arr instanceof Uint16Array) return arr as TypedArray
-    if (arr instanceof Uint32Array) return arr as TypedArray
-    if (arr instanceof Uint8ClampedArray) return arr as TypedArray
-
-    switch (this.type) {
-      case 'f32': return new Float32Array(arr)
-      case 'f64': return new Float64Array(arr)
-      case 'i8': return new Int8Array(arr)
-      case 'i16': return new Int16Array(arr)
-      case 'i32': return new Int32Array(arr)
-      case 'u8': return new Uint8Array(arr)
-      case 'u16': return new Uint16Array(arr)
-      case 'u32': return new Uint32Array(arr)
-      case 'u8C': return new Uint8ClampedArray(arr)
-      default: return new Float32Array(arr)
-    }
+  private arrayFrom (arr: number[] | Float32Array | Float64Array | Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Uint8ClampedArray): ITypedArray {
+    if (isTypedArray(arr)) return arr as ITypedArray
+    return createTypedArray(this.type, arr as number[])
   }
 }
