@@ -343,7 +343,7 @@ export class Surface extends SurfaceBase {
     return new Surface(1, 1)
   }
 
-  static combine (images: SurfaceBase[], rows: number, cols: number): CombinedSurface {
+  static combine (images: SurfaceBase[], rows: number, cols: number, offscreen: boolean = true): CombinedSurface {
     const rects: Rect[] = []
     let k = 0
     const pos = Point.zero
@@ -366,7 +366,7 @@ export class Surface extends SurfaceBase {
     }
 
     const { width, height } = Rect.merge(rects)
-    const surface = new Surface(width, height)
+    const surface = new Surface(width, height, { useOffscreen: offscreen })
     k = 0
     pos.moveSelf(0, 0)
     maxH = 0
