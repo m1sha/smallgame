@@ -17,9 +17,9 @@ export class GlPointerArrayBufferObject {
   }
 
   set (n: number[], dstByteOffset: number = 0) {
-    const data = new Float32Array(n)
+    
     this.buffer.bind()
-    this.buffer.subdata(data, dstByteOffset)
+    this.buffer.subdata(n, dstByteOffset)
     return this
   }
 

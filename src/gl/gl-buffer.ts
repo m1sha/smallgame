@@ -1,3 +1,4 @@
+import { ITypedArray } from "../utils"
 import { type DrawType, getGlDrawType } from "./types"
 
 export type GlBufferType = 
@@ -51,8 +52,10 @@ export class GlBuffer {
     this.gl.bufferData(this.glType, array, type)
   }
 
-  subdata (array: Float32Array, dstByteOffset: number) {
-    this.gl.bufferSubData(this.glType, dstByteOffset, array)
+  subdata (array: number[] | ITypedArray, dstByteOffset: number) {
+    if (!this._data) throw new Error('Draw type must be dynamic')
+    this._data.set(array, dstByteOffset / Float32Array.BYTES_PER_ELEMENT)
+    this.gl.bufferSubData(this.glType, dstByteOffset, this._data.subarray(dstByteOffset / Float32Array.BYTES_PER_ELEMENT))
   }
 
   remove () {
