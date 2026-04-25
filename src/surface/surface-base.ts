@@ -44,7 +44,13 @@ export abstract class SurfaceBase {
   }
 
   toDataURL (type?: string, quality?: any): string {
-    if (this.canvas instanceof OffscreenCanvas) throw new Error('Cannot create an image from the OffscreenCanvas.')
+    if (this.canvas instanceof OffscreenCanvas) {
+      const canvas = document.createElement('canvas')
+      canvas.width = this.canvas.width
+      canvas.height = this.canvas.height
+      canvas.getContext('2d')!.drawImage(this.canvas, 0, 0)
+      return canvas.toDataURL(type, quality)
+    }
     return this.canvas.toDataURL(type, quality)
   }
 
