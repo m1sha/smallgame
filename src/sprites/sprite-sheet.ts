@@ -39,6 +39,13 @@ export class SpriteSheet {
     return this
   }
 
+  addBatchList (list: { start: number, count: number, name: string }[]) {
+    for (const item of list) {
+      this.addBatch(item.name, item.start, item.count)
+    }
+    return this
+  }
+
   getBatch (name: keyof TSpriteSheetBatchScheme) {
     return this.batches.get(name) ?? null
   }
