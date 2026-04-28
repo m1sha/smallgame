@@ -43,6 +43,15 @@ export class AnimatedSprite extends Sprite {
     this.image.blit(sprite, this.originRect.move(this.rect.center, 'center-center'), { angle: this.rotationAngle, pivote: 'center-center' })
   }
 
+  getFrame (num: number) {
+    if (num < 0 || num >= this.spriteSheet.count) throw new Error('Out of range of frames count.')
+    return this.spriteSheet.getTile(num)
+  }
+
+  get frameCount () {
+    return this.spriteSheet.count
+  }
+
   playBatch (name: string) {
     this.batch = this.spriteSheet.getBatch(name)
   }
