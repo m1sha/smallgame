@@ -43,7 +43,7 @@ export class Parallax {
   draw (screen: Surface, insertSuface?: Surface, insertIndex?: number): void {
     for (let i = 0; i < this.layers.length; i++) {
       const surface = this.layers[i].surface
-      screen.blit(surface, screen.rect)
+      screen.blit(surface, surface.rect)
       
       if (insertSuface && insertIndex === i) {
         screen.blit(insertSuface, screen.rect)
