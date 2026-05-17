@@ -372,9 +372,10 @@ export class Point {
    * @param {number} deg - Rotation angle in degrees
    * @returns {Point} New rotated point
    */
-  rotate (deg: number): Point {
+  rotate (deg: number, radius?: number): Point {
     const a = rad(deg)
-    return new Point(this.x + Math.cos(a), this.y + Math.sin(a))
+    const r = typeof radius === 'number' ? radius : 1
+    return new Point(this.x + r * Math.cos(a), this.y + r * Math.sin(a))
   }
 
   /**
