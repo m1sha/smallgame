@@ -12,7 +12,7 @@ export class GlTextureArray extends TextureBase {
     this.activate()
     gl.bindTexture(this.type, texture)
 
-    gl.texStorage3D(this.type, 2,  gl.RGBA8, surfaces[0].width, surfaces[0].height, 2)
+    gl.texStorage3D(this.type, 1,  gl.RGBA8, surfaces[0].width, surfaces[0].height, surfaces.length)
     const mipmapLevel = this.activateParameters()
 
     for (let i = 0; i < surfaces.length; i++) {
@@ -25,7 +25,7 @@ export class GlTextureArray extends TextureBase {
         gl.texImage3D(this.type, 0, gl.RGBA8, surface.width, surface.height, i, 0, gl.UNSIGNED_BYTE, gl.RGBA, (surface as any).origin)
     }
 
-    //gl.generateMipmap(this.type)
+    gl.generateMipmap(this.type)
   }
 
 }
