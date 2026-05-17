@@ -8,7 +8,7 @@ export function calcArrowHead (vector: TSegment, dir: number, arrowRadius: numbe
   }
 
   const result = []
-  const angle = alfa(vector)
+  const angle = alfa(vector) - Math.PI
   const point = dir < 0 ? vector.p0 : vector.p1
   const r = arrowRadius
   const turn = arrowAngle
