@@ -7,6 +7,7 @@ import { calcArrowHead } from "../../gmath"
 
 export function drawArrow (shape: Arrow, surface: Surface, shift: TPoint, scale: TPoint) {
   const { p0, p1 } = shape
+  surface.draw.beginPath()
   surface.draw.moveTo(shift.x + p0.x * scale.x, shift.y + p0.y * scale.y)
   surface.draw.lineTo(shift.x + p1.x * scale.x, shift.y + p1.y * scale.y)
   drawShape(shape, surface)
