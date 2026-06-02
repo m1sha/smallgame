@@ -1,6 +1,8 @@
 //import { EventQueue } from "../events/event-queue"
+import { GMath } from "../gmath"
 import { Point } from "../point"
 import { Key } from "./key"
+import { Time } from "../time"
 
 const keymap: Record<string, number> = {
   'enter': Key.RETURN,
@@ -98,6 +100,11 @@ const keymap: Record<string, number> = {
 export class Keys /* implicitly implements EventQueue */ {
   private keys: number[] = []
 
+  sensitivityX = 2
+  frictionX = 2
+  sensitivityY = 2
+  frictionY = 2
+
   constructor () {
     this.keys = new Array(Object.keys(Key).length).fill(0)
   }
@@ -106,7 +113,7 @@ export class Keys /* implicitly implements EventQueue */ {
     return this.keys
   }
 
-  get horizontalAxis () {
+  get horizontalAxisRaw () {
     const keys = this.keys
     if (keys[Key.K_A] || keys[Key.LEFT]) { 
       return -1
@@ -119,7 +126,28 @@ export class Keys /* implicitly implements EventQueue */ {
     return 0
   }
 
-  get verticalAxis () {
+  private horizontalAxisValue = 0
+
+  get horizontalAxis () {
+    const keys = this.keys
+    let target = 0
+    if (keys[Key.K_A] || keys[Key.LEFT]) { 
+      target = -1
+    } 
+    else
+    if (keys[Key.K_D] || keys[Key.RIGHT]) { 
+      target = 1 
+    } 
+    
+    this.horizontalAxisValue = target === 0 
+      ? GMath.moveTowards(0, this.horizontalAxisValue, this.frictionX * Time.deltaTime)
+      : GMath.moveTowards(target, this.horizontalAxisValue, this.sensitivityX * Time.deltaTime)
+    
+    
+    return this.horizontalAxisValue
+  }
+
+  get verticalAxisRaw () {
     const keys = this.keys
     if (keys[Key.K_W] || keys[Key.UP]) { 
       return -1
@@ -130,6 +158,30 @@ export class Keys /* implicitly implements EventQueue */ {
     } 
     
     return 0
+  }
+
+  private verticalAxisValue = 0
+
+  get verticalAxis () {
+    const keys = this.keys
+    let target = 0
+    if (keys[Key.K_W] || keys[Key.UP]) { 
+      target = -1
+    } 
+    else
+    if (keys[Key.K_S] || keys[Key.DOWN]) { 
+      target = 1 
+    } 
+
+    this.verticalAxisValue = target === 0 
+      ? GMath.moveTowards(0, this.verticalAxisValue, this.frictionY * Time.deltaTime)
+      : GMath.moveTowards(target, this.verticalAxisValue, this.sensitivityY * Time.deltaTime)
+    
+    return this.verticalAxisValue
+  }
+
+  get axisesRaw () {
+    return new Point(this.horizontalAxisRaw, this.verticalAxisRaw)
   }
 
   get axises () {
