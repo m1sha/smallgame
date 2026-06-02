@@ -1,4 +1,4 @@
-import { setPoint, type TPoint } from "./point"
+import { Point, setPoint, type TPoint } from "./point"
 
 export type TSegment = {
   readonly p0: TPoint
@@ -13,6 +13,9 @@ export class Segment {
     this.p0 = p0
     this.p1 = p1
   }
+
+  get start () { return this.p0 }
+  get end () { return this.p1 }
 
   normals () {
     const cx = (this.p1.x + this.p0.x) / 2
@@ -36,6 +39,24 @@ export class Segment {
       new Segment(setPoint(x1, y1), setPoint(cx, cy)),
       new Segment(setPoint(cx, cy), setPoint(x2, y2))
     ]
+  }
+
+  normalize () {
+    const dx = this.p1.x - this.p0.x
+    const dy = this.p1.y - this.p0.y
+    const distance = Math.sqrt(dx * dx + dy * dy)
+
+    return new Point(dx / distance, dy / distance)
+  }
+
+  extrapolateEnd (length: number) {
+    const n = this.normalize().scaleSelf(length)
+    return new Segment(this.p1, n.shiftSelf(this.p1)) 
+  }
+
+  extrapolateStart (length: number) {
+    const n = this.normalize().scaleSelf(length)
+    return new Segment(Point.from(this.p0).shiftSelf(n.negSelf()), this.p0)
   }
 
   static hasPoint (seg: TSegment, p: TPoint) {
