@@ -2,20 +2,16 @@ import { CssViewport, TransformViewport, type Viewport, type ViewportType } from
 import { Surface, type SurfaceCreateOptions } from './surface'
 import { type TPoint } from './point'
 import { Rect, TRect } from './rect'
-import { SurfaceGL } from './surface-gl'
 import { TColorSource } from './styles/color-source'
 import { SurfaceBase } from './surface/surface-base'
 import { TSize } from './size'
+import { EventController } from './events'
 
 export class Screen {
   readonly viewport: Viewport
-  //readonly surface: SurfaceGL 
   readonly surface: Surface
 
   constructor(viewportType: ViewportType, width: number, height: number, options?: SurfaceCreateOptions) { 
-    // this.surface = new SurfaceGL(width, height, options) //super(width, height, options)
-    // this.surface.create()
-
     this.surface = new Surface(width, height, options)
     
     this.viewport = viewportType === 'css' 
@@ -91,7 +87,22 @@ export class Screen {
     this.originCanvas.remove()
   }
 
+  remove () {
+    this.originCanvas.remove()
+    this.viewport.htmlContainer.remove()
+  }
+
   disableContextMenu () {
     this.originCanvas.addEventListener('contextmenu', e => e.preventDefault())
+  }
+
+  attachContrainer (container: HTMLElement) {
+    container.appendChild(this.viewport.htmlContainer)
+  }
+
+  createEventBusController () {
+    const bus = new EventController()
+    bus.init(this.viewport.htmlContainer)
+    return bus
   }
 }
