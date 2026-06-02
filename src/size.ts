@@ -326,6 +326,10 @@ export class Size implements TSize {
     return this
   }
 
+  half (): Size {
+    return this.scale(0.5)
+  }
+
   toPoint (): Point {
     return new Point(this.width, this.height)
   }
