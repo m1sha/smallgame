@@ -9,6 +9,8 @@ import { type TSegment } from '../segment'
 import { type CoordinateSystem } from '../coords'
 import { type TArrowDrawOptions, ArrowDrawOptions, RectDrawOptions, type TRectDrawOptions } from './options'
 import { drawerMap } from './drawers'
+import { TTextStyle } from '../styles/text-style'
+import { Text } from '../text'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -199,14 +201,35 @@ export class Sketch extends Drawable {
     return this
   }
 
+  text (style: TTextStyle, text: string, pos: TPoint) {
+     const shape: Shape = { 
+      type: 'text', 
+      style: style,
+      text,
+      pos,
+      target: ''
+    }
+    this._shapes.push(shape)
+    return this
+  }
+
   draw (suface: Surface): void {
     const shift = new Point(this.x, this.y)
     const scale = new Point(this.sx, this.sy)
     
     for (const shape of this._shapes) {
       suface.draw.save()  
-      if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
-      if (shape.style.fill) applyFill(suface.draw as any, shape.style.fill)
+
+      if (shape.type === 'text') {
+        const text = new Text(shape.text, shape.style)
+        text.pos = shape.pos
+        text.draw(suface)
+      }
+      
+      if (shape.style instanceof ShapeStyle) {
+        if (shape.style.stroke) applyStroke(suface.draw as any, shape.style)
+        if (shape.style.fill) applyFill(suface.draw as any, shape.style.fill)
+      }
         
       drawerMap.get(shape.type)?.(shape, suface, shift, scale)
       suface.draw.restore()  

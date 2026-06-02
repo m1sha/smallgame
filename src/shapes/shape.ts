@@ -12,6 +12,7 @@ import { Arrows } from './arrows'
 import { Arrow } from './arrow'
 import { type VLine } from './vline'
 import { CubicBezier } from './cubic-bezier'
+import { Text } from './text'
 
   
 export type Shape = (
@@ -29,4 +30,5 @@ export type Shape = (
   | Arrows
   | Arrow
   | CubicBezier
+  | Text
 ) 
