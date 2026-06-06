@@ -790,8 +790,11 @@ export class Rect {
    * @returns New rectangle
    */
   static fromTwoPoints (p0: TPoint, p1: TPoint) {
-    const p = absPoint(subPoints(p1, p0))
-    return new Rect(p0.x, p0.y, p.x, p.y)
+    const x = Math.min(p0.x, p1.x)
+    const y = Math.min(p0.y, p1.y)
+    const w = Math.max(p0.x, p1.x) - x
+    const h = Math.max(p0.y, p1.y) - y
+    return new Rect(x, y, w, h)
   }
 
   /** 
