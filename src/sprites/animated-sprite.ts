@@ -15,12 +15,12 @@ export class AnimatedSprite extends Sprite {
   rotationAngle = 0
   playing = true
   
-  constructor (readonly spriteSheet: SpriteSheet, size?: TSize) {
+  constructor (readonly spriteSheet: SpriteSheet, size?: TSize, options?: any) {
     super ()
 
     this.originRect = Rect.size(size ? size.width : spriteSheet.size.width, size ? size.height : spriteSheet.size.height)
     const diagonal = this.originRect.diagonal
-    this.image = new MemSurface(new Size(diagonal))
+    this.image = new MemSurface(options && options.useDiagonal === false ? this.originRect.size : new Size(diagonal))
     this.image.imageRendering = 'pixelated'
     this.rect = this.image.rect
     this.batch = spriteSheet.defaultBatch()
