@@ -354,8 +354,8 @@ export class Point {
    * @param {TPoint} p - Other point
    * @returns {number} Dot product
    */
-  dot (p: TPoint) {
-   return this.x * p.x + this.y * p.y
+  dot (p?: TPoint) {
+   return p ? this.x * p.x + this.y * p.y : this.x * this.x + this.y * this.y
   }
 
   /**
@@ -438,6 +438,16 @@ export class Point {
    */
   negYSelf (): Point {
     this.y *= -1
+    return this
+  }
+
+  invert (): Point {
+    return new Point(1.0 / this.x, 1.0 / this.y)
+  }
+
+  invertSelf (): Point {
+    this.x = 1.0 / this.x
+    this.y = 1.0 / this.y
     return this
   }
 
