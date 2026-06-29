@@ -6,12 +6,12 @@ export type TSegment = {
 }
 
 export class Segment {
-  readonly p0: TPoint
-  readonly p1: TPoint
+  readonly p0: Point
+  readonly p1: Point
   
   constructor (p0: TPoint, p1: TPoint) {
-    this.p0 = p0
-    this.p1 = p1
+    this.p0 = p0 instanceof Point ? p0: Point.from(p0)
+    this.p1 = p1 instanceof Point ? p1: Point.from(p1)
   }
 
   get start () { return this.p0 }
@@ -47,6 +47,20 @@ export class Segment {
     const distance = Math.sqrt(dx * dx + dy * dy)
 
     return new Point(dx / distance, dy / distance)
+  }
+
+  getPointOnSegment (point: Point, maxDistantion: number = 0) {
+    const d = this.p1.shift(this.p0.neg())
+    const lenSq = d.dot()
+    if (lenSq === 0) return null
+    let t = point.shift(this.p0.neg()).dot(d) / lenSq
+    
+    //if (t < 0 || t > 1) return null
+    t = Math.max(0, Math.min(1, t))
+    const result = d.scale(t).shiftSelf(this.p0)
+    const dist = point.distance(result)
+    if (dist <= maxDistantion) return result  
+    return null
   }
 
   extrapolateEnd (length: number) {
