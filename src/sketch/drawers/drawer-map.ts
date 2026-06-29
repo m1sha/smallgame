@@ -15,6 +15,8 @@ import { drawHLine } from "./draw-hline"
 import { drawSegmentLine } from "./draw-segmentline"
 import { drawPixel } from "./draw-pixel"
 import { drawCubicbezier } from "./draw-cubic-bezier"
+import { drawArc } from "./draw-arc"
+import { drawArcTo } from "./draw-arc-to"
 
 const drawerMap: Map<Shape['type'], (shape: any, suface: Surface, shift: TPoint, scale: TPoint) => void> = new Map()
 
@@ -32,5 +34,7 @@ drawerMap.set('hline', drawHLine)
 drawerMap.set('segmentline', drawSegmentLine)
 drawerMap.set('pixel', drawPixel)
 drawerMap.set('cubicbezier', drawCubicbezier)
+drawerMap.set('arc', drawArc)
+drawerMap.set('arc-to', drawArcTo)
 
 export { drawerMap }

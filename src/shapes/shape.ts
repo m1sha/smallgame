@@ -13,6 +13,8 @@ import { Arrow } from './arrow'
 import { type VLine } from './vline'
 import { CubicBezier } from './cubic-bezier'
 import { Text } from './text'
+import { Arc } from './arc'
+import { ArcTo } from './arc-to'
 
   
 export type Shape = (
@@ -29,6 +31,8 @@ export type Shape = (
   | Pixel
   | Arrows
   | Arrow
+  | Arc
+  | ArcTo
   | CubicBezier
   | Text
 ) 

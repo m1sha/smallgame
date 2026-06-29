@@ -11,6 +11,7 @@ import { type TArrowDrawOptions, ArrowDrawOptions, RectDrawOptions, type TRectDr
 import { drawerMap } from './drawers'
 import { TTextStyle } from '../styles/text-style'
 import { Text } from '../text'
+import { Shapes } from './shapes'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -24,6 +25,8 @@ export class Sketch extends Drawable {
     this._styleList[name] = ShapeStyle.from(style)
     return this
   }
+
+  get shapes () { return new Shapes(this._shapes) }
 
   get styleNames () { return Object.keys(this._styleList) }
 
@@ -208,6 +211,34 @@ export class Sketch extends Drawable {
       text,
       pos,
       target: ''
+    }
+    this._shapes.push(shape)
+    return this
+  }
+
+  arc (style: ShapeStyle | TShapeStyle | string, center: TPoint, radius: number, startAngle: number = 0, endAngle: number = 2*Math.PI, counterclockwise: boolean = false) {
+    const shape: Shape = {
+      type: 'arc',
+      style: this.initStyle(style),
+      x: center.x,
+      y: center.y,
+      radius: radius,
+      startAngle,
+      endAngle,
+      counterclockwise
+    }
+    this._shapes.push(shape)
+    return this
+  }
+
+  arcTo (style: ShapeStyle | TShapeStyle | string, p0: TPoint, p1: TPoint, p2: TPoint, radius: number) {
+    const shape: Shape = {
+      type: 'arc-to',
+      style: this.initStyle(style),
+      p0,
+      p1,
+      p2,
+      radius
     }
     this._shapes.push(shape)
     return this
