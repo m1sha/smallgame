@@ -77,8 +77,16 @@ export class Surface extends SurfaceBase {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
   }
 
-  fill (color: TColorSource) {
+  fill (color: TColorSource, offset?: TPoint) {
     this.ctx.fillStyle = typeof color === 'number' ? int2Str(color) : color
+    
+    if (offset) {
+      this.ctx.setTransform(new DOMMatrix().translateSelf(-offset.x, -offset.y))
+      this.ctx.fillRect(0, 0, this.width + offset.x, this.height + offset.y)  
+      this.draw.resetTransform()
+      return
+    }
+    
     this.ctx.fillRect(0, 0, this.width, this.height)
   }
 
