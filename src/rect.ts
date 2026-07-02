@@ -825,12 +825,14 @@ export class Rect {
    * Scales the rectangle to a specified length while maintaining its aspect ratio.
    * The length is applied to the longest side of the rectangle.
    * @param originRect - The source rectangle to scale.
-   * @param length - The target length for the dominant side.
+   * @param dimension - The target length for the dominant side.
    * @returns A new Rect scaled proportionally to the given length.
    */
-  static scaleToFit (originSize: Rect | TRect | TSize | Size, length: number): Rect {
-    const size = originSize instanceof Rect ? originSize : new Size(originSize)
-    return Rect.fromRatio(size.ratio, length, size.width > size.height ? 'width' : 'height')
+  static scaleToFit (originSize: Rect | TRect | TSize | Size, dimension: number | TSize): Rect {
+    const w = (typeof dimension  === 'number' ? dimension : dimension.width) / originSize.width
+    const h = (typeof dimension  === 'number' ? dimension : dimension.height) / originSize.height
+    const s = Math.min(w, h)
+    return Rect.size(originSize.width * s, originSize.height * s)
   }
 
   /** 
