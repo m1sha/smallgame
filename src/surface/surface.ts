@@ -195,6 +195,7 @@ export class Surface extends SurfaceBase {
 
   scaleSelf (dx: number, dy: number) {
     this.resizeSelf(this.width * dx, this.height * dy)
+    return this
   }
 
   scale (dx: number, dy: number) {
