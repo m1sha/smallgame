@@ -738,6 +738,10 @@ export class Point {
     return new Point(this.xy[0], this.xy[1])
   }
 
+  atan2 (p: TPoint): number {
+    return Math.atan2(this.y - p.y, this.x - p.x)
+  }
+
   /**
    * Gets a zero point (0, 0)
    * @static
