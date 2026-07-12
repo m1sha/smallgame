@@ -17,6 +17,10 @@ export class Segment {
   get start () { return this.p0 }
   get end () { return this.p1 }
 
+  distance () {
+    return this.start.distance(this.end)
+  }
+
   normals () {
     const cx = (this.p1.x + this.p0.x) / 2
     const cy = (this.p1.y + this.p0.y) / 2
@@ -73,6 +77,37 @@ export class Segment {
     return new Segment(Point.from(this.p0).shiftSelf(n.negSelf()), this.p0)
   }
 
+  interpolateStart (length: number) {
+    const n = this.normalize().scaleSelf(length)
+    return new Segment(n, this.end)
+  }
+
+  interpolateEnd (length: number) {
+    const n = this.normalize().scaleSelf(length)
+    return new Segment(this.start, n)
+  }
+
+  bisector (a: 'start' | 'end', c: Point) {
+    const v = a == 'start' ? this.start : this.end
+    const ac = v.distance(c)
+    const ab = this.distance()
+    if (ab + ac === 0) return new Segment(v, v)
+    const r = ab / (ab + ac)
+    return new Segment(v, this.end.shift(this.start.neg()).scale(r).shift(this.start))
+  }
+
+  atan2 (pos: 'start' | 'end' = 'start') {
+    return this.end.atan2(pos === 'start' ? this.start: this.end)
+  }
+
+  ray (segment: TSegment) {
+    return ray(this, segment)
+  }
+
+  dup () {
+    return new Segment(this.start.dup(), this.end.dup())
+  }
+
   static hasPoint (seg: TSegment, p: TPoint) {
     const ab = Segment.distanceSq(seg)
     const ac = Segment.distanceSq({ p0: seg.p0, p1: p })
@@ -88,7 +123,10 @@ export class Segment {
   }
 }
 
-export function ray (seg0: TSegment, seg1: TSegment): { point: TPoint | null, intersect: 'parallel' | 'intersect' | 'start-reached' | 'end-reached' | 'no-one' } {
+export type RayTraceIntersection = 'parallel' | 'intersect' | 'start-reached' | 'end-reached' | 'no-one'
+export type RayTraceResult = { point: TPoint | null, intersect: RayTraceIntersection  }
+
+export function ray (seg0: TSegment, seg1: TSegment): RayTraceResult {
   const eq = ({ p0, p1 }: TSegment) => {
     const a = p1.y - p0.y
     const b = p0.x - p1.x
