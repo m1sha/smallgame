@@ -4,12 +4,14 @@ import { setPoint, type TPoint } from "./point"
 import { type TTextStyle, TextStyle } from "./styles/text-style"
 import { TSize } from "./size"
 import { Rect, TRect } from "./rect"
+import { Pivote } from "./pivote"
 
 export class Text implements Drawable {
   content: string
   #pos: TPoint
   style: TextStyle
-  #mitrics: { width: number, height: number }
+  #mitrics: { width: number, height: number, hDescent: number, vDescent: number }
+  pivote: Pivote = 'top-left'
 
   constructor (content: string, style: TTextStyle | TextStyle) {
     this.content = content
@@ -20,8 +22,13 @@ export class Text implements Drawable {
   
   draw (suface: Surface): void {
     assignTextStyle(suface.draw as any, this.style)
-    const y = this.#pos.y + this.#mitrics.height + this.style.outlineWidth
-    drawText(suface.draw as any, this.style, this.content, this.#pos.x, y)
+    let y = this.#pos.y + this.#mitrics.height - this.#mitrics.hDescent + this.style.outlineWidth
+    let x = this.#pos.x + this.#mitrics.vDescent
+    if (this.pivote === 'center-center') {
+      x -= this.#mitrics.width / 2
+      y -= this.#mitrics.height / 2
+    }
+    drawText(suface.draw as any, this.style, this.content, x, y)
   }
 
   get pos () {
@@ -34,7 +41,7 @@ export class Text implements Drawable {
     this.#pos.y = value.y
   }
 
-  get bounds (): TRect {
+  get bounds (): Rect {
     return Rect.size(TextMeasurer.measureText(this.content, this.style))
   }
 
@@ -122,12 +129,14 @@ export class TextMeasurer {
     return this.getGefaultCanvas().getContext('2d')!
   } 
 
-  static measureText (text: string, style: TextStyle): { width: number, height: number } {
+  static measureText (text: string, style: TextStyle): { width: number, height: number, hDescent: number, vDescent: number } {
     const ctx = TextMeasurer.getDefaultCtx()
     const metrics =this.measureTextInt(ctx, text, style)
     return {
       width: metrics.width,
-      height: this.getHeight(text, style, metrics)
+      height: this.getHeight(text, style, metrics),
+      hDescent: metrics.actualBoundingBoxDescent || 0,
+      vDescent: metrics.actualBoundingBoxLeft || 0,
     }
   }
 
@@ -159,7 +168,7 @@ export class TextMeasurer {
 
   private static getHeight (_: string, style: TextStyle, metrics: TextMetrics) {
     if (metrics.actualBoundingBoxAscent && metrics.actualBoundingBoxDescent) {
-      return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent 
+      return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
     }
     return TextMeasurer.getWidth('M', style) 
   }
