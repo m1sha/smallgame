@@ -15,6 +15,7 @@ import { CubicBezier } from './cubic-bezier'
 import { Text } from './text'
 import { Arc } from './arc'
 import { ArcTo } from './arc-to'
+import { Pie } from './pie'
 
   
 export type Shape = (
@@ -33,6 +34,7 @@ export type Shape = (
   | Arrow
   | Arc
   | ArcTo
+  | Pie
   | CubicBezier
   | Text
 ) 

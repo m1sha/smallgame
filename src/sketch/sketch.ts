@@ -5,13 +5,14 @@ import { PolyRect, Rect, type TRect } from '../rect'
 import { Point, type TPoint } from '../point'
 import { type Shape, type Rectangle } from '../shapes'
 import { Boundedrect } from '../shapes/boundedrect'
-import { type TSegment } from '../segment'
+import { Segment, type TSegment } from '../segment'
 import { type CoordinateSystem } from '../coords'
 import { type TArrowDrawOptions, ArrowDrawOptions, RectDrawOptions, type TRectDrawOptions } from './options'
 import { drawerMap } from './drawers'
 import { TTextStyle } from '../styles/text-style'
 import { Text } from '../text'
 import { Shapes } from './shapes'
+import { Pivote } from '../pivote'
 
 export class Sketch extends Drawable {
   private _shapes: Shape[] = []
@@ -126,7 +127,12 @@ export class Sketch extends Drawable {
     return this
   }
 
-  line (style: ShapeStyle | TShapeStyle | string, p0: Point | TPoint, p1: Point | TPoint): Sketch  {
+  line (style: ShapeStyle | TShapeStyle | string, segment: Segment): Sketch
+  line (style: ShapeStyle | TShapeStyle | string, p0: Point | TPoint, p1: Point | TPoint): Sketch
+  line (...args: Array<any>): Sketch  {
+    const style = args[0]
+    const p0 = args.length === 3 ? args[1]: args[1].start
+    const p1 = args.length === 3 ? args[2]: args[1].end
     const shape: Shape = {  type: 'line', p0, p1, style: this.initStyle(style) }
     this._shapes.push(shape)
     return this
@@ -204,13 +210,13 @@ export class Sketch extends Drawable {
     return this
   }
 
-  text (style: TTextStyle, text: string, pos: TPoint) {
+  text (style: TTextStyle, text: string, pos: TPoint, options?: { pivote?: Pivote}) {
      const shape: Shape = { 
       type: 'text', 
       style: style,
       text,
       pos,
-      target: ''
+      target: options ? options.pivote ?? 'top-left' : 'top-left'
     }
     this._shapes.push(shape)
     return this
@@ -244,6 +250,21 @@ export class Sketch extends Drawable {
     return this
   }
 
+  pie (style: ShapeStyle | TShapeStyle | string, center: TPoint, radius: number, startAngle: number = 0, endAngle: number = 2*Math.PI, counterclockwise: boolean = false) {
+     const shape: Shape = {
+      type: 'pie',
+      style: this.initStyle(style),
+      x: center.x,
+      y: center.y,
+      radius: radius,
+      startAngle,
+      endAngle,
+      counterclockwise
+    }
+    this._shapes.push(shape)
+    return this
+  }
+
   draw (suface: Surface): void {
     const shift = new Point(this.x, this.y)
     const scale = new Point(this.sx, this.sy)
@@ -254,6 +275,7 @@ export class Sketch extends Drawable {
       if (shape.type === 'text') {
         const text = new Text(shape.text, shape.style)
         text.pos = shape.pos
+        text.pivote = shape.target as any
         text.draw(suface)
       }
       

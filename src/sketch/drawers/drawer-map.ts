@@ -17,6 +17,7 @@ import { drawPixel } from "./draw-pixel"
 import { drawCubicbezier } from "./draw-cubic-bezier"
 import { drawArc } from "./draw-arc"
 import { drawArcTo } from "./draw-arc-to"
+import { drawPie } from "./draw-pie"
 
 const drawerMap: Map<Shape['type'], (shape: any, suface: Surface, shift: TPoint, scale: TPoint) => void> = new Map()
 
@@ -36,5 +37,6 @@ drawerMap.set('pixel', drawPixel)
 drawerMap.set('cubicbezier', drawCubicbezier)
 drawerMap.set('arc', drawArc)
 drawerMap.set('arc-to', drawArcTo)
+drawerMap.set('pie', drawPie)
 
 export { drawerMap }
