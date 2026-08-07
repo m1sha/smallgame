@@ -1,6 +1,8 @@
 import { GMath } from "../gmath"
 import { fromString } from "./imports/from-string"
 
+export interface IColorDiff { r: number, g: number, b: number, a: number }
+
 export class Color {
   #rgba: Float32Array
   
@@ -111,6 +113,10 @@ export class Color {
     return this.#rgba[2] * 255
   }
 
+  luminance (dr = 0.2126, dg = 0.7152, db = 0.0722): number {
+    return this.r * dr + this.g * dg + this.b * db
+  }
+
   toArray (format: 'rgb' | 'rgba' = 'rgb'): [number, number, number] | [number, number, number, number] {
     if (format == 'rgba') return [this.#rgba[0], this.#rgba[1], this.#rgba[2], this.#rgba[3]]
     return [this.#rgba[0], this.#rgba[1], this.#rgba[2]]
@@ -123,6 +129,18 @@ export class Color {
       : `#${conv(this.#rgba[0])}${conv(this.#rgba[1])}${conv(this.#rgba[2])}${conv(this.#rgba[3])}`
   }
 
+  dup () {
+    return new Color(this.r, this.g, this.b, this.#rgba[3])
+  }
+
+  diff (color: Color): IColorDiff {
+    return { r: this.r - color.r, g: this.g - color.g, b: this.b - color.b, a: this.#rgba[3] }
+  }
+
+  gray () {
+    const val = 0.299 * this.r + 0.587 * this.g + 0.114 * this.b
+    return new Color(val, val, val, 1.0)
+  }
 
   private trunc (value: number) {
     if (value < 0.0) return 0.0
