@@ -1,5 +1,51 @@
+import { Color } from "../color"
+
 export type RGBA = [number, number, number, number]
 type ColorChannel = 'r' | 'g' | 'b' | 'a'
+
+export class Pixel {
+  #color: Color
+
+  constructor (readonly x: number, readonly y: number, private pixels: Pixels) {
+    const index = this.getIndex(x, y)
+    const r = pixels.imageData.data[index] / 255
+    const g = pixels.imageData.data[index + 1] / 255
+    const b = pixels.imageData.data[index + 2] / 255
+    const a = pixels.imageData.data[index + 3] / 255
+    this.#color = new Color(r, g, b, a)  
+  }
+
+  get color () {
+    return this.#color
+  }
+
+  set color (color: Color) {
+    this.#color = color
+    const index = this.getIndex(this.x, this.y)
+    this.pixels.imageData.data[index] = this.color.ri
+    this.pixels.imageData.data[index + 1] = this.color.gi
+    this.pixels.imageData.data[index + 2] = this.color.bi
+    this.pixels.imageData.data[index + 3] = 255
+  }
+
+  get rgba () {
+    return this.pixels.int32(this.x, this.y)
+  }
+
+  
+  inRadius (pixel: Pixel, radius: number) {
+    return (
+      Math.abs(this.color.r - pixel.color.r) <= radius && 
+      Math.abs(this.color.g - pixel.color.g) <= radius && 
+      Math.abs(this.color.b - pixel.color.b) <= radius 
+    )
+  }
+
+  private getIndex (x: number, y: number) {
+    return this.pixels.imageData.width * y * 4 + x * 4
+  }
+  
+}
 
 export class Pixels {
   imageData: ImageData
@@ -8,22 +54,8 @@ export class Pixels {
     this.imageData = imageData
   }
 
-  getPixel (x: number, y: number): RGBA {
-    const index = this.getIndex(x, y)
-    return [
-      this.imageData.data[index],
-      this.imageData.data[index + 1],
-      this.imageData.data[index + 2],
-      this.imageData.data[index + 3]
-    ]
-  }
-
-  setPixel (x: number, y: number, color: RGBA) {
-    const index = this.getIndex(x, y)
-    this.imageData.data[index] = color[0]
-    this.imageData.data[index + 1] = color[1]
-    this.imageData.data[index + 2] = color[2]
-    this.imageData.data[index + 3] = color[3]
+  getPixel (x: number, y: number): Pixel {
+    return new Pixel(x, y, this)
   }
 
   getValue (x: number, y: number, _: ColorChannel): number {
@@ -47,6 +79,20 @@ export class Pixels {
 
   get height () {
     return this.imageData.height
+  }
+
+  forEach (callback: (pixel: Pixel) => void) {
+    for (let i = 0; i < this.height; i++)
+      for (let j = 0; j < this.width; j++)
+        callback(new Pixel(j, i, this))
+  }
+
+  map<T> (callback: (pixel: Pixel) => T): T[] {
+    const result = []
+    for (let i = 0; i < this.height; i++)
+      for (let j = 0; j < this.width; j++)
+        result.push(callback(new Pixel(j, i, this)))
+    return result
   }
 
   private getIndex (x: number, y: number) {
