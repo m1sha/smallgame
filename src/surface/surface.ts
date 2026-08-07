@@ -313,7 +313,12 @@ export class Surface extends SurfaceBase {
     return PixelMask.fromImageData(this, imageDate)
   }
 
+  /**@deprecated Use dup() instead */
   clone (): Surface {
+    return this.dup()
+  }
+
+  dup (): Surface {
     const surface = new Surface(this.width, this.height)
     const canvas = this.cloneCanvas()
     surface.canvas = canvas
