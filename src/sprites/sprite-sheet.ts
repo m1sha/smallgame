@@ -15,7 +15,7 @@ export class SpriteSheet {
   constructor (
     public readonly surface: SurfaceBase, 
     size: TSize, 
-    public readonly rate: number, 
+    public rate: number, 
     padding?: TPoint,
     private scheme: TSpriteSheetBatchScheme = {}
     ) {
