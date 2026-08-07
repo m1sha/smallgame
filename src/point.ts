@@ -1,4 +1,4 @@
-import { TSize } from "./size"
+import { TSize, isTSize } from "./size"
 import { rad } from "./utils"
 
 export type TPoint = { x: number, y: number }
@@ -365,6 +365,21 @@ export class Point {
    */
   cross (p: TPoint) {
    return this.x * p.y - this.y * p.x
+  }
+
+  mod (p: TPoint | TSize | number) {
+    if (isTSize(p)) {
+      return new Point(this.x % p.width, this.y % p.height)
+    }
+    if (isTPoint(p)) {
+      return new Point(this.x % p.x, this.y % p.y)
+    }
+    
+    return new Point(this.x % p, this.y % p)
+  }
+
+  isZero (): boolean {
+    return this.x === 0 && this.y === 0
   }
 
   /**

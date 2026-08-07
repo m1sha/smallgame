@@ -2,6 +2,9 @@ import { Point, TPoint } from "./point"
 
 export type TSize = { width: number, height: number }
 export function setSize (width: number, height: number): TSize { return { width, height }}
+export function isTSize (obj: any): obj is TSize {
+  return obj && typeof obj.width == 'number' && typeof obj.height == 'number'
+}
 
 /**
  * Represents a size with width and height dimensions.
@@ -332,6 +335,14 @@ export class Size implements TSize {
 
   toPoint (): Point {
     return new Point(this.width, this.height)
+  }
+
+  int () {
+    return new Size(0 | this.width, 0 | this.height)
+  }
+
+  dup (): Size {
+    return new Size(this.width, this.height)
   }
 
   static get zero () { return new Size(0, 0) }
