@@ -13,6 +13,7 @@ export class Screen {
 
   constructor(viewportType: ViewportType, width: number, height: number, options?: SurfaceCreateOptions) { 
     this.surface = new Surface(width, height, options)
+    ;(this.surface.origin as any).tabIndex = 0
     
     this.viewport = viewportType === 'css' 
       ? new CssViewport(this.originCanvas) 

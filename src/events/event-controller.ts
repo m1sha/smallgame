@@ -62,10 +62,6 @@ export class EventController {
 
   private activateListeners (htmlContainter: HTMLElement) { 
     this.listeners.forEach(listener => {
-      if (['keydown', 'keyup'].includes(listener.name)) {
-        document.addEventListener(listener.name, listener.callback)
-        return
-      }
       htmlContainter.addEventListener(listener.name, listener.callback)
     })
   }
